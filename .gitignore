@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+node_modules/
+data/
+.DS_Store
+CLAUDE.md
+AGENTS.md
+SPEC.md
+.claude/
+.mcp.json
