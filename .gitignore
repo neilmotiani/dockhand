@@ -9,3 +9,20 @@ AGENTS.md
 SPEC.md
 .claude/
 .mcp.json
+
+# Python
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# Next.js
+web/.next/
+web/out/
+
+# Local media captured from Ring / own footage
+media/
