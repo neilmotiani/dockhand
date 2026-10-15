@@ -109,3 +109,34 @@ def test_committed_fixtures_are_redacted():
         assert fx["request"]["headers"].get("authorization") == "<REDACTED>"
         body = fx["request"]["body"] or ""
         assert "ice-pwd:<REDACTED>" in body or "ice-pwd" not in body
+
+
+def test_offline_fixture_parses_as_offline():
+    devices = summarize_devices(load("devices_list_offline")["response"]["body"])
+    assert devices[0]["online"] is False
+
+
+class _FakeFrame:
+    width, height = 4, 4
+
+    def to_image(self):
+        from PIL import Image
+
+        return Image.new("RGB", (4, 4))
+
+
+class _FakeTrack:
+    async def recv(self):
+        return _FakeFrame()
+
+
+async def test_collect_frames_reports_partial_progress_on_timeout(tmp_path):
+    import asyncio
+
+    saved: list[Path] = []
+    with pytest.raises(TimeoutError):
+        await asyncio.wait_for(
+            ring_spike.collect_frames(_FakeTrack(), 100, tmp_path, 0.05, saved), timeout=0.3
+        )
+    assert 1 <= len(saved) < 100
+    assert all(p.exists() for p in saved)

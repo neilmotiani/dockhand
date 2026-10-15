@@ -7,11 +7,12 @@ Steps:
    apply the SDP answer and decode frames from the video track.
 4. Save --frames frames (default 10) to data/spike/, then DELETE the session.
 
-Every raw request/response is written to tests/fixtures/ring/ with the access token, ICE
-passwords and DTLS fingerprints redacted. The token itself is never printed.
+With --record, every raw request/response is written to tests/fixtures/ring/ with the access
+token, ICE passwords, DTLS fingerprints and client IPs redacted. The token itself is never printed.
 
 Usage:
-    uv run python -m scripts.ring_spike [--device NAME_OR_ID] [--frames 10]
+    uv run python -m scripts.ring_spike [--device NAME_OR_ID] [--frames 10] [--out DIR]
+        [--interval 0.5] [--timeout 25] [--record]
 """
 
 import argparse
@@ -144,10 +145,14 @@ def session_url(location: str | None, base_url: str) -> str:
     return urljoin(base_url + "/", location)
 
 
-async def collect_frames(track, n: int, out_dir: Path) -> list[Path]:
-    """Decode frames from the track and save one every FRAME_INTERVAL_S until n are saved."""
+async def collect_frames(
+    track, n: int, out_dir: Path, interval_s: float, saved: list[Path]
+) -> list[Path]:
+    """Decode frames from the track and save one every interval_s until n are saved.
+
+    Appends to the caller's `saved` list so a timeout still reports what reached disk.
+    """
     await asyncio.to_thread(out_dir.mkdir, parents=True, exist_ok=True)
-    saved: list[Path] = []
     last = 0.0
     while len(saved) < n:
         try:
@@ -155,7 +160,7 @@ async def collect_frames(track, n: int, out_dir: Path) -> list[Path]:
         except MediaStreamError:
             break
         now = time.monotonic()
-        if saved and now - last < FRAME_INTERVAL_S:
+        if saved and now - last < interval_s:
             continue
         last = now
         path = out_dir / f"frame_{len(saved):02d}.jpg"
@@ -165,20 +170,32 @@ async def collect_frames(track, n: int, out_dir: Path) -> list[Path]:
     return saved
 
 
-async def run(device_query: str, n_frames: int) -> int:
+async def run(
+    device_query: str,
+    n_frames: int,
+    out_dir: Path = SPIKE_DIR,
+    interval_s: float = FRAME_INTERVAL_S,
+    timeout_s: float = CAPTURE_TIMEOUT_S,
+    record_fixtures: bool = False,
+) -> int:
     settings = get_settings()
     if settings.ring_access_token is None:
         print("RING_ACCESS_TOKEN is not set", file=sys.stderr)
         return 2
     token = settings.ring_access_token.get_secret_value()
     secrets = [token]
+
+    def save(name: str, response: httpx.Response) -> None:
+        if record_fixtures:
+            record(name, response, secrets)
+
     base = settings.ring_api_base_url.rstrip("/")
     auth = {"Authorization": f"Bearer {token}"}
 
     async with httpx.AsyncClient(base_url=base, headers=auth, timeout=20.0) as http:
         t0 = time.perf_counter()
         r = await http.get("/v1/devices", params={"include": "status,capabilities"})
-        record("devices_list", r, secrets)
+        save("devices_list", r)
         print(f"GET /v1/devices -> {r.status_code} ({(time.perf_counter() - t0) * 1000:.0f} ms)")
         if r.status_code != 200:
             print(r.text, file=sys.stderr)
@@ -188,6 +205,14 @@ async def run(device_query: str, n_frames: int) -> int:
             print(f"  {d['name']!r:32} online={d['online']} codecs={d['codecs']} id={d['id']}")
         device = pick_device(devices, device_query)
         print(f"Using {device['name']!r}")
+        # An offline Playground device still gets 201 from WHEP and a connected peer, but no RTP
+        # ever arrives (see FRICTION_LOG.md), so fail here instead of waiting out the timeout.
+        if device["online"] is False:
+            print(
+                "Device is offline; Ring will not send video. Check the Playground.",
+                file=sys.stderr,
+            )
+            return 1
 
         pc = RTCPeerConnection(RTCConfiguration(iceServers=[RTCIceServer(urls=STUN)]))
         track_ready: asyncio.Future = asyncio.get_running_loop().create_future()
@@ -218,7 +243,7 @@ async def run(device_query: str, n_frames: int) -> int:
                 content=pc.localDescription.sdp,
                 headers={"Content-Type": "application/sdp"},
             )
-            record("whep_create", r, secrets)
+            save("whep_create", r)
             ms = (time.perf_counter() - t0) * 1000
             print(f"POST whep/sessions -> {r.status_code} ({ms:.0f} ms)")
             if r.status_code != 201:
@@ -229,8 +254,8 @@ async def run(device_query: str, n_frames: int) -> int:
 
             t0 = time.perf_counter()
             track = await asyncio.wait_for(track_ready, timeout=10)
-            saved = await asyncio.wait_for(
-                collect_frames(track, n_frames, SPIKE_DIR), timeout=CAPTURE_TIMEOUT_S
+            await asyncio.wait_for(
+                collect_frames(track, n_frames, out_dir, interval_s, saved), timeout=timeout_s
             )
             print(f"Captured {len(saved)} frames in {time.perf_counter() - t0:.1f} s")
         except TimeoutError:
@@ -239,7 +264,7 @@ async def run(device_query: str, n_frames: int) -> int:
             await pc.close()
             if sess_url:
                 r = await http.delete(sess_url)
-                record("whep_delete", r, secrets)
+                save("whep_delete", r)
                 print(f"DELETE session -> {r.status_code}")
     return 0 if len(saved) >= n_frames else 1
 
@@ -248,8 +273,20 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--device", default="package", help="device name substring or exact ID")
     p.add_argument("--frames", type=int, default=10)
+    p.add_argument("--out", type=Path, default=SPIKE_DIR, help="directory for saved frames")
+    p.add_argument(
+        "--interval", type=float, default=FRAME_INTERVAL_S, help="seconds between frames"
+    )
+    p.add_argument("--timeout", type=float, default=CAPTURE_TIMEOUT_S, help="capture timeout (s)")
+    p.add_argument(
+        "--record", action="store_true", help=f"write redacted fixtures to {FIXTURE_DIR}"
+    )
     args = p.parse_args()
-    sys.exit(asyncio.run(run(args.device, args.frames)))
+    sys.exit(
+        asyncio.run(
+            run(args.device, args.frames, args.out, args.interval, args.timeout, args.record)
+        )
+    )
 
 
 if __name__ == "__main__":

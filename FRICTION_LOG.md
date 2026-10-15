@@ -51,3 +51,13 @@ Format per entry: task, steps, expected vs. actual, severity, workaround, sugges
 - **Severity:** Low.
 - **Workaround:** Store the `Location` header verbatim and DELETE that exact URL (`session_url()` in `scripts/ring_spike.py`; covered by a test against the recorded fixture).
 - **Suggestion:** Show the query parameter in the docs, tell clients to treat the Location URL as opaque, and document the DELETE response.
+
+## 2026-10-15 · WHEP returns 201 and connects for an offline device, then sends no media
+
+- **Task:** Re-run the WHEP spike after selecting the Package event in the Playground (step 3).
+- **Steps:** `GET /v1/devices?include=status` → `Playground Device` with `online: false`. Then `POST .../whep/sessions` → 201 with a valid SDP answer. aiortc reached `connected` (ICE + DTLS).
+- **Expected (per the WHEP docs):** `503 Device Unavailable` / "Device is currently offline".
+- **Actual:** 201 Created and a connected peer, but `getStats()` showed zero inbound RTP packets over 20 s, so no frames. The device was online and streaming (bird-feeder scene) about 20 minutes earlier, before the Package event was selected. DELETE still returned 200. Recorded as `tests/fixtures/ring/devices_list_offline.json`.
+- **Severity:** Medium (a client waits out its whole timeout instead of failing fast, and "connected" looks healthy).
+- **Workaround:** `scripts/ring_spike.py` checks `online` from device discovery and exits before opening a session.
+- **Suggestion:** Return the documented 503 for offline devices, and document how the Playground device's online state relates to the selected live-view event.
