@@ -1,0 +1,1355 @@
+{
+  "script": "eval/reconciliation.py",
+  "generated_at": "2026-10-15T23:07:55+00:00",
+  "git_commit": "bc62b15535f0968d3cd2e814326d13e4231e79c9",
+  "data": "synthetic (eval/simulate.py); not Ring footage",
+  "seeds": [
+    101,
+    102,
+    103,
+    104,
+    105
+  ],
+  "dev_seed_excluded": 7,
+  "weeks_per_seed": 20,
+  "injection_rates": {
+    "missing": 0.06,
+    "short": 0.08,
+    "over": 0.04,
+    "late": 0.1,
+    "early": 0.03,
+    "mislabel": 0.06,
+    "extra_per_day": 0.3
+  },
+  "config": {
+    "max_cost": 1.0,
+    "carrier_mismatch_cost": 0.5,
+    "carrier_unknown_cost": 0.2,
+    "time_cost_per_hour": 0.15,
+    "max_offset_hours": 8.0,
+    "count_cost_weight": 0.5,
+    "grace_minutes": 60.0
+  },
+  "pooled": {
+    "n_days": 700,
+    "n_expected": 1408,
+    "n_deliveries": 1544,
+    "discrepancy_micro": {
+      "precision": {
+        "value": 0.9593,
+        "k": 424,
+        "n": 442,
+        "ci95": [
+          0.9365,
+          0.9741
+        ]
+      },
+      "recall": {
+        "value": 0.9443,
+        "k": 424,
+        "n": 449,
+        "ci95": [
+          0.9191,
+          0.962
+        ]
+      }
+    },
+    "per_status": {
+      "matched": {
+        "precision": {
+          "value": 0.9898,
+          "k": 1169,
+          "n": 1181,
+          "ci95": [
+            0.9823,
+            0.9942
+          ]
+        },
+        "recall": {
+          "value": 0.9915,
+          "k": 1169,
+          "n": 1179,
+          "ci95": [
+            0.9845,
+            0.9954
+          ]
+        }
+      },
+      "short": {
+        "precision": {
+          "value": 0.9574,
+          "k": 90,
+          "n": 94,
+          "ci95": [
+            0.8956,
+            0.9833
+          ]
+        },
+        "recall": {
+          "value": 0.9783,
+          "k": 90,
+          "n": 92,
+          "ci95": [
+            0.9242,
+            0.994
+          ]
+        }
+      },
+      "over": {
+        "precision": {
+          "value": 0.8704,
+          "k": 47,
+          "n": 54,
+          "ci95": [
+            0.7558,
+            0.9358
+          ]
+        },
+        "recall": {
+          "value": 0.8868,
+          "k": 47,
+          "n": 53,
+          "ci95": [
+            0.7742,
+            0.9471
+          ]
+        }
+      },
+      "missing": {
+        "precision": {
+          "value": 0.9747,
+          "k": 77,
+          "n": 79,
+          "ci95": [
+            0.9123,
+            0.993
+          ]
+        },
+        "recall": {
+          "value": 0.9167,
+          "k": 77,
+          "n": 84,
+          "ci95": [
+            0.8378,
+            0.959
+          ]
+        }
+      },
+      "unexpected": {
+        "precision": {
+          "value": 0.9767,
+          "k": 210,
+          "n": 215,
+          "ci95": [
+            0.9467,
+            0.99
+          ]
+        },
+        "recall": {
+          "value": 0.9545,
+          "k": 210,
+          "n": 220,
+          "ci95": [
+            0.9184,
+            0.9751
+          ]
+        }
+      }
+    },
+    "pair_accuracy": {
+      "value": 0.9864,
+      "k": 1306,
+      "n": 1324,
+      "ci95": [
+        0.9786,
+        0.9914
+      ]
+    },
+    "recall_by_injected_problem": {
+      "early": {
+        "value": 1.0,
+        "k": 41,
+        "n": 41,
+        "ci95": [
+          0.9143,
+          1.0
+        ]
+      },
+      "extra": {
+        "value": 0.9545,
+        "k": 210,
+        "n": 220,
+        "ci95": [
+          0.9184,
+          0.9751
+        ]
+      },
+      "late": {
+        "value": 0.9655,
+        "k": 140,
+        "n": 145,
+        "ci95": [
+          0.9218,
+          0.9852
+        ]
+      },
+      "mislabel": {
+        "value": 0.9315,
+        "k": 68,
+        "n": 73,
+        "ci95": [
+          0.8495,
+          0.9704
+        ]
+      },
+      "missing": {
+        "value": 0.9167,
+        "k": 77,
+        "n": 84,
+        "ci95": [
+          0.8378,
+          0.959
+        ]
+      },
+      "over": {
+        "value": 0.8868,
+        "k": 47,
+        "n": 53,
+        "ci95": [
+          0.7742,
+          0.9471
+        ]
+      },
+      "short": {
+        "value": 0.9783,
+        "k": 90,
+        "n": 92,
+        "ci95": [
+          0.9242,
+          0.994
+        ]
+      }
+    },
+    "confusion_expected_truth_vs_pred": {
+      "matched": {
+        "matched": 1174,
+        "missing": 2,
+        "short": 1,
+        "over": 2
+      },
+      "over": {
+        "over": 50,
+        "matched": 2,
+        "short": 1
+      },
+      "missing": {
+        "missing": 77,
+        "short": 1,
+        "matched": 4,
+        "over": 2
+      },
+      "short": {
+        "short": 91,
+        "matched": 1
+      }
+    }
+  },
+  "per_seed": {
+    "101": {
+      "n_days": 140,
+      "n_expected": 282,
+      "n_deliveries": 312,
+      "discrepancy_micro": {
+        "precision": {
+          "value": 0.9792,
+          "k": 94,
+          "n": 96,
+          "ci95": [
+            0.9272,
+            0.9943
+          ]
+        },
+        "recall": {
+          "value": 0.9691,
+          "k": 94,
+          "n": 97,
+          "ci95": [
+            0.913,
+            0.9894
+          ]
+        }
+      },
+      "per_status": {
+        "matched": {
+          "precision": {
+            "value": 0.9872,
+            "k": 232,
+            "n": 235,
+            "ci95": [
+              0.9631,
+              0.9956
+            ]
+          },
+          "recall": {
+            "value": 0.9872,
+            "k": 232,
+            "n": 235,
+            "ci95": [
+              0.9631,
+              0.9956
+            ]
+          }
+        },
+        "short": {
+          "precision": {
+            "value": 0.9375,
+            "k": 15,
+            "n": 16,
+            "ci95": [
+              0.7167,
+              0.9889
+            ]
+          },
+          "recall": {
+            "value": 1.0,
+            "k": 15,
+            "n": 15,
+            "ci95": [
+              0.7961,
+              1.0
+            ]
+          }
+        },
+        "over": {
+          "precision": {
+            "value": 0.9167,
+            "k": 11,
+            "n": 12,
+            "ci95": [
+              0.6461,
+              0.9851
+            ]
+          },
+          "recall": {
+            "value": 0.9167,
+            "k": 11,
+            "n": 12,
+            "ci95": [
+              0.6461,
+              0.9851
+            ]
+          }
+        },
+        "missing": {
+          "precision": {
+            "value": 1.0,
+            "k": 19,
+            "n": 19,
+            "ci95": [
+              0.8318,
+              1.0
+            ]
+          },
+          "recall": {
+            "value": 0.95,
+            "k": 19,
+            "n": 20,
+            "ci95": [
+              0.7639,
+              0.9911
+            ]
+          }
+        },
+        "unexpected": {
+          "precision": {
+            "value": 1.0,
+            "k": 49,
+            "n": 49,
+            "ci95": [
+              0.9273,
+              1.0
+            ]
+          },
+          "recall": {
+            "value": 0.98,
+            "k": 49,
+            "n": 50,
+            "ci95": [
+              0.895,
+              0.9965
+            ]
+          }
+        }
+      },
+      "pair_accuracy": {
+        "value": 0.9847,
+        "k": 258,
+        "n": 262,
+        "ci95": [
+          0.9614,
+          0.994
+        ]
+      },
+      "recall_by_injected_problem": {
+        "early": {
+          "value": 1.0,
+          "k": 8,
+          "n": 8,
+          "ci95": [
+            0.6756,
+            1.0
+          ]
+        },
+        "extra": {
+          "value": 0.98,
+          "k": 49,
+          "n": 50,
+          "ci95": [
+            0.895,
+            0.9965
+          ]
+        },
+        "late": {
+          "value": 0.9667,
+          "k": 29,
+          "n": 30,
+          "ci95": [
+            0.8333,
+            0.9941
+          ]
+        },
+        "mislabel": {
+          "value": 1.0,
+          "k": 8,
+          "n": 8,
+          "ci95": [
+            0.6756,
+            1.0
+          ]
+        },
+        "missing": {
+          "value": 0.95,
+          "k": 19,
+          "n": 20,
+          "ci95": [
+            0.7639,
+            0.9911
+          ]
+        },
+        "over": {
+          "value": 0.9167,
+          "k": 11,
+          "n": 12,
+          "ci95": [
+            0.6461,
+            0.9851
+          ]
+        },
+        "short": {
+          "value": 1.0,
+          "k": 15,
+          "n": 15,
+          "ci95": [
+            0.7961,
+            1.0
+          ]
+        }
+      },
+      "confusion_expected_truth_vs_pred": {
+        "matched": {
+          "matched": 235
+        },
+        "over": {
+          "over": 12
+        },
+        "missing": {
+          "missing": 19,
+          "short": 1
+        },
+        "short": {
+          "short": 15
+        }
+      }
+    },
+    "102": {
+      "n_days": 140,
+      "n_expected": 285,
+      "n_deliveries": 313,
+      "discrepancy_micro": {
+        "precision": {
+          "value": 0.9565,
+          "k": 88,
+          "n": 92,
+          "ci95": [
+            0.8935,
+            0.983
+          ]
+        },
+        "recall": {
+          "value": 0.9462,
+          "k": 88,
+          "n": 93,
+          "ci95": [
+            0.8803,
+            0.9768
+          ]
+        }
+      },
+      "per_status": {
+        "matched": {
+          "precision": {
+            "value": 0.9916,
+            "k": 236,
+            "n": 238,
+            "ci95": [
+              0.9699,
+              0.9977
+            ]
+          },
+          "recall": {
+            "value": 0.9958,
+            "k": 236,
+            "n": 237,
+            "ci95": [
+              0.9765,
+              0.9993
+            ]
+          }
+        },
+        "short": {
+          "precision": {
+            "value": 0.95,
+            "k": 19,
+            "n": 20,
+            "ci95": [
+              0.7639,
+              0.9911
+            ]
+          },
+          "recall": {
+            "value": 0.9048,
+            "k": 19,
+            "n": 21,
+            "ci95": [
+              0.7109,
+              0.9735
+            ]
+          }
+        },
+        "over": {
+          "precision": {
+            "value": 1.0,
+            "k": 10,
+            "n": 10,
+            "ci95": [
+              0.7225,
+              1.0
+            ]
+          },
+          "recall": {
+            "value": 1.0,
+            "k": 10,
+            "n": 10,
+            "ci95": [
+              0.7225,
+              1.0
+            ]
+          }
+        },
+        "missing": {
+          "precision": {
+            "value": 0.9412,
+            "k": 16,
+            "n": 17,
+            "ci95": [
+              0.7302,
+              0.9895
+            ]
+          },
+          "recall": {
+            "value": 0.9412,
+            "k": 16,
+            "n": 17,
+            "ci95": [
+              0.7302,
+              0.9895
+            ]
+          }
+        },
+        "unexpected": {
+          "precision": {
+            "value": 0.9556,
+            "k": 43,
+            "n": 45,
+            "ci95": [
+              0.8517,
+              0.9877
+            ]
+          },
+          "recall": {
+            "value": 0.9556,
+            "k": 43,
+            "n": 45,
+            "ci95": [
+              0.8517,
+              0.9877
+            ]
+          }
+        }
+      },
+      "pair_accuracy": {
+        "value": 0.9888,
+        "k": 265,
+        "n": 268,
+        "ci95": [
+          0.9676,
+          0.9962
+        ]
+      },
+      "recall_by_injected_problem": {
+        "early": {
+          "value": 1.0,
+          "k": 5,
+          "n": 5,
+          "ci95": [
+            0.5655,
+            1.0
+          ]
+        },
+        "extra": {
+          "value": 0.9556,
+          "k": 43,
+          "n": 45,
+          "ci95": [
+            0.8517,
+            0.9877
+          ]
+        },
+        "late": {
+          "value": 0.963,
+          "k": 26,
+          "n": 27,
+          "ci95": [
+            0.8172,
+            0.9934
+          ]
+        },
+        "mislabel": {
+          "value": 0.8571,
+          "k": 12,
+          "n": 14,
+          "ci95": [
+            0.6006,
+            0.9599
+          ]
+        },
+        "missing": {
+          "value": 0.9412,
+          "k": 16,
+          "n": 17,
+          "ci95": [
+            0.7302,
+            0.9895
+          ]
+        },
+        "over": {
+          "value": 1.0,
+          "k": 10,
+          "n": 10,
+          "ci95": [
+            0.7225,
+            1.0
+          ]
+        },
+        "short": {
+          "value": 0.9048,
+          "k": 19,
+          "n": 21,
+          "ci95": [
+            0.7109,
+            0.9735
+          ]
+        }
+      },
+      "confusion_expected_truth_vs_pred": {
+        "matched": {
+          "matched": 236,
+          "missing": 1
+        },
+        "over": {
+          "over": 10
+        },
+        "short": {
+          "short": 20,
+          "matched": 1
+        },
+        "missing": {
+          "missing": 16,
+          "matched": 1
+        }
+      }
+    },
+    "103": {
+      "n_days": 140,
+      "n_expected": 276,
+      "n_deliveries": 292,
+      "discrepancy_micro": {
+        "precision": {
+          "value": 0.9722,
+          "k": 70,
+          "n": 72,
+          "ci95": [
+            0.9043,
+            0.9923
+          ]
+        },
+        "recall": {
+          "value": 0.9333,
+          "k": 70,
+          "n": 75,
+          "ci95": [
+            0.8532,
+            0.9712
+          ]
+        }
+      },
+      "per_status": {
+        "matched": {
+          "precision": {
+            "value": 0.9914,
+            "k": 231,
+            "n": 233,
+            "ci95": [
+              0.9692,
+              0.9976
+            ]
+          },
+          "recall": {
+            "value": 0.9957,
+            "k": 231,
+            "n": 232,
+            "ci95": [
+              0.976,
+              0.9992
+            ]
+          }
+        },
+        "short": {
+          "precision": {
+            "value": 0.9545,
+            "k": 21,
+            "n": 22,
+            "ci95": [
+              0.782,
+              0.9919
+            ]
+          },
+          "recall": {
+            "value": 1.0,
+            "k": 21,
+            "n": 21,
+            "ci95": [
+              0.8454,
+              1.0
+            ]
+          }
+        },
+        "over": {
+          "precision": {
+            "value": 0.875,
+            "k": 7,
+            "n": 8,
+            "ci95": [
+              0.5291,
+              0.9776
+            ]
+          },
+          "recall": {
+            "value": 0.875,
+            "k": 7,
+            "n": 8,
+            "ci95": [
+              0.5291,
+              0.9776
+            ]
+          }
+        },
+        "missing": {
+          "precision": {
+            "value": 1.0,
+            "k": 13,
+            "n": 13,
+            "ci95": [
+              0.7719,
+              1.0
+            ]
+          },
+          "recall": {
+            "value": 0.8667,
+            "k": 13,
+            "n": 15,
+            "ci95": [
+              0.6212,
+              0.9626
+            ]
+          }
+        },
+        "unexpected": {
+          "precision": {
+            "value": 1.0,
+            "k": 29,
+            "n": 29,
+            "ci95": [
+              0.883,
+              1.0
+            ]
+          },
+          "recall": {
+            "value": 0.9355,
+            "k": 29,
+            "n": 31,
+            "ci95": [
+              0.7928,
+              0.9821
+            ]
+          }
+        }
+      },
+      "pair_accuracy": {
+        "value": 0.9923,
+        "k": 259,
+        "n": 261,
+        "ci95": [
+          0.9725,
+          0.9979
+        ]
+      },
+      "recall_by_injected_problem": {
+        "early": {
+          "value": 1.0,
+          "k": 10,
+          "n": 10,
+          "ci95": [
+            0.7225,
+            1.0
+          ]
+        },
+        "extra": {
+          "value": 0.9355,
+          "k": 29,
+          "n": 31,
+          "ci95": [
+            0.7928,
+            0.9821
+          ]
+        },
+        "late": {
+          "value": 1.0,
+          "k": 27,
+          "n": 27,
+          "ci95": [
+            0.8754,
+            1.0
+          ]
+        },
+        "mislabel": {
+          "value": 0.9375,
+          "k": 15,
+          "n": 16,
+          "ci95": [
+            0.7167,
+            0.9889
+          ]
+        },
+        "missing": {
+          "value": 0.8667,
+          "k": 13,
+          "n": 15,
+          "ci95": [
+            0.6212,
+            0.9626
+          ]
+        },
+        "over": {
+          "value": 0.875,
+          "k": 7,
+          "n": 8,
+          "ci95": [
+            0.5291,
+            0.9776
+          ]
+        },
+        "short": {
+          "value": 1.0,
+          "k": 21,
+          "n": 21,
+          "ci95": [
+            0.8454,
+            1.0
+          ]
+        }
+      },
+      "confusion_expected_truth_vs_pred": {
+        "matched": {
+          "matched": 231,
+          "short": 1
+        },
+        "missing": {
+          "missing": 13,
+          "matched": 1,
+          "over": 1
+        },
+        "short": {
+          "short": 21
+        },
+        "over": {
+          "over": 7,
+          "matched": 1
+        }
+      }
+    },
+    "104": {
+      "n_days": 140,
+      "n_expected": 284,
+      "n_deliveries": 319,
+      "discrepancy_micro": {
+        "precision": {
+          "value": 0.9438,
+          "k": 84,
+          "n": 89,
+          "ci95": [
+            0.8751,
+            0.9758
+          ]
+        },
+        "recall": {
+          "value": 0.9545,
+          "k": 84,
+          "n": 88,
+          "ci95": [
+            0.8889,
+            0.9822
+          ]
+        }
+      },
+      "per_status": {
+        "matched": {
+          "precision": {
+            "value": 0.9917,
+            "k": 238,
+            "n": 240,
+            "ci95": [
+              0.9701,
+              0.9977
+            ]
+          },
+          "recall": {
+            "value": 0.9876,
+            "k": 238,
+            "n": 241,
+            "ci95": [
+              0.964,
+              0.9958
+            ]
+          }
+        },
+        "short": {
+          "precision": {
+            "value": 1.0,
+            "k": 21,
+            "n": 21,
+            "ci95": [
+              0.8454,
+              1.0
+            ]
+          },
+          "recall": {
+            "value": 1.0,
+            "k": 21,
+            "n": 21,
+            "ci95": [
+              0.8454,
+              1.0
+            ]
+          }
+        },
+        "over": {
+          "precision": {
+            "value": 0.7692,
+            "k": 10,
+            "n": 13,
+            "ci95": [
+              0.4974,
+              0.9182
+            ]
+          },
+          "recall": {
+            "value": 0.8333,
+            "k": 10,
+            "n": 12,
+            "ci95": [
+              0.552,
+              0.953
+            ]
+          }
+        },
+        "missing": {
+          "precision": {
+            "value": 0.9,
+            "k": 9,
+            "n": 10,
+            "ci95": [
+              0.5958,
+              0.9821
+            ]
+          },
+          "recall": {
+            "value": 0.9,
+            "k": 9,
+            "n": 10,
+            "ci95": [
+              0.5958,
+              0.9821
+            ]
+          }
+        },
+        "unexpected": {
+          "precision": {
+            "value": 0.9778,
+            "k": 44,
+            "n": 45,
+            "ci95": [
+              0.8843,
+              0.9961
+            ]
+          },
+          "recall": {
+            "value": 0.9778,
+            "k": 44,
+            "n": 45,
+            "ci95": [
+              0.8843,
+              0.9961
+            ]
+          }
+        }
+      },
+      "pair_accuracy": {
+        "value": 0.9818,
+        "k": 269,
+        "n": 274,
+        "ci95": [
+          0.958,
+          0.9922
+        ]
+      },
+      "recall_by_injected_problem": {
+        "early": {
+          "value": 1.0,
+          "k": 9,
+          "n": 9,
+          "ci95": [
+            0.7008,
+            1.0
+          ]
+        },
+        "extra": {
+          "value": 0.9778,
+          "k": 44,
+          "n": 45,
+          "ci95": [
+            0.8843,
+            0.9961
+          ]
+        },
+        "late": {
+          "value": 0.9231,
+          "k": 24,
+          "n": 26,
+          "ci95": [
+            0.7586,
+            0.9786
+          ]
+        },
+        "mislabel": {
+          "value": 0.95,
+          "k": 19,
+          "n": 20,
+          "ci95": [
+            0.7639,
+            0.9911
+          ]
+        },
+        "missing": {
+          "value": 0.9,
+          "k": 9,
+          "n": 10,
+          "ci95": [
+            0.5958,
+            0.9821
+          ]
+        },
+        "over": {
+          "value": 0.8333,
+          "k": 10,
+          "n": 12,
+          "ci95": [
+            0.552,
+            0.953
+          ]
+        },
+        "short": {
+          "value": 1.0,
+          "k": 21,
+          "n": 21,
+          "ci95": [
+            0.8454,
+            1.0
+          ]
+        }
+      },
+      "confusion_expected_truth_vs_pred": {
+        "matched": {
+          "matched": 239,
+          "missing": 1,
+          "over": 1
+        },
+        "short": {
+          "short": 21
+        },
+        "missing": {
+          "missing": 9,
+          "matched": 1
+        },
+        "over": {
+          "over": 12
+        }
+      }
+    },
+    "105": {
+      "n_days": 140,
+      "n_expected": 281,
+      "n_deliveries": 308,
+      "discrepancy_micro": {
+        "precision": {
+          "value": 0.9462,
+          "k": 88,
+          "n": 93,
+          "ci95": [
+            0.8803,
+            0.9768
+          ]
+        },
+        "recall": {
+          "value": 0.9167,
+          "k": 88,
+          "n": 96,
+          "ci95": [
+            0.8441,
+            0.9572
+          ]
+        }
+      },
+      "per_status": {
+        "matched": {
+          "precision": {
+            "value": 0.9872,
+            "k": 232,
+            "n": 235,
+            "ci95": [
+              0.9631,
+              0.9956
+            ]
+          },
+          "recall": {
+            "value": 0.9915,
+            "k": 232,
+            "n": 234,
+            "ci95": [
+              0.9694,
+              0.9977
+            ]
+          }
+        },
+        "short": {
+          "precision": {
+            "value": 0.9333,
+            "k": 14,
+            "n": 15,
+            "ci95": [
+              0.7018,
+              0.9881
+            ]
+          },
+          "recall": {
+            "value": 1.0,
+            "k": 14,
+            "n": 14,
+            "ci95": [
+              0.7847,
+              1.0
+            ]
+          }
+        },
+        "over": {
+          "precision": {
+            "value": 0.8182,
+            "k": 9,
+            "n": 11,
+            "ci95": [
+              0.523,
+              0.9486
+            ]
+          },
+          "recall": {
+            "value": 0.8182,
+            "k": 9,
+            "n": 11,
+            "ci95": [
+              0.523,
+              0.9486
+            ]
+          }
+        },
+        "missing": {
+          "precision": {
+            "value": 1.0,
+            "k": 20,
+            "n": 20,
+            "ci95": [
+              0.8389,
+              1.0
+            ]
+          },
+          "recall": {
+            "value": 0.9091,
+            "k": 20,
+            "n": 22,
+            "ci95": [
+              0.7218,
+              0.9747
+            ]
+          }
+        },
+        "unexpected": {
+          "precision": {
+            "value": 0.9574,
+            "k": 45,
+            "n": 47,
+            "ci95": [
+              0.8575,
+              0.9883
+            ]
+          },
+          "recall": {
+            "value": 0.9184,
+            "k": 45,
+            "n": 49,
+            "ci95": [
+              0.8081,
+              0.9678
+            ]
+          }
+        }
+      },
+      "pair_accuracy": {
+        "value": 0.9846,
+        "k": 255,
+        "n": 259,
+        "ci95": [
+          0.961,
+          0.994
+        ]
+      },
+      "recall_by_injected_problem": {
+        "early": {
+          "value": 1.0,
+          "k": 9,
+          "n": 9,
+          "ci95": [
+            0.7008,
+            1.0
+          ]
+        },
+        "extra": {
+          "value": 0.9184,
+          "k": 45,
+          "n": 49,
+          "ci95": [
+            0.8081,
+            0.9678
+          ]
+        },
+        "late": {
+          "value": 0.9714,
+          "k": 34,
+          "n": 35,
+          "ci95": [
+            0.8547,
+            0.9949
+          ]
+        },
+        "mislabel": {
+          "value": 0.9333,
+          "k": 14,
+          "n": 15,
+          "ci95": [
+            0.7018,
+            0.9881
+          ]
+        },
+        "missing": {
+          "value": 0.9091,
+          "k": 20,
+          "n": 22,
+          "ci95": [
+            0.7218,
+            0.9747
+          ]
+        },
+        "over": {
+          "value": 0.8182,
+          "k": 9,
+          "n": 11,
+          "ci95": [
+            0.523,
+            0.9486
+          ]
+        },
+        "short": {
+          "value": 1.0,
+          "k": 14,
+          "n": 14,
+          "ci95": [
+            0.7847,
+            1.0
+          ]
+        }
+      },
+      "confusion_expected_truth_vs_pred": {
+        "matched": {
+          "matched": 233,
+          "over": 1
+        },
+        "short": {
+          "short": 14
+        },
+        "missing": {
+          "missing": 20,
+          "over": 1,
+          "matched": 1
+        },
+        "over": {
+          "over": 9,
+          "short": 1,
+          "matched": 1
+        }
+      }
+    }
+  },
+  "caveats": [
+    "Simulator and matcher share assumptions (same cost features), so this measures the matcher on the problems we chose to inject, not real-world accuracy.",
+    "Vision package-count misreads are not simulated; carrier misreads are (mislabel).",
+    "Split deliveries and multi-day windows are not simulated."
+  ]
+}
