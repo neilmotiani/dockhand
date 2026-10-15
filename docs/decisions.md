@@ -23,3 +23,26 @@ Revisit if maintenance stalls or Starlette changes its recommendation.
 
 ## Ring device IDs are not configured
 The capture worker discovers devices from `GET /v1/devices` at runtime. Hardcoding an ID would break when switching between Playground devices and a real camera.
+
+## Reconciliation as an assignment problem with "unpaired" slots
+`app/reconcile/matcher.py` pairs detected deliveries (rows) with expected deliveries (columns) using `scipy.optimize.linear_sum_assignment`. A greedy matcher (best pair first) can make an early choice that ruins a later one, for example two UPS orders on the same Wednesday. The assignment solver minimizes total cost over all pairs together.
+
+Plain `linear_sum_assignment` on a rectangular matrix always pairs `min(rows, cols)` items, and thresholding afterwards can then discard pairs the solver was forced into. It can also give up a perfect pair to make room for two mediocre ones that both fail the threshold (`test_solver_does_not_sacrifice_a_good_pair`). So the matrix is padded with one dummy column per delivery and one dummy row per expected delivery, each costing `max_cost / 2`. A real pair beats leaving both items unpaired exactly when its cost is below `max_cost`, and the solver considers that option for every item at once. `test_solver_matches_brute_force` checks it against exhaustive search on random small matrices.
+
+## Cost terms and default weights
+cost = carrier + time + count, in units of the acceptance threshold (`max_cost = 1.0`):
+- **Carrier mismatch 0.5**, unknown 0.2. This is below the threshold on purpose: the vision model can misread a carrier, and a delivery that is on time with the right count should still match. A wrong carrier combined with being late or off on count tips it over.
+- **Time 0.15 per hour outside the window**, infeasible beyond 8 h. A 2 h late truck still matches easily. One 6+ h late with a wrong carrier does not.
+- **Count 0.5 × relative difference**, capped. Relative, so 1 short of 2 costs more than 1 short of 10. Short and over deliveries must still pair (they get the `short`/`over` statuses), so a full-count miss costs at most half the budget.
+
+The defaults were set from these rules of thumb and checked on simulator seed 7. Reported numbers use seeds 101–105, so the weights were never tuned on the evaluation data. All weights are env-configurable (`RECONCILE_*`).
+
+## Idempotent reconciliation = full recompute
+`reconcile()` is a pure function of (deliveries, expected, now, config). It does not update previous decisions incrementally. Inputs are deduped by ID and sorted before the matrix is built, so replays, duplicates and input order cannot change the output. Row IDs are `uuid5(namespace, expected_id|delivery_id)`, so storage can upsert or replace the day's set without creating duplicates. A pair's status can only change when the inputs change, for example when a new order lets an "unexpected" delivery match.
+
+Unpaired expected deliveries before `window_end + grace` are returned as `pending_expected_ids` with no row. `next_missing_deadline()` tells the timer when to run next.
+
+Known limitation: matching is one-to-one, so an order split across two drops shows as `short` plus `unexpected`.
+
+## Reconciliation eval is synthetic
+`eval/simulate.py` generates the café scenario with injected missing/short/over/late/early/carrier-mislabel/extra deliveries. `eval/reconciliation.py` scores a predicted row as correct only if (expected_id, delivery_id, status) all match the truth. The simulator and matcher share assumptions, and package-count misreads are not simulated, so these numbers describe the matcher on the problems we injected. They are not field accuracy. The results file says so.

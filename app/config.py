@@ -31,6 +31,16 @@ class Settings(BaseSettings):
     bedrock_model_id: str = "us.anthropic.claude-sonnet-5-5"
     extraction_prompt_version: str = "v1"
 
+    # Reconciliation. See app/reconcile/cost.py for what each term means and
+    # docs/decisions.md for how the defaults were chosen.
+    reconcile_grace_minutes: float = 60.0
+    reconcile_max_cost: float = 1.0
+    reconcile_carrier_mismatch_cost: float = 0.5
+    reconcile_carrier_unknown_cost: float = 0.2
+    reconcile_time_cost_per_hour: float = 0.15
+    reconcile_max_offset_hours: float = 8.0
+    reconcile_count_cost_weight: float = 0.5
+
 
 @lru_cache
 def get_settings() -> Settings:
