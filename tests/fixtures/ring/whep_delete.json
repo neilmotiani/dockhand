@@ -1,0 +1,28 @@
+{
+  "request": {
+    "method": "DELETE",
+    "url": "https://api.amazonvision.com/v1/devices/ava1.ring.device.4AFLP4V4HMODMDHI5OEKWUKS27CG4MOV5BZFP4WLAH6VXGCEKYZN4EQTLHP5ILURGV3STZPXEKYYXUW7FVNXQN3NXSFKYGPK/media/streaming/whep/sessions/6c3975d3-9878-4ff7-b3b6-d13a9bd58247?location=ava1.ring.whep.location.ST34RBINRGBOQSLMSXRNNAQZLZ7KGV4MJMWAAR4JEQISU63WEWVP4DXJMBUJERJUQXX7DTGTKLBT4J3TDQG7FOD3G4MULLORDCY3JT553I4NJR72LR2SOZHQHIHRXTDICW2USZEDEDQJO5NQNXPNJR6OI3AAFR44IPET3WR7JVDXNXJAT5OWPD5UZV2OESZQKEY7NRTU62OYTGOKCQVFYCAWK254ZUQI56V6QI5S6AW7P45CNHORD6HYOLR63J4XWICULORYTGRUY3GL4PHH3EQZLQMU5GQZAAB2MOCXFPWPQRCP3ZXCULMQICJERIDNKEBPZ3A",
+    "headers": {
+      "host": "api.amazonvision.com",
+      "accept": "*/*",
+      "accept-encoding": "gzip, deflate",
+      "connection": "keep-alive",
+      "user-agent": "python-httpx/0.28.1",
+      "authorization": "<REDACTED>"
+    },
+    "body": null
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "date": "Thu, 15 Oct 2026 23:32:07 GMT",
+      "content-length": "0",
+      "connection": "keep-alive",
+      "x-correlation-id": "NgYFJghoDR3",
+      "x-request-id": "d9dc6e7f-4156-4a04-ac47-ae7026a8b7b7",
+      "x-envoy-upstream-service-time": "272",
+      "server": "envoy"
+    },
+    "body": ""
+  }
+}

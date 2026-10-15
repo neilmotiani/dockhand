@@ -22,3 +22,32 @@ Format per entry: task, steps, expected vs. actual, severity, workaround, sugges
 - **Severity:** Low.
 - **Workaround:** `make_bedrock_client()` exports the configured key before creating the client. A test intercepts the signed request to confirm `Authorization: Bearer` is sent.
 - **Suggestion:** Accept the token as a client or session parameter.
+
+## 2026-10-15 · Playground live-view scene can't be chosen through the API, and the docs don't cover it
+
+- **Task:** WHEP spike: open a live-view session on the simulated Package stream from a server-side script (`scripts/ring_spike.py`).
+- **Steps:** Generated a Playground token. Called `GET /v1/devices?include=status,capabilities`, then `POST .../whep/sessions` on the only device returned.
+- **Expected:** One device per simulated scene (for example, a "Package" camera), or a documented way to pick the scene.
+- **Actual:** The account has one device, `Playground Device` (AVC, online). Its WHEP stream showed a snowy bird feeder. The scene is picked in the Playground UI under step 3, "Simulate live view event". The Ring knowledge MCP server returns `clarification_needed` with no results for every Playground query I tried (simulated device, scenes, Package stream), and the API docs don't say how the Playground device chooses what it streams.
+- **Severity:** Medium (the integration works, but there's no way to script the demo scenario or know in advance which footage an API client will get).
+- **Workaround:** Select the event by hand in the Playground tab that generated the token, then run the script.
+- **Suggestion:** Document the Playground's simulated scenes, expose them as separate devices or a query parameter, and index the Playground guide in the knowledge MCP server.
+
+## 2026-10-15 · Playground steps stay locked in a new tab while a token is active
+
+- **Task:** Open the Playground in a second tab to switch the simulated live-view event.
+- **Steps:** Developer Console → Playground → "Try the Playground", while a token generated in another tab was still valid.
+- **Expected:** Steps 2–3 (Explore APIs, Simulate live view event) usable, since the page knows a token is active.
+- **Actual:** Step 1 shows "You have an active token… You can generate a new token in 27 minutes", but steps 2 and 3 show "Generate a token to get started" and are disabled. Until the cooldown ends, the only usable Playground is the original tab.
+- **Severity:** Medium (closing or reloading that tab blocks live-view simulation for up to ~30 min).
+- **Workaround:** Keep the tab that generated the token open, and drive the scene from it.
+- **Suggestion:** Unlock steps 2–3 in any tab once a token is active, or let the developer revoke it and generate a new one.
+
+## 2026-10-15 · WHEP Location header carries an undocumented `?location=` query, and DELETE's response isn't documented
+
+- **Task:** Close a WHEP session with the URL from the `Location` header.
+- **Expected (per the WHEP docs):** `Location: https://api.amazonvision.com/v1/devices/{device_id}/media/streaming/whep/sessions/{session_id}`.
+- **Actual:** `.../whep/sessions/{uuid}?location=ava1.ring.whep.location.<~300-char token>`. A client that rebuilds the URL from `device_id` + `session_id` (as the docs' "Session URL Structure" suggests) drops it. Using the header unchanged, `DELETE` returned `200` with an empty body; the docs give no status code for DELETE. I haven't tested whether DELETE works without the query.
+- **Severity:** Low.
+- **Workaround:** Store the `Location` header verbatim and DELETE that exact URL (`session_url()` in `scripts/ring_spike.py`; covered by a test against the recorded fixture).
+- **Suggestion:** Show the query parameter in the docs, tell clients to treat the Location URL as opaque, and document the DELETE response.

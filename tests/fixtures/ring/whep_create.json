@@ -1,0 +1,33 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://api.amazonvision.com/v1/devices/ava1.ring.device.4AFLP4V4HMODMDHI5OEKWUKS27CG4MOV5BZFP4WLAH6VXGCEKYZN4EQTLHP5ILURGV3STZPXEKYYXUW7FVNXQN3NXSFKYGPK/media/streaming/whep/sessions",
+    "headers": {
+      "host": "api.amazonvision.com",
+      "accept": "*/*",
+      "accept-encoding": "gzip, deflate",
+      "connection": "keep-alive",
+      "user-agent": "python-httpx/0.28.1",
+      "authorization": "<REDACTED>",
+      "content-type": "application/sdp",
+      "content-length": "1970"
+    },
+    "body": "v=0\r\no=- 4001095921 4001095921 IN IP4 0.0.0.0\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic:WMS *\r\nm=video 51406 UDP/TLS/RTP/SAVPF 97 98 99 100 101 102\r\nc=IN IP4 0.0.0.0\r\na=recvonly\r\na=extmap:1 urn:ietf:params:rtp-hdrext:sdes:mid\r\na=extmap:3 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time\r\na=mid:0\r\na=msid:b08f213b-9fee-4160-8bd0-1e3c6f603a32 0044e469-a32e-42a8-9cc8-e05f2dd7d638\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=rtcp-mux\r\na=ssrc-group:FID 4135939988 503178338\r\na=ssrc:4135939988 cname:febd5e4a-0abb-400d-98b2-1a4b014fd80d\r\na=ssrc:503178338 cname:febd5e4a-0abb-400d-98b2-1a4b014fd80d\r\na=rtpmap:97 VP8/90000\r\na=rtcp-fb:97 nack\r\na=rtcp-fb:97 nack pli\r\na=rtcp-fb:97 goog-remb\r\na=rtpmap:98 rtx/90000\r\na=fmtp:98 apt=97\r\na=rtpmap:99 H264/90000\r\na=rtcp-fb:99 nack\r\na=rtcp-fb:99 nack pli\r\na=rtcp-fb:99 goog-remb\r\na=fmtp:99 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f\r\na=rtpmap:100 rtx/90000\r\na=fmtp:100 apt=99\r\na=rtpmap:101 H264/90000\r\na=rtcp-fb:101 nack\r\na=rtcp-fb:101 nack pli\r\na=rtcp-fb:101 goog-remb\r\na=fmtp:101 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f\r\na=rtpmap:102 rtx/90000\r\na=fmtp:102 apt=101\r\na=candidate:b7ce44741ebb8b31e38c9ecffba6fd52 1 udp 2130706431 0.0.0.0 51406 typ host\r\na=candidate:484bc1996534b2c80e52b58cc06fd024 1 udp 1694498815 0.0.0.0 51406 typ srflx raddr 0.0.0.0 rport 51406\r\na=end-of-candidates\r\na=ice-ufrag:pqJw\r\na=ice-pwd:<REDACTED>\r\na=fingerprint:sha-256 <REDACTED>\r\na=fingerprint:sha-384 <REDACTED>\r\na=fingerprint:sha-512 <REDACTED>\r\na=setup:actpass\r\n"
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "date": "Thu, 15 Oct 2026 23:32:01 GMT",
+      "content-type": "application/sdp",
+      "content-length": "1200",
+      "connection": "keep-alive",
+      "x-envoy-upstream-service-time": "336",
+      "location": "https://api.amazonvision.com/v1/devices/ava1.ring.device.4AFLP4V4HMODMDHI5OEKWUKS27CG4MOV5BZFP4WLAH6VXGCEKYZN4EQTLHP5ILURGV3STZPXEKYYXUW7FVNXQN3NXSFKYGPK/media/streaming/whep/sessions/6c3975d3-9878-4ff7-b3b6-d13a9bd58247?location=ava1.ring.whep.location.ST34RBINRGBOQSLMSXRNNAQZLZ7KGV4MJMWAAR4JEQISU63WEWVP4DXJMBUJERJUQXX7DTGTKLBT4J3TDQG7FOD3G4MULLORDCY3JT553I4NJR72LR2SOZHQHIHRXTDICW2USZEDEDQJO5NQNXPNJR6OI3AAFR44IPET3WR7JVDXNXJAT5OWPD5UZV2OESZQKEY7NRTU62OYTGOKCQVFYCAWK254ZUQI56V6QI5S6AW7P45CNHORD6HYOLR63J4XWICULORYTGRUY3GL4PHH3EQZLQMU5GQZAAB2MOCXFPWPQRCP3ZXCULMQICJERIDNKEBPZ3A",
+      "x-correlation-id": "BiSd5monHNf",
+      "x-request-id": "0b9d428c-fa3d-4368-a83e-02af22ce01e9",
+      "access-control-expose-headers": "Location, X-Request-Id",
+      "server": "envoy"
+    },
+    "body": "v=0\r\no=- 4001095921 4001095921 IN IP4 0.0.0.0\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\nm=video 9 UDP/TLS/RTP/SAVPF 99 100\r\nc=IN IP4 0.0.0.0\r\na=sendonly\r\na=mid:0\r\na=rtcp-mux\r\na=setup:active\r\na=fingerprint:sha-256 <REDACTED>\r\na=ice-ufrag:135cPa4BBhe4ono96iAkH0o3ZytyKI1v\r\na=ice-pwd:<REDACTED>\r\na=candidate:1 1 UDP 2013266431 2600:1f14:d8d:d700:d3cf:d153:194f:d8d4 45310 typ host\r\na=candidate:3 1 TCP 1010828799 2600:1f14:d8d:d700:d3cf:d153:194f:d8d4 443 typ host tcptype passive\r\na=candidate:4 1 UDP 2013266430 2600:1f14:d8d:d700:d3cf:d153:194f:d8d4 43615 typ host\r\na=candidate:7 1 UDP 2013266429 52.10.39.14 26661 typ host\r\na=candidate:9 1 TCP 1010828031 52.10.39.14 443 typ host tcptype passive\r\na=rtpmap:99 H264/90000\r\na=rtcp-fb:99 nack\r\na=rtcp-fb:99 nack pli\r\na=fmtp:99 profile-level-id=42001f;packetization-mode=1\r\na=rtpmap:100 RTX/90000\r\na=fmtp:100 apt=99\r\na=ssrc-group:FID 2257939038 4293748372\r\na=ssrc:2257939038 msid:3521859370@gml-827413823 0\r\na=ssrc:2257939038 cname:3521859370@gml-827413823\r\na=ssrc:4293748372 msid:3521859370@gml-827413823 0\r\na=ssrc:4293748372 cname:3521859370@gml-827413823\r\n"
+  }
+}
