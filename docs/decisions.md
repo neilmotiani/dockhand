@@ -46,3 +46,9 @@ Known limitation: matching is one-to-one, so an order split across two drops sho
 
 ## Reconciliation eval is synthetic
 `eval/simulate.py` generates the café scenario with injected missing/short/over/late/early/carrier-mislabel/extra deliveries. `eval/reconciliation.py` scores a predicted row as correct only if (expected_id, delivery_id, status) all match the truth. The simulator and matcher share assumptions, and package-count misreads are not simulated, so these numbers describe the matcher on the problems we injected. They are not field accuracy. The results file says so.
+
+## Bedrock auth: API key or SigV4
+`AWS_BEARER_TOKEN_BEDROCK` (a Bedrock API key) is loaded into `Settings` as a `SecretStr`. botocore reads bearer tokens only from that environment variable, so `make_bedrock_client()` exports it before creating the client. If the variable is already set in the real environment, that value wins, matching pydantic-settings precedence. Without a key, boto3 uses the normal credential chain and signs with SigV4. Never enable botocore debug logging: it logs request headers, including the bearer token.
+
+## Extraction: Converse structured output + Pydantic
+The JSON schema goes in Converse `outputConfig.textFormat` (constrained decoding), and Pydantic validates the result again. The schema is hand-written because constrained decoding supports only part of JSON Schema (no numeric bounds), so ranges such as `0 <= confidence <= 1` are enforced by Pydantic. On a validation failure or truncation, we retry once and show the model the error. `reasoning` is the first property so the model writes its observations before the answer fields. Temperature is 0 for repeatable evals. Prompts are versioned in `app/extract/prompts.py` and never edited in place.

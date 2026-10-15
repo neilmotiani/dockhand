@@ -28,8 +28,13 @@ class Settings(BaseSettings):
     # Bedrock. The default is the cross-region inference profile for the current Sonnet;
     # confirm with `aws bedrock list-inference-profiles --region us-east-1`.
     aws_region: str = "us-east-1"
+    # Bedrock API key (bearer token). If unset, boto3 falls back to the standard AWS credential
+    # chain (env, ~/.aws, SSO) and signs with SigV4.
+    aws_bearer_token_bedrock: SecretStr | None = None
     bedrock_model_id: str = "us.anthropic.claude-sonnet-5-5"
     extraction_prompt_version: str = "v1"
+    extraction_max_tokens: int = 1024
+    bedrock_timeout_s: float = 60.0
 
     # Reconciliation. See app/reconcile/cost.py for what each term means and
     # docs/decisions.md for how the defaults were chosen.
