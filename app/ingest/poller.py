@@ -51,6 +51,7 @@ class HistoryPoller:
         self._since = clock() - lookback
         self._devices: list[Device] = []
         self._devices_at: datetime | None = None
+        self._warned_filter = False
 
     async def _cameras(self) -> list[Device]:
         now = self._clock()
@@ -59,24 +60,49 @@ class HistoryPoller:
             self._devices_at = now
         return self._devices
 
+    def _page_sub_types(self, items: list[dict]) -> dict[str, str]:
+        """The subtype implied by the filter, only if this page shows the filter was applied.
+
+        On 2026-10-16 the Playground ignored `event_types` entirely (`motion.human,ding`, and
+        even `bogus_type`, returned the same on_demand items; tests/fixtures/ring/
+        history_events_*.json). If the filter is ignored, a returned motion item could be any
+        subtype, so labelling it `human` would be invented data. A page containing a type we
+        did not ask for proves the filter was not applied.
+        """
+        requested = {part.strip().partition(".")[0] for part in self._event_types.split(",")}
+        returned = {(i.get("attributes") or {}).get("event_type") for i in items}
+        if returned <= requested:
+            return self._sub_types
+        if not self._warned_filter:
+            log.warning(
+                "Event History ignored event_types=%s (returned %s); not inferring subtypes",
+                self._event_types,
+                sorted(t for t in returned if t),
+            )
+            self._warned_filter = True
+        return {}
+
     async def poll_once(self) -> int:
-        """Fetch history for every camera and enqueue new events. Returns rows inserted."""
+        """Fetch history for every camera and enqueue new relevant events. Returns rows
+        inserted. Irrelevant items (e.g. on_demand from our own live views) are not stored:
+        unlike a webhook, nothing was pushed to us, and storing them would only add noise."""
         inserted = 0
         for device in await self._cameras():
             items = await self._ring.history_events(device.id, self._event_types)
+            sub_types = self._page_sub_types(items)
             for item in items:
                 try:
-                    event = from_history(item, self._sub_types)
+                    event = from_history(item, sub_types)
                 except PayloadError:
                     log.warning("skipping malformed history item: %r", item)
                     continue
                 if event.occurred_at is not None and event.occurred_at < self._since:
                     continue
+                if not is_relevant(event, self._rules):
+                    continue
                 now = self._clock()
                 async with self._engine.begin() as conn:
-                    new_id = await insert_event(
-                        conn, event, is_relevant(event, self._rules), received_at=now
-                    )
+                    new_id = await insert_event(conn, event, True, received_at=now)
                 if new_id is not None:
                     inserted += 1
         if inserted:

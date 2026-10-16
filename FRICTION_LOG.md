@@ -111,3 +111,13 @@ Format per entry: task, steps, expected vs. actual, severity, workaround, sugges
 - **Severity:** Low.
 - **Workaround:** Query with a filter that pins one subtype (`motion.human,ding`) and take the subtype from the filter. Store Ring's event ID under a unique constraint, so if the IDs match, a webhook and a poll of the same event dedupe.
 - **Suggestion:** Return the subtype on history items, and state whether the history event ID equals the webhook `data.id`.
+
+## 2026-10-16 · Event History ignores `event_types` in the Playground, and items carry undocumented fields
+
+- **Task:** Record real Event History responses for the polling fallback.
+- **Steps:** `GET /v1/history/devices/{device_id}/events` on the Playground Device with `event_types` set to `motion.human,ding`, `ding`, `motion`, `motion.human`, `on_demand`, `bogus_type`, and with no filter.
+- **Expected (per the Event History docs):** only matching types; an error (or empty result) for an unknown type; `links.next` present ("`links.next` may be present even when `data` is empty").
+- **Actual:** Every request returned `200` with the same 15 `on_demand` items, including `event_types=bogus_type`. No response had `links`. Items also carry `relationships.cv_detections` (`{"data": []}`) and `meta.riid` (`null`), which the docs' response fields table doesn't list. After two WHEP sessions of ours, two new `on_demand` items appeared with matching times (12:49:48 and 12:50:28 PT), which fits the docs' "User or partner initiated a live view session". With the Package event running, no `motion` or `ding` items appeared. Recorded as `tests/fixtures/ring/history_events_*.json`.
+- **Severity:** Medium. A client that trusts the filter would treat every returned item as a match. Ours would have labelled any motion item `human`.
+- **Workaround:** The poller checks each page against the requested types, and only infers a subtype when the page is consistent with the filter. It enqueues only items that pass its own relevance rules. For Playground demos, use `POST /v1/trigger`.
+- **Suggestion:** Apply `event_types` in the Playground (or say it's unsupported there), return `400` for unknown types, document `cv_detections` and `riid`, and have simulated events (Package) create history entries.

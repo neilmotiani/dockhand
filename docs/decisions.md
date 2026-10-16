@@ -136,3 +136,11 @@ I checked each guarantee by breaking it and confirming its test fails.
 `POST /v1/expected` (bearer `ADMIN_TOKEN`) stores one expected delivery and reconciles its business day right away. A delivery that already arrived gets matched without waiting for the timer, and the response says where the order stands. The client may supply `id`. The same id with the same fields returns the stored row (`200`, `duplicate`); the same id with different fields is a `409`, so a retried request can never silently rewrite an order. `carrier` uses the extraction enum, so it's compared in the same vocabulary the model answers in. Leaving it out costs the matcher's "unknown carrier" amount.
 
 `scripts/seed_expected.py` seeds the live Playground test through this endpoint. IDs are `uuid5(date, supplier)` and the windows are fixed clock times on that date, so re-running it is a no-op.
+
+## Event History filter is verified, not trusted
+
+The Playground returned the same `on_demand` items for every `event_types` value, including a nonsense one (FRICTION_LOG.md, 2026-10-16). The poller therefore only infers a subtype from the filter when every returned item has one of the requested types. Otherwise motion items get no subtype, and the default `motion_detected.human` rule won't capture them. The poller also no longer stores history items that fail the relevance rules. Unlike webhooks, nothing was pushed to us, and our own live views would otherwise add a row each.
+
+## Capture time is dominated by the timeout on the Playground
+
+In the 2026-10-16 live run (N=2), the Package stream never stalled, so each capture ran the full `CAPTURE_TIMEOUT_S` (25 s) on top of ~5.5 s of WHEP setup: 31 s of a 33 s event-to-ledger time. Setup plus timeout (~30.5 s) is also right at the 30 s session limit Ring documents for battery cameras. Lowering the timeout is the obvious lever. It's not changed yet, because shorter clips trade latency against the chance of catching the driver mid-drop, which a static Playground scene can't measure.
