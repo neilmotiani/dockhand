@@ -60,7 +60,7 @@ def from_webhook(payload: Any) -> NormalizedEvent:
     if not isinstance(attrs, dict):
         attrs = {}
     # Ring documents the motion subtype at `data.subType` (Notifications → Motion Detection).
-    # SPEC.md says `attributes.sub_type`; that is also accepted, as a fallback only.
+    # `attributes.sub_type` / `subType` are accepted as fallbacks in case a payload differs.
     sub_type = (
         _str_or_none(data.get("subType"))
         or _str_or_none(attrs.get("sub_type"))

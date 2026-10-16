@@ -1,0 +1,85 @@
+{
+  "script": "bench/latency.py",
+  "generated_at": "2026-10-16T19:52:40+00:00",
+  "git_commit": "efa502a7bf72f4d4dc8c92cf92c29396a9a8822d",
+  "filters": {
+    "source": "ring_playground",
+    "origin": "manual"
+  },
+  "n_deliveries": 2,
+  "percentile_method": "nearest-rank",
+  "stages": {
+    "event_to_ledger": {
+      "n": 2,
+      "p50_ms": 33233.4,
+      "p95_ms": 33517.0,
+      "max_ms": 33517.0
+    },
+    "received_to_ledger": {
+      "n": 2,
+      "p50_ms": 33231.8,
+      "p95_ms": 33515.8,
+      "max_ms": 33515.8
+    },
+    "ring_to_received": {
+      "n": 2,
+      "p50_ms": 1.2,
+      "p95_ms": 1.6,
+      "max_ms": 1.6
+    },
+    "queue_wait": {
+      "n": 2,
+      "p50_ms": 5.8,
+      "p95_ms": 7.8,
+      "max_ms": 7.8
+    },
+    "device_resolve": {
+      "n": 2,
+      "p50_ms": 0.0,
+      "p95_ms": 333.9,
+      "max_ms": 333.9
+    },
+    "whep_setup": {
+      "n": 2,
+      "p50_ms": 5509.4,
+      "p95_ms": 5567.2,
+      "max_ms": 5567.2
+    },
+    "capture": {
+      "n": 2,
+      "p50_ms": 31013.0,
+      "p95_ms": 31036.9,
+      "max_ms": 31036.9
+    },
+    "select": {
+      "n": 2,
+      "p50_ms": 40.0,
+      "p95_ms": 48.4,
+      "max_ms": 48.4
+    },
+    "extract": {
+      "n": 2,
+      "p50_ms": 2081.8,
+      "p95_ms": 2156.9,
+      "max_ms": 2156.9
+    },
+    "save_frames": {
+      "n": 2,
+      "p50_ms": 0.7,
+      "p95_ms": 2.8,
+      "max_ms": 2.8
+    },
+    "ledger_insert": {
+      "n": 2,
+      "p50_ms": 4.1,
+      "p95_ms": 7.9,
+      "max_ms": 7.9
+    },
+    "reconcile": {
+      "n": 2,
+      "p50_ms": 4.0,
+      "p95_ms": 8.8,
+      "max_ms": 8.8
+    }
+  }
+}

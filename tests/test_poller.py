@@ -113,3 +113,45 @@ async def test_expired_token_raises_auth_error_and_invalidates(engine):
     with pytest.raises(RingAuthError):
         await poller(ring, engine).poll_once()
     assert ring._tokens.invalidated
+
+
+def recorded(name: str) -> dict:
+    return json.loads((FIXTURES / f"{name}.json").read_text())["response"]["body"]
+
+
+def test_recorded_history_shape():
+    """Real Playground responses (2026-10-16): the filter was ignored, and items carry fields
+    the docs don't list (relationships.cv_detections, meta.riid). links.next was absent."""
+    filtered = recorded("history_events_filter_motion_human_ding")
+    unfiltered = recorded("history_events_unfiltered")
+    assert filtered["data"] == unfiltered["data"]
+    assert {i["attributes"]["event_type"] for i in filtered["data"]} == {"on_demand"}
+    assert "links" not in filtered
+    item = filtered["data"][0]
+    assert set(item["attributes"]) >= {"event_type", "start", "end", "is_third_party_reviewed"}
+    assert item["relationships"]["source"]["data"]["type"] == "devices"
+
+
+async def test_recorded_playground_history_enqueues_nothing(engine):
+    """Our own live views come back as on_demand; none may trigger a capture, and none are
+    stored."""
+    page = recorded("history_events_filter_motion_human_ding")
+    p = poller(ring_with(page, []), engine, lookback=timedelta(days=3650))
+    assert await p.poll_once() == 0
+    assert await stored(engine) == []
+
+
+async def test_ignored_filter_means_no_inferred_subtype(engine):
+    """If the page contains a type we didn't request, the server ignored the filter, so a
+    motion item must not be labelled `human`."""
+    page = recorded("history_events_filter_motion_human_ding")
+    motion = json.loads(json.dumps(history()["data"][1]))  # docs-shaped motion item
+    page = {"data": [motion, *page["data"][:2]]}
+    p = poller(ring_with(page, []), engine, lookback=timedelta(days=3650))
+    assert await p.poll_once() == 0  # motion with unknown subtype doesn't meet motion.human
+
+    p = poller(ring_with(page, []), engine, lookback=timedelta(days=3650))
+    p._rules = ["motion_detected"]  # an operator who accepts any motion
+    assert await p.poll_once() == 1
+    (row,) = await stored(engine)
+    assert row["event_type"] == "motion_detected" and row["sub_type"] is None

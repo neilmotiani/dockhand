@@ -3,11 +3,14 @@
 The `playground` scenario is built around what the Playground Package scene shows: one box on
 the steps, no driver or truck, so the carrier is usually unreadable. It creates two orders
 with no carrier (the matcher then charges the same "unknown carrier" cost for both):
-- "Sysco" expecting 1 box   -> the first Playground delivery should match it   (`matched`)
-- "US Foods" expecting 3     -> the second one should pair with it, 1 of 3      (`short`)
+- "Sysco" expecting 1 box   -> one Playground delivery pairs with it      (`matched`)
+- "US Foods" expecting 3     -> the other pairs with it, 1 of 3           (`short`)
 
-Run it, then trigger the pipeline twice (POST /v1/trigger or the poller). With only one
-delivery so far, US Foods stays pending until its window plus grace has passed.
+Two one-box deliveries are interchangeable, so which one gets which order is a tie-break
+(in the 2026-10-16 live run the second delivery got Sysco). Run this, then trigger the
+pipeline twice with different idempotency keys (POST /v1/trigger; the Playground produces
+no motion events for the poller). With only one delivery so far, it pairs with Sysco and
+US Foods stays pending until its window plus grace has passed.
 
 IDs are uuid5(date, supplier) and the windows are fixed clock times on the given date, so
 re-running on the same day reports `duplicate` instead of creating a second set.
