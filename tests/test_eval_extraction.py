@@ -218,3 +218,31 @@ def test_label_box_draws_only_when_carrier_known() -> None:
     labelled, trk = build_synthetic.label_box(sprite, "FedEx", random.Random(0))
     assert trk.startswith("FE ")
     assert labelled.tobytes() != sprite.tobytes()
+
+
+def test_by_background_groups_only_items_with_a_background() -> None:
+    rows = [
+        {"item": {**item("a", 2), "background_kind": "porch"}, "pred": pred(2)},
+        {"item": {**item("b", 1), "background_kind": "driveway"}, "pred": pred(0)},
+        {"item": {**item("c", 3), "background_kind": "porch"}, "pred": pred(2)},
+        {"item": item("d", 0), "pred": pred(0)},
+    ]
+    groups = extraction.by_background(rows)
+    assert {k: [r["item"]["id"] for r in v] for k, v in groups.items()} == {
+        "porch": ["a", "c"],
+        "driveway": ["b"],
+    }
+
+
+def test_label_existing_marks_porch_box_only_when_carrier_known() -> None:
+    porch, driveway = build_synthetic.BACKGROUNDS
+    canvas = Image.new("RGB", (1280, 720), (90, 90, 90))
+    assert build_synthetic.label_existing(canvas, porch, None, random.Random(0)) is None
+    assert build_synthetic.label_existing(canvas, driveway, "UPS", random.Random(0)) is None
+    assert canvas.getbbox() == (0, 0, 1280, 720) and len(set(canvas.getdata())) == 1
+    trk = build_synthetic.label_existing(canvas, porch, "UPS", random.Random(0))
+    assert trk.startswith("UP ")
+    cx, cy, _ = porch.existing_label
+    assert canvas.getpixel((cx, cy)) != (90, 90, 90)
+    # The label lies on the existing box, which pasted boxes must avoid.
+    assert any(o[0] <= cx <= o[2] and o[1] <= cy <= o[3] for o in porch.obstacles)

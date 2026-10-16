@@ -7,7 +7,9 @@ dataset (downloaded by eval/build_roboflow.py). Count and carrier are exact by c
 
 Backgrounds:
 - driveway frames from the Playground "Vehicle" clip with no vehicle in view (base count 0);
-- porch frames from the "Package" clip, which already show one unlabelled box (base count 1).
+- porch frames from the "Package" clip, which already show one box (base count 1). Since
+  amendment 2 of eval/SELECTION.md, that box gets the same carrier label as the pasted boxes, so
+  the whole image is one delivery event.
 
 Boxes are placed only inside hand-picked ground regions of each background and never overlap each
 other, the existing porch box, or the frame edge. If a layout cannot be placed, the next seed is
@@ -48,6 +50,8 @@ class Background:
     regions: tuple[Rect, ...]  # boxes must lie fully inside one region
     obstacles: tuple[Rect, ...]  # things already in the scene that must stay visible
     box_width: tuple[int, int]  # pasted box width range, px (1280x720 frames)
+    # Where the label goes on the box already in the scene: centre x, centre y, rotation (degrees).
+    existing_label: tuple[int, int, float] | None = None
 
 
 # Regions picked on a grid overlay of frame 40 of each clip (both clips are from a static camera).
@@ -60,6 +64,7 @@ BACKGROUNDS = [
         regions=((165, 335, 560, 475), (165, 480, 392, 665), (650, 470, 900, 640)),
         obstacles=((395, 478, 640, 720), (625, 640, 760, 720)),  # existing box, bottle
         box_width=(85, 130),
+        existing_label=(480, 600, -35.0),  # front face of the existing box, picked on frame 10
     ),
     Background(
         kind="driveway",
@@ -134,17 +139,38 @@ def label_box(
     if carrier is None:
         return sprite, None
     img = sprite.copy()
-    d = ImageDraw.Draw(img)
     lw, lh = int(img.width * 0.6), int(img.width * 0.36)
     x0 = (img.width - lw) // 2
     y0 = max(2, (img.height - lh) // 2)
+    trk = draw_label(ImageDraw.Draw(img), x0, y0, lw, lh, carrier, rng)
+    return img, trk
+
+
+def draw_label(
+    d: ImageDraw.ImageDraw, x0: int, y0: int, lw: int, lh: int, carrier: str, rng: random.Random
+) -> str:
     d.rectangle([x0, y0, x0 + lw, y0 + lh], fill=(250, 250, 248), outline=(30, 30, 30), width=2)
     big = ImageFont.load_default(size=max(14, int(lh * 0.42)))
     small = ImageFont.load_default(size=max(9, int(lh * 0.18)))
     d.text((x0 + 6, y0 + 4), carrier, fill=(0, 0, 0), font=big)
     trk = tracking_number(rng, carrier)
     d.text((x0 + 6, y0 + lh - int(lh * 0.28)), trk, fill=(0, 0, 0), font=small)
-    return img, trk
+    return trk
+
+
+def label_existing(
+    canvas: Image.Image, bg: Background, carrier: str | None, rng: random.Random
+) -> str | None:
+    """Put the carrier label on the box already in the background (amendment 2)."""
+    if carrier is None or bg.existing_label is None:
+        return None
+    cx, cy, angle = bg.existing_label
+    lw, lh = 90, 54  # the label label_box draws on a 150 px wide box
+    tag = Image.new("RGBA", (lw + 1, lh + 1), (0, 0, 0, 0))
+    trk = draw_label(ImageDraw.Draw(tag), 0, 0, lw, lh, carrier, rng)
+    tag = tag.rotate(angle, expand=True, resample=Image.Resampling.BICUBIC)
+    canvas.paste(tag, (cx - tag.width // 2, cy - tag.height // 2), tag)
+    return trk
 
 
 def plan(rng: random.Random) -> list[dict]:
@@ -193,6 +219,8 @@ def build() -> list[dict]:
             canvas.paste(crop, rect[:2])
             if trk:
                 tracking.append(trk)
+        # Separate rng, so the pasted boxes and their labels are the same as in the first build.
+        existing_trk = label_existing(canvas, bg, p["carrier"], random.Random(f"existing:{i}"))
         name = f"syn_{i:03d}.jpg"
         canvas.save(OUT_DIR / name, quality=92)
         items.append(
@@ -208,6 +236,7 @@ def build() -> list[dict]:
                 "base_count": bg.base_count,
                 "pasted_count": p["pasted"],
                 "tracking_numbers": tracking,
+                "existing_box_tracking_number": existing_trk,
                 "box_sources": [s["file"] for s in chosen],
                 "box_rects": [list(r) for r in rects],
                 "layout_retries": retries,

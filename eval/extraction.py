@@ -205,6 +205,15 @@ def summarize(rows: list[dict]) -> dict:
     }
 
 
+def by_background(rows: list[dict]) -> dict[str, list[dict]]:
+    """Rows grouped by the item's background_kind; items without one are left out."""
+    out: dict[str, list[dict]] = defaultdict(list)
+    for r in rows:
+        if kind := r["item"].get("background_kind"):
+            out[kind].append(r)
+    return dict(out)
+
+
 def _git_commit() -> str | None:
     try:
         return subprocess.run(
@@ -305,6 +314,12 @@ def main() -> None:
             {"source": src, "model": model, **summarize(rows)}
             for (src, model), rows in sorted(groups.items())
         ],
+        # Synthetic composites split by background (eval/SELECTION.md, amendment 2).
+        "per_background": [
+            {"source": src, "model": model, "background_kind": kind, **summarize(sub)}
+            for (src, model), rows in sorted(groups.items())
+            for kind, sub in sorted(by_background(rows).items())
+        ],
         "ledger_total_usd": round(ledger_total(), 4),
         "per_item": per_item,
         "caveats": [
@@ -315,6 +330,8 @@ def main() -> None:
             "Carrier accuracy exists only where carrier truth exists (synthetic_overlay).",
             "Latency is wall clock per call, run sequentially from one client, including a retry.",
             "The two models run with different output modes (see models[].structured_output).",
+            "Porch composites were rebuilt under amendment 2 after the first run; first-run "
+            "synthetic results are in commit c25d058 and are superseded.",
         ],
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
@@ -340,6 +357,11 @@ def print_table(report: dict) -> None:
             f"{r['count_mae']} | {_pct(r['negatives_false_alarm'])} | "
             f"{_pct(r['carrier_accuracy'])} | {r['failures']} | {r['latency_ms_p50']} | "
             f"{r['latency_ms_p95']} | {r['usd_per_call']} |"
+        )
+    for r in report.get("per_background", []):
+        print(
+            f"{r['source']} [{r['background_kind']}] {r['model']}: "
+            f"count exact {_pct(r['count_exact'])}, carrier {_pct(r['carrier_accuracy'])}"
         )
 
 
