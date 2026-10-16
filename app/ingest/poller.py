@@ -1,12 +1,13 @@
 """Event History polling fallback.
 
-Webhooks are delivered to the Webhook URL registered on a Ring app, for accounts linked to it.
-A Developer Playground token belongs to no app, so the Playground cannot deliver webhooks to
-us (see docs/decisions.md). The poller turns new Event History entries into the same queue
-rows a webhook would create, deduped on Ring's event ID.
+Ring documents webhooks only as going to a URL registered on an app during onboarding, and
+we found no way to give the Developer Playground one (docs/decisions.md). The poller turns new
+Event History entries into the same queue rows a webhook would create, deduped on Ring's
+event ID.
 
 Only `motion.human` and `ding` are requested by default. `on_demand` is excluded on purpose:
-our own WHEP capture creates an on_demand event, and polling it would trigger another capture.
+Event History defines it as "User or partner initiated a live view session", so our own WHEP
+capture would appear there and polling it would trigger another capture.
 """
 
 import asyncio

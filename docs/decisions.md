@@ -81,7 +81,7 @@ With `RING_WEBHOOK_SECRET` unset, the webhook returns 503 rather than accepting 
 
 ## The Playground doesn't send webhooks: poller + manual trigger
 
-The Ring docs (checked with the knowledge MCP server on 2026-10-16) only describe webhooks going to the Webhook URL configured on an app, for linked accounts. A Playground token has no app behind it. So:
+The Ring docs (checked with the knowledge MCP server on 2026-10-16) only describe a webhook URL registered on an app ("Webhook URL is configured during partner onboarding"), and we found no place to give the Playground one. So:
 - `HistoryPoller` (`RING_POLL_INTERVAL_S > 0`) reads Event History for each camera with `event_types=motion.human,ding` and enqueues new items under `request_id = poll:<event id>`. `on_demand` is left out on purpose, because our own WHEP capture creates `on_demand` events and polling them would loop. Items older than startup minus `CAPTURE_MAX_EVENT_AGE_S` are skipped, since they can't be captured live.
 - `POST /v1/trigger` (bearer `ADMIN_TOKEN`, disabled when unset) enqueues a `manual_trigger` event for a device. It takes an optional `idempotency_key`, so a retried demo click doesn't start a second capture.
 
@@ -130,3 +130,9 @@ I checked each guarantee by breaking it and confirming its test fails.
 - **Auth failures are final.** An expired Playground token fails the event once, with the reason, instead of burning three retries in milliseconds. Other errors retry immediately, up to `QUEUE_MAX_ATTEMPTS`; there's no backoff, because a capture retried later would be stale anyway.
 - **Reconciliation batches are business days** (`BUSINESS_TIMEZONE`). An expected delivery belongs to the day its window starts, a delivery to the day it was detected. Limitation: a delivery just after midnight for a window ending just before it lands in a different batch (`unexpected` + `missing`). The timer (`RECONCILE_INTERVAL_S`) re-runs today and yesterday so overdue windows turn `missing`.
 - **Latency stamps** (`deliveries.latency_ms`): `ring_to_received`, `queue_wait`, `device_resolve`, `whep_setup`, `capture`, `select`, `extract`, `save_frames`, `ledger_insert`, `reconcile`, plus the end-to-end spans `event_to_ledger` and `received_to_ledger`. `bench/latency.py` reports nearest-rank p50/p95 with N per stage.
+
+## Expected deliveries: a minimal admin endpoint for now
+
+`POST /v1/expected` (bearer `ADMIN_TOKEN`) stores one expected delivery and reconciles its business day right away. A delivery that already arrived gets matched without waiting for the timer, and the response says where the order stands. The client may supply `id`. The same id with the same fields returns the stored row (`200`, `duplicate`); the same id with different fields is a `409`, so a retried request can never silently rewrite an order. `carrier` uses the extraction enum, so it's compared in the same vocabulary the model answers in. Leaving it out costs the matcher's "unknown carrier" amount.
+
+`scripts/seed_expected.py` seeds the live Playground test through this endpoint. IDs are `uuid5(date, supplier)` and the windows are fixed clock times on that date, so re-running it is a no-op.

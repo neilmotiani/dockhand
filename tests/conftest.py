@@ -18,7 +18,7 @@ from app.db.models import metadata
 from app.db.session import make_engine
 
 TEST_DATABASE_URL = os.environ.get(
-    "TEST_DATABASE_URL", "postgresql+asyncpg://dockhand:dockhand@localhost:5432/dockhand_test"
+    "TEST_DATABASE_URL", "postgresql+asyncpg://dockhand:dockhand@localhost:55432/dockhand_test"
 )
 
 
