@@ -71,3 +71,23 @@ Format per entry: task, steps, expected vs. actual, severity, workaround, sugges
 - **Severity:** Low–medium (a fixed-interval capture can silently come back nearly empty).
 - **Workaround:** `scripts/ring_spike.py --spread` decodes until the stream stalls for 2 s (or the timeout), then keeps N frames evenly spaced over what actually arrived.
 - **Suggestion:** Document each simulated event's duration and looping behaviour, and end the track or session when the clip finishes.
+
+## 2026-10-15 · Bedrock lists inference profiles the account can't invoke
+
+- **Task:** Bedrock vision spike with SigV4 credentials (IAM user, us-east-1), model `us.anthropic.claude-sonnet-5-5`.
+- **Steps:** `ListInferenceProfiles(typeEquals=SYSTEM_DEFINED)` lists the profile, so `scripts/bedrock_spike.py` reports it "confirmed". Then `Converse`.
+- **Expected:** A listed profile is invocable, or the listing marks which ones aren't available to the account.
+- **Actual:** `AccessDeniedException: anthropic.claude-sonnet-5-5 is not available for this account`. A 5-token text probe across 26 listed `us.*` vision-capable profiles: 13 denied as "not available for this account" or end-of-life/legacy; Claude Sonnet 4.6 / 4.5, Opus 4.6 / 4.5, Haiku 4.5, Nova, Llama 4 and Pixtral succeeded.
+- **Severity:** Medium (the listing API can't tell you which models you can actually use; you find out by paying for a probe).
+- **Workaround:** Probe with a tiny Converse call before trusting a model ID.
+- **Suggestion:** Add per-account availability to `ListInferenceProfiles` / `ListFoundationModels`, or a dry-run access check.
+
+## 2026-10-15 · Anthropic models on Bedrock work, then fail minutes later with "use case details have not been submitted"
+
+- **Task:** Same account, a few minutes after the probe above.
+- **Steps:** Text-only `Converse` to `us.anthropic.claude-sonnet-4-6` and `us.anthropic.claude-haiku-4-5-20251001-v1:0` succeeded. About 3–5 minutes later, the same calls (text and image) on both models failed.
+- **Expected:** Consistent access: either blocked from the first call, or allowed throughout.
+- **Actual:** `ResourceNotFoundException: Model use case details have not been submitted for this account. Fill out the Anthropic use case details form before using the model. If you have already filled out the form, try again in 15 minutes.` Using a not-found exception for a missing form makes it look like a wrong model ID.
+- **Severity:** High (blocks every Anthropic model in the account).
+- **Workaround:** Submit the Anthropic use case form in the Bedrock console and wait up to 15 minutes.
+- **Suggestion:** Gate access the same way from the first call; return `AccessDeniedException` with a link to the form; show the form requirement on the model's catalog page before any invoke.
