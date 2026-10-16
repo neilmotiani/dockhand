@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from app.capture.selection import Selection, select_frames
+from app.capture.settle import SettleDetector
 from app.config import Settings
 from app.ring.client import RingClient
 from app.ring.devices import Device, pick_device
@@ -98,11 +99,19 @@ class Capturer:
         device = await self.resolve(query, exact=exact)
         resolve_ms = _ms(t)
         async with self._locks.setdefault(device.id, asyncio.Lock()):
+            detector = None
+            if self._s.capture_settle_s > 0:
+                detector = SettleDetector(
+                    threshold=self._s.capture_settle_threshold,
+                    settle_s=self._s.capture_settle_s,
+                    min_s=self._s.capture_min_s,
+                )
             clip = await self._capture_fn(
                 self._ring,
                 device.id,
                 stall_s=self._s.capture_stall_s,
                 timeout_s=self._s.capture_timeout_s,
+                should_stop=detector.update if detector else None,
             )
         if len(clip.frames) < 2:
             raise CaptureError(

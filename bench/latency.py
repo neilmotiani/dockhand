@@ -13,6 +13,7 @@ Ring detection time). Filter by provenance with --source and by ingest path with
 Usage:
     uv run python -m bench.latency                                  # all deliveries
     uv run python -m bench.latency --source ring_playground --origin poll
+    uv run python -m bench.latency --since 2026-10-16T20:30:00Z --until 2026-10-16T21:00:00Z
 """
 
 import argparse
@@ -74,7 +75,13 @@ def summarize(rows: list[dict]) -> dict[str, dict]:
     }
 
 
-async def load(database_url: str, source: str | None, origin: str | None) -> list[dict]:
+async def load(
+    database_url: str,
+    source: str | None,
+    origin: str | None,
+    since: datetime | None = None,
+    until: datetime | None = None,
+) -> list[dict]:
     engine = make_engine(database_url)
     stmt = select(deliveries.c.latency_ms).join(
         ring_events, ring_events.c.id == deliveries.c.event_id
@@ -83,6 +90,10 @@ async def load(database_url: str, source: str | None, origin: str | None) -> lis
         stmt = stmt.where(deliveries.c.source == source)
     if origin:
         stmt = stmt.where(ring_events.c.origin == origin)
+    if since:
+        stmt = stmt.where(deliveries.c.detected_at >= since)
+    if until:
+        stmt = stmt.where(deliveries.c.detected_at < until)
     try:
         async with engine.connect() as conn:
             return list((await conn.execute(stmt)).scalars())
@@ -102,10 +113,18 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--source", choices=["ring_playground", "ring_device", "own_footage"])
     p.add_argument("--origin", choices=["webhook", "poll", "manual"])
+    p.add_argument("--since", type=datetime.fromisoformat, help="detected_at >= (ISO, with tz)")
+    p.add_argument("--until", type=datetime.fromisoformat, help="detected_at < (ISO, with tz)")
     p.add_argument("--out", type=Path, default=DEFAULT_OUT)
     args = p.parse_args()
 
-    rows = asyncio.run(load(get_settings().database_url, args.source, args.origin))
+    for name in ("since", "until"):
+        value = getattr(args, name)
+        if value is not None and value.tzinfo is None:
+            raise SystemExit(f"--{name} needs a timezone, e.g. 2026-10-16T20:30:00Z")
+    rows = asyncio.run(
+        load(get_settings().database_url, args.source, args.origin, args.since, args.until)
+    )
     if not rows:
         raise SystemExit("no deliveries match; nothing to report")
     stages = summarize(rows)
@@ -113,7 +132,12 @@ def main() -> None:
         "script": "bench/latency.py",
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "git_commit": _git_commit(),
-        "filters": {"source": args.source, "origin": args.origin},
+        "filters": {
+            "source": args.source,
+            "origin": args.origin,
+            "since": args.since.isoformat() if args.since else None,
+            "until": args.until.isoformat() if args.until else None,
+        },
         "n_deliveries": len(rows),
         "percentile_method": "nearest-rank",
         "stages": stages,

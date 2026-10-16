@@ -226,6 +226,8 @@ class Pipeline:
                         "structured_output": outcome.structured_output,
                         "cache_hit": cache_hit,
                         "frames_decoded": sel.decoded,
+                        "capture_end": cap.clip.end_reason,
+                        "stream_s": round(cap.clip.frames[-1][0], 2) if cap.clip.frames else 0,
                     },
                     latency_ms=latency,
                     source=self._s.media_source,
