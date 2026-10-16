@@ -52,3 +52,17 @@ Known limitation: matching is one-to-one, so an order split across two drops sho
 
 ## Extraction: Converse structured output + Pydantic
 The JSON schema goes in Converse `outputConfig.textFormat` (constrained decoding), and Pydantic validates the result again. The schema is hand-written because constrained decoding supports only part of JSON Schema (no numeric bounds), so ranges such as `0 <= confidence <= 1` are enforced by Pydantic. On a validation failure or truncation, we retry once and show the model the error. `reasoning` is the first property so the model writes its observations before the answer fields. Temperature is 0 for repeatable evals. Prompts are versioned in `app/extract/prompts.py` and never edited in place.
+
+## Structured output is a switch, not an assumption
+
+`BedrockExtractor` normally constrains the model with Converse structured output
+(`outputConfig` JSON schema). Amazon Nova rejects that field (`ValidationException: This model
+doesn't support the outputConfig field`), and on 2026-10-15 Nova was the only vision family this
+account could call (Anthropic models were blocked pending the use case form). So
+`BEDROCK_STRUCTURED_OUTPUT=false` drops `outputConfig`, appends the same JSON schema to the
+system prompt, and strips Markdown fences; Pydantic validation and the single retry still apply.
+
+The schema instruction is appended at runtime instead of becoming a new prompt version, so `v1`
+stays byte-identical for models that support structured output. Every `ExtractionOutcome`
+records `structured_output`, and eval results from the two modes must be reported separately:
+the effective prompt differs, and only one mode has a decoder-level schema guarantee.

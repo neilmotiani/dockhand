@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     # chain (env, ~/.aws, SSO) and signs with SigV4.
     aws_bearer_token_bedrock: SecretStr | None = None
     bedrock_model_id: str = "us.anthropic.claude-sonnet-5-5"
+    # Converse structured output (`outputConfig` JSON schema). Turn off for models that reject it
+    # (e.g. Amazon Nova); the schema then goes in the system prompt and Pydantic still validates.
+    bedrock_structured_output: bool = True
     extraction_prompt_version: str = "v1"
     extraction_max_tokens: int = 1024
     bedrock_timeout_s: float = 60.0

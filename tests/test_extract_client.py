@@ -230,3 +230,24 @@ def test_client_errors_propagate() -> None:
 def test_requires_images() -> None:
     with pytest.raises(ValueError, match="at least one image"):
         BedrockExtractor(FakeClient([]), settings()).extract([])
+
+
+def test_unstructured_mode_puts_schema_in_prompt_and_strips_fences() -> None:
+    from app.extract.client import SCHEMA_INSTRUCTION
+
+    fenced = "```json\n" + json.dumps(GOOD) + "\n```"
+    fake = FakeClient([converse_response(fenced)])
+    out = BedrockExtractor(fake, settings(bedrock_structured_output=False)).extract(IMG)
+
+    assert out.result == ExtractionResult.model_validate(GOOD)
+    assert out.structured_output is False
+    (call,) = fake.calls
+    assert "outputConfig" not in call
+    assert call["system"] == [{"text": PROMPTS["v1"] + SCHEMA_INSTRUCTION}]
+
+
+def test_structured_mode_is_default_and_flagged() -> None:
+    fake = FakeClient([converse_response(json.dumps(GOOD))])
+    out = BedrockExtractor(fake, settings()).extract(IMG)
+    assert out.structured_output is True
+    assert "outputConfig" in fake.calls[0]
