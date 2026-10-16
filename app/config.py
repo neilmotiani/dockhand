@@ -6,7 +6,7 @@ Model IDs, thresholds and secrets live here so they can change without a code ch
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import SecretStr
+from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 MediaSource = Literal["ring_playground", "ring_device", "own_footage"]
@@ -22,8 +22,26 @@ class Settings(BaseSettings):
     ring_api_base_url: str = "https://api.amazonvision.com"
     ring_oauth_base_url: str = "https://oauth.ring.com"
     ring_access_token: SecretStr | None = None  # Playground one-click token (~30 min lifetime)
-    ring_webhook_secret: SecretStr | None = None
+    ring_webhook_secret: SecretStr | None = None  # the app's HMAC Signature Key
     media_source: MediaSource = "ring_playground"
+    ring_http_timeout_s: float = 20.0
+
+    # Ingest. Which events start the capture pipeline, as `type` or `type.sub_type` in the
+    # webhook vocabulary (Event History types are mapped onto it, see app/ingest/events.py).
+    ingest_relevant_events: list[str] = ["motion_detected.human", "button_press"]
+    # Live capture only makes sense while the event is still happening. A webhook retried by
+    # Ring minutes later (or a backlog after downtime) would capture an unrelated scene.
+    capture_max_event_age_s: float = 120.0
+    queue_workers: int = 2
+    queue_max_attempts: int = 3
+    # A job claimed longer ago than this is assumed to belong to a crashed worker and is retried.
+    queue_lease_s: float = 300.0
+    queue_idle_poll_s: float = 1.0
+    # Event History polling fallback (the Playground does not deliver webhooks). 0 disables it.
+    ring_poll_interval_s: float = 0.0
+    ring_poll_event_types: str = "motion.human,ding"
+    # Bearer token for the manual trigger endpoint. Unset disables the endpoint.
+    admin_token: SecretStr | None = None
 
     # Bedrock. Model IDs are cross-region inference profiles; confirm availability with a small
     # Converse call (listing a profile does not mean the account can invoke it). See
@@ -53,6 +71,21 @@ class Settings(BaseSettings):
     reconcile_time_cost_per_hour: float = 0.15
     reconcile_max_offset_hours: float = 8.0
     reconcile_count_cost_weight: float = 0.5
+
+    @field_validator(
+        "ring_access_token",
+        "ring_webhook_secret",
+        "aws_bearer_token_bedrock",
+        "admin_token",
+        mode="before",
+    )
+    @classmethod
+    def _blank_secret_is_unset(cls, v: object) -> object:
+        # `.env.example` ships `KEY=` lines. An empty secret must mean "not configured", or
+        # an empty webhook key / admin token would be accepted as valid credentials.
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
 
 
 @lru_cache

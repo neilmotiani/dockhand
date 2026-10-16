@@ -66,3 +66,29 @@ The schema instruction is appended at runtime instead of becoming a new prompt v
 stays byte-identical for models that support structured output. Every `ExtractionOutcome`
 records `structured_output`, and eval results from the two modes must be reported separately:
 the effective prompt differs, and only one mode has a decoder-level schema guarantee.
+
+## Ingest: the events table is the queue
+
+`ring_events` stores every event and doubles as the work queue (`status`, `attempts`, `claimed_at`). The webhook handler verifies the signature, inserts the row with `INSERT ... ON CONFLICT DO NOTHING`, and returns 200. The ack happens after the commit, so an event Ring got a 200 for survives a crash. Dedupe is enforced by the database (unique `request_id` and unique `ring_event_id`), so ten concurrent deliveries of one webhook still insert one row (`test_concurrent_duplicate_deliveries_insert_once`). An in-memory `asyncio.Queue` would be faster, but it would lose acked events on restart and could not dedupe across processes.
+
+Workers claim rows with `UPDATE ... WHERE id = (SELECT ... FOR UPDATE SKIP LOCKED LIMIT 1)`. A claim is a lease: a row left in `processing` longer than `QUEUE_LEASE_S` is assumed orphaned and claimed again, and a late result from the old worker is discarded (guarded on `claimed_at`). Workers wake through an in-process `asyncio.Event` on insert and also poll every second, which covers rows written by another process. Failures retry up to `QUEUE_MAX_ATTEMPTS` and then stay as `failed` with the error.
+
+Irrelevant events (`device_online`, unknown types) are stored as `ignored` and acked with 200. Unknown event types must not get a 4xx, because Ring may add types and would retry them.
+
+## Webhooks need the signing key, and blank secrets are unset
+
+With `RING_WEBHOOK_SECRET` unset, the webhook returns 503 rather than accepting unsigned events. An empty `KEY=` in `.env` counts as unset; otherwise an empty key would make anyone able to sign. Verification uses `hmac.compare_digest` on the raw request bytes.
+
+## The Playground doesn't send webhooks: poller + manual trigger
+
+The Ring docs (checked with the knowledge MCP server on 2026-10-16) only describe webhooks going to the Webhook URL configured on an app, for linked accounts. A Playground token has no app behind it. So:
+- `HistoryPoller` (`RING_POLL_INTERVAL_S > 0`) reads Event History for each camera with `event_types=motion.human,ding` and enqueues new items under `request_id = poll:<event id>`. `on_demand` is left out on purpose, because our own WHEP capture creates `on_demand` events and polling them would loop. Items older than startup minus `CAPTURE_MAX_EVENT_AGE_S` are skipped, since they can't be captured live.
+- `POST /v1/trigger` (bearer `ADMIN_TOKEN`, disabled when unset) enqueues a `manual_trigger` event for a device. It takes an optional `idempotency_key`, so a retried demo click doesn't start a second capture.
+
+## Schema without migrations (for now)
+
+`init_db()` runs `metadata.create_all` at startup. Nothing is deployed yet, so there's no data to migrate. Alembic comes in with the first change to an existing table.
+
+## Database tests use a real Postgres
+
+The queue's correctness rests on `SKIP LOCKED`, unique constraints and `ON CONFLICT`, which SQLite or a fake wouldn't show. CI runs a Postgres service with `REQUIRE_DB=1`. Locally the tests skip if no database is reachable at `TEST_DATABASE_URL`.

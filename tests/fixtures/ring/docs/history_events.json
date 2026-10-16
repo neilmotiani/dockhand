@@ -1,0 +1,20 @@
+{
+  "_source": "Ring docs example response (amazon_vision_api/event_history.md) for event_types=motion.human,ding, with placeholders filled in. Not recorded.",
+  "response": {
+    "data": [
+      {
+        "type": "history-events",
+        "id": "hist-ding-1",
+        "attributes": {"event_type": "ding", "is_third_party_reviewed": false, "start": 1792170360000, "end": 1792170390000},
+        "relationships": {"source": {"data": {"type": "devices", "id": "ava1.ring.device.TEST"}}}
+      },
+      {
+        "type": "history-events",
+        "id": "hist-motion-1",
+        "attributes": {"event_type": "motion", "is_third_party_reviewed": false, "start": 1792170300000, "end": 1792170325000},
+        "relationships": {"source": {"data": {"type": "devices", "id": "ava1.ring.device.TEST"}}}
+      }
+    ],
+    "links": {"next": "/v1/history/devices/ava1.ring.device.TEST/events?page[key]=2026-10-16T17:05:00Z"}
+  }
+}
