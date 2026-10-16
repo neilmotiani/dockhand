@@ -156,7 +156,9 @@ def test_usage_add() -> None:
 
 def test_extract_success_and_request_shape() -> None:
     fake = FakeClient([converse_response(json.dumps(GOOD))])
-    s = settings(bedrock_model_id="model-x", extraction_max_tokens=512)
+    s = settings(
+        bedrock_model_id="model-x", extraction_max_tokens=512, bedrock_structured_output=True
+    )
     out = BedrockExtractor(fake, s).extract(IMG + [(b"jpg", "jpeg")])
 
     assert out.result == ExtractionResult.model_validate(GOOD)
@@ -246,8 +248,8 @@ def test_unstructured_mode_puts_schema_in_prompt_and_strips_fences() -> None:
     assert call["system"] == [{"text": PROMPTS["v1"] + SCHEMA_INSTRUCTION}]
 
 
-def test_structured_mode_is_default_and_flagged() -> None:
+def test_structured_mode_flagged() -> None:
     fake = FakeClient([converse_response(json.dumps(GOOD))])
-    out = BedrockExtractor(fake, settings()).extract(IMG)
+    out = BedrockExtractor(fake, settings(bedrock_structured_output=True)).extract(IMG)
     assert out.structured_output is True
     assert "outputConfig" in fake.calls[0]

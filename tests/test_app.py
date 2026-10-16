@@ -30,3 +30,11 @@ def test_settings_reject_unknown_media_source(monkeypatch) -> None:
     monkeypatch.setenv("MEDIA_SOURCE", "youtube")
     with pytest.raises(pydantic.ValidationError):
         Settings(_env_file=None)
+
+
+def test_bedrock_defaults_nova_with_sonnet_comparison() -> None:
+    s = Settings(_env_file=None)
+    assert s.bedrock_model_id == "us.amazon.nova-pro-v1:0"
+    assert s.bedrock_structured_output is False
+    assert s.bedrock_comparison_model_id == "us.anthropic.claude-sonnet-4-6"
+    assert s.bedrock_comparison_structured_output is True

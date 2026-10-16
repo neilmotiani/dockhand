@@ -25,16 +25,21 @@ class Settings(BaseSettings):
     ring_webhook_secret: SecretStr | None = None
     media_source: MediaSource = "ring_playground"
 
-    # Bedrock. The default is the cross-region inference profile for the current Sonnet;
-    # confirm with `aws bedrock list-inference-profiles --region us-east-1`.
+    # Bedrock. Model IDs are cross-region inference profiles; confirm availability with a small
+    # Converse call (listing a profile does not mean the account can invoke it). See
+    # docs/decisions.md for why the default is Nova Pro.
     aws_region: str = "us-east-1"
     # Bedrock API key (bearer token). If unset, boto3 falls back to the standard AWS credential
     # chain (env, ~/.aws, SSO) and signs with SigV4.
     aws_bearer_token_bedrock: SecretStr | None = None
-    bedrock_model_id: str = "us.anthropic.claude-sonnet-5-5"
-    # Converse structured output (`outputConfig` JSON schema). Turn off for models that reject it
+    bedrock_model_id: str = "us.amazon.nova-pro-v1:0"
+    # Converse structured output (`outputConfig` JSON schema). Off for models that reject it
     # (e.g. Amazon Nova); the schema then goes in the system prompt and Pydantic still validates.
-    bedrock_structured_output: bool = True
+    bedrock_structured_output: bool = False
+    # Second model the extraction eval always runs alongside the default, so every report
+    # compares the two on the same labelled set.
+    bedrock_comparison_model_id: str = "us.anthropic.claude-sonnet-4-6"
+    bedrock_comparison_structured_output: bool = True
     extraction_prompt_version: str = "v1"
     extraction_max_tokens: int = 1024
     bedrock_timeout_s: float = 60.0
