@@ -140,3 +140,46 @@ async def test_collect_frames_reports_partial_progress_on_timeout(tmp_path):
         )
     assert 1 <= len(saved) < 100
     assert all(p.exists() for p in saved)
+
+
+def test_evenly_spaced():
+    assert ring_spike.evenly_spaced(5, 10) == [0, 1, 2, 3, 4]
+    assert ring_spike.evenly_spaced(280, 60)[0] == 0
+    assert ring_spike.evenly_spaced(280, 60)[-1] == 279
+    idx = ring_spike.evenly_spaced(280, 60)
+    assert len(idx) == 60 and len(set(idx)) == 60 and idx == sorted(idx)
+    assert ring_spike.evenly_spaced(10, 1) == [0]
+
+
+class _ClipTrack:
+    """Delivers `n` frames quickly, then stalls like the Playground stream after a clip ends."""
+
+    def __init__(self, n: int):
+        self.n = n
+
+    async def recv(self):
+        import asyncio
+
+        if self.n == 0:
+            await asyncio.sleep(3600)
+        self.n -= 1
+        await asyncio.sleep(0.001)
+        return _FakeFrame()
+
+
+async def test_buffer_until_stall_stops_after_gap():
+    buf: list = []
+    await ring_spike.buffer_until_stall(_ClipTrack(5), 0.1, buf)
+    assert len(buf) == 5
+    assert buf[0][0] == 0.0
+    assert all(data[:2] == b"\xff\xd8" for _, data in buf)  # JPEG magic
+
+
+def test_write_spread_replaces_old_frames(tmp_path):
+    (tmp_path / "frame_99.jpg").write_bytes(b"old")
+    buf = [(i * 0.1, b"\xff\xd8" + bytes([i])) for i in range(20)]
+    paths = ring_spike.write_spread(buf, 5, tmp_path)
+    assert len(paths) == 5
+    assert not (tmp_path / "frame_99.jpg").exists()
+    assert paths[0].name == "frame_00_t00.00s.jpg"
+    assert paths[-1].name == "frame_04_t01.90s.jpg"

@@ -61,3 +61,13 @@ Format per entry: task, steps, expected vs. actual, severity, workaround, sugges
 - **Severity:** Medium (a client waits out its whole timeout instead of failing fast, and "connected" looks healthy).
 - **Workaround:** `scripts/ring_spike.py` checks `online` from device discovery and exits before opening a session.
 - **Suggestion:** Return the documented 503 for offline devices, and document how the Playground device's online state relates to the selected live-view event.
+
+## 2026-10-15 · Playground Package stream length varies by session, and nothing signals the end of a clip
+
+- **Task:** Capture frames spread across the Playground "Package" live-view event.
+- **Steps:** Selected the Package event (Playground step 3), then opened three WHEP sessions over a few minutes.
+- **Expected:** A predictable clip length, or a signal when the clip ends (RTCP BYE, track `ended`, session closed).
+- **Actual:** Session 1 got ~1.5 s of video and session 2 got ~10 s (about 29 fps, 1518 RTP packets); both then stopped sending RTP while ICE/DTLS stayed `connected` and the device stayed `online: true`. Session 3 streamed for the full 26 s until our client timed out (772 frames). The picture is a static scene: one box on snowy steps, no driver or motion.
+- **Severity:** Low–medium (a fixed-interval capture can silently come back nearly empty).
+- **Workaround:** `scripts/ring_spike.py --spread` decodes until the stream stalls for 2 s (or the timeout), then keeps N frames evenly spaced over what actually arrived.
+- **Suggestion:** Document each simulated event's duration and looping behaviour, and end the track or session when the clip finishes.

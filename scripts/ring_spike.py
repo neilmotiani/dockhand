@@ -12,11 +12,12 @@ token, ICE passwords, DTLS fingerprints and client IPs redacted. The token itsel
 
 Usage:
     uv run python -m scripts.ring_spike [--device NAME_OR_ID] [--frames 10] [--out DIR]
-        [--interval 0.5] [--timeout 25] [--record]
+        [--interval 0.5] [--timeout 25] [--record] [--spread]
 """
 
 import argparse
 import asyncio
+import io
 import json
 import re
 import sys
@@ -38,6 +39,9 @@ STUN = "stun:stun.l.google.com:19302"
 # docs), so the whole capture has to fit well inside 30 s.
 CAPTURE_TIMEOUT_S = 25.0
 FRAME_INTERVAL_S = 0.5
+# The Playground's simulated events are short clips (~10 s observed for Package); once a clip
+# ends Ring stops sending RTP while ICE stays connected. A gap this long means the clip is over.
+STALL_S = 2.0
 SENSITIVE_HEADERS = {"authorization", "cookie", "set-cookie", "x-amz-security-token"}
 
 
@@ -170,6 +174,39 @@ async def collect_frames(
     return saved
 
 
+def evenly_spaced(total: int, k: int) -> list[int]:
+    """k indices spread evenly over range(total), always including the first and last."""
+    if total <= k:
+        return list(range(total))
+    if k == 1:
+        return [0]
+    return [round(i * (total - 1) / (k - 1)) for i in range(k)]
+
+
+def _jpeg(frame) -> bytes:
+    buf = io.BytesIO()
+    frame.to_image().save(buf, format="JPEG", quality=92)
+    return buf.getvalue()
+
+
+async def buffer_until_stall(track, stall_s: float, buf: list[tuple[float, bytes]]) -> None:
+    """Decode every frame into buf as (seconds since first frame, JPEG bytes) until no frame
+    arrives for stall_s. Before the first frame it waits indefinitely (bounded by the caller)."""
+    t_first = None
+    while True:
+        try:
+            if t_first is None:
+                frame = await track.recv()
+            else:
+                frame = await asyncio.wait_for(track.recv(), timeout=stall_s)
+        except (TimeoutError, MediaStreamError):
+            return
+        now = time.monotonic()
+        t_first = t_first if t_first is not None else now
+        # JPEG-encode now: ~300 raw 720p frames would hold ~400 MB of decoded YUV.
+        buf.append((now - t_first, await asyncio.to_thread(_jpeg, frame)))
+
+
 async def run(
     device_query: str,
     n_frames: int,
@@ -177,6 +214,7 @@ async def run(
     interval_s: float = FRAME_INTERVAL_S,
     timeout_s: float = CAPTURE_TIMEOUT_S,
     record_fixtures: bool = False,
+    spread: bool = False,
 ) -> int:
     settings = get_settings()
     if settings.ring_access_token is None:
@@ -254,10 +292,20 @@ async def run(
 
             t0 = time.perf_counter()
             track = await asyncio.wait_for(track_ready, timeout=10)
-            await asyncio.wait_for(
-                collect_frames(track, n_frames, out_dir, interval_s, saved), timeout=timeout_s
-            )
-            print(f"Captured {len(saved)} frames in {time.perf_counter() - t0:.1f} s")
+            if spread:
+                buf: list[tuple[float, bytes]] = []
+                try:
+                    await asyncio.wait_for(buffer_until_stall(track, STALL_S, buf), timeout_s)
+                except TimeoutError:
+                    print("Capture timeout reached before the stream stalled", file=sys.stderr)
+                saved.extend(await asyncio.to_thread(write_spread, buf, n_frames, out_dir))
+                span = buf[-1][0] if buf else 0.0
+                print(f"Decoded {len(buf)} frames over {span:.1f} s; kept {len(saved)} evenly")
+            else:
+                await asyncio.wait_for(
+                    collect_frames(track, n_frames, out_dir, interval_s, saved), timeout_s
+                )
+                print(f"Captured {len(saved)} frames in {time.perf_counter() - t0:.1f} s")
         except TimeoutError:
             print(f"Timed out with {len(saved)} frames saved", file=sys.stderr)
         finally:
@@ -267,6 +315,20 @@ async def run(
                 save("whep_delete", r)
                 print(f"DELETE session -> {r.status_code}")
     return 0 if len(saved) >= n_frames else 1
+
+
+def write_spread(buf: list[tuple[float, bytes]], n: int, out_dir: Path) -> list[Path]:
+    """Write n frames evenly spaced over the buffered clip, replacing earlier frame_*.jpg."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for old in out_dir.glob("frame_*.jpg"):
+        old.unlink()
+    paths = []
+    for rank, i in enumerate(evenly_spaced(len(buf), n)):
+        t, data = buf[i]
+        path = out_dir / f"frame_{rank:02d}_t{t:05.2f}s.jpg"
+        path.write_bytes(data)
+        paths.append(path)
+    return paths
 
 
 def main() -> None:
@@ -281,10 +343,24 @@ def main() -> None:
     p.add_argument(
         "--record", action="store_true", help=f"write redacted fixtures to {FIXTURE_DIR}"
     )
+    p.add_argument(
+        "--spread",
+        action="store_true",
+        help="decode the whole clip until the stream stalls, then keep --frames evenly spaced "
+        "(ignores --interval)",
+    )
     args = p.parse_args()
     sys.exit(
         asyncio.run(
-            run(args.device, args.frames, args.out, args.interval, args.timeout, args.record)
+            run(
+                args.device,
+                args.frames,
+                args.out,
+                args.interval,
+                args.timeout,
+                args.record,
+                args.spread,
+            )
         )
     )
 
