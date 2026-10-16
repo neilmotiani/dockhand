@@ -69,15 +69,15 @@ def test_redact_sdp_strips_credentials_line_by_line():
     sdp = (
         "a=ice-ufrag:abcd\r\na=ice-pwd:secretpwd\r\n"
         "a=fingerprint:sha-256 AA:BB:CC\r\na=setup:actpass\r\n"
-        "c=IN IP4 192.168.1.76\r\n"
-        "a=candidate:1 1 udp 1 203.0.113.9 5000 typ srflx raddr 192.168.1.76 rport 5000\r\n"
+        "c=IN IP4 198.51.100.7\r\n"
+        "a=candidate:1 1 udp 1 203.0.113.9 5000 typ srflx raddr 198.51.100.7 rport 5000\r\n"
     )
     out = redact_sdp(sdp)
     assert "secretpwd" not in out and "AA:BB:CC" not in out
     assert "a=setup:actpass" in out  # only the credential lines change
-    assert "192.168.1.76" in out
+    assert "198.51.100.7" in out
     masked = redact_sdp(sdp, mask_addresses=True)
-    assert "192.168.1.76" not in masked and "203.0.113.9" not in masked
+    assert "198.51.100.7" not in masked and "203.0.113.9" not in masked
     assert "a=ice-ufrag:abcd" in masked
 
 
