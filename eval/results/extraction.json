@@ -1,7 +1,7 @@
 {
   "script": "eval/extraction.py",
-  "generated_at": "2026-10-16T03:55:37+00:00",
-  "git_commit": "9f8175511b54249ef51cb397cc2b1f7bcb7392da",
+  "generated_at": "2026-10-16T18:04:38+00:00",
+  "git_commit": "6a7e068c9b34d057086ecd2769d5429c326c21b8",
   "prompt_version": "v1",
   "models": [
     {
@@ -263,17 +263,17 @@
       "model": "us.amazon.nova-pro-v1:0",
       "n": 36,
       "count_exact": {
-        "value": 0.3333,
-        "k": 12,
+        "value": 0.4167,
+        "k": 15,
         "n": 36,
         "ci95": [
-          0.2021,
-          0.4967
+          0.2714,
+          0.578
         ]
       },
-      "count_mae": 0.778,
+      "count_mae": 0.611,
       "count_mae_n": 36,
-      "count_wrong": 24,
+      "count_wrong": 21,
       "negatives_false_alarm": {
         "value": null,
         "k": 0,
@@ -290,27 +290,27 @@
         ]
       },
       "failures": 0,
-      "latency_ms_p50": 1479.5,
-      "latency_ms_p95": 1950.4,
-      "usd_total": 0.083226,
-      "usd_per_call": 0.002312
+      "latency_ms_p50": 1651.2,
+      "latency_ms_p95": 2488.3,
+      "usd_total": 0.084557,
+      "usd_per_call": 0.002349
     },
     {
       "source": "synthetic_overlay",
       "model": "us.anthropic.claude-sonnet-4-6",
       "n": 36,
       "count_exact": {
-        "value": 0.5,
-        "k": 18,
+        "value": 0.75,
+        "k": 27,
         "n": 36,
         "ci95": [
-          0.3447,
-          0.6553
+          0.5893,
+          0.8625
         ]
       },
-      "count_mae": 0.75,
+      "count_mae": 0.417,
       "count_mae_n": 36,
-      "count_wrong": 18,
+      "count_wrong": 9,
       "negatives_false_alarm": {
         "value": null,
         "k": 0,
@@ -327,13 +327,167 @@
         ]
       },
       "failures": 0,
-      "latency_ms_p50": 3629.5,
-      "latency_ms_p95": 4904.7,
-      "usd_total": 0.28368,
-      "usd_per_call": 0.00788
+      "latency_ms_p50": 3777.4,
+      "latency_ms_p95": 5269.2,
+      "usd_total": 0.289489,
+      "usd_per_call": 0.008041
     }
   ],
-  "ledger_total_usd": 0.7343,
+  "per_background": [
+    {
+      "source": "synthetic_overlay",
+      "model": "us.amazon.nova-pro-v1:0",
+      "background_kind": "driveway",
+      "n": 16,
+      "count_exact": {
+        "value": 0.5625,
+        "k": 9,
+        "n": 16,
+        "ci95": [
+          0.3318,
+          0.769
+        ]
+      },
+      "count_mae": 0.5,
+      "count_mae_n": 16,
+      "count_wrong": 7,
+      "negatives_false_alarm": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "carrier_accuracy": {
+        "value": 1.0,
+        "k": 16,
+        "n": 16,
+        "ci95": [
+          0.8064,
+          1.0
+        ]
+      },
+      "failures": 0,
+      "latency_ms_p50": 1585.1,
+      "latency_ms_p95": 2005.0,
+      "usd_total": 0.037066,
+      "usd_per_call": 0.002317
+    },
+    {
+      "source": "synthetic_overlay",
+      "model": "us.amazon.nova-pro-v1:0",
+      "background_kind": "porch",
+      "n": 20,
+      "count_exact": {
+        "value": 0.3,
+        "k": 6,
+        "n": 20,
+        "ci95": [
+          0.1455,
+          0.519
+        ]
+      },
+      "count_mae": 0.7,
+      "count_mae_n": 20,
+      "count_wrong": 14,
+      "negatives_false_alarm": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "carrier_accuracy": {
+        "value": 0.95,
+        "k": 19,
+        "n": 20,
+        "ci95": [
+          0.7639,
+          0.9911
+        ]
+      },
+      "failures": 0,
+      "latency_ms_p50": 2012.7,
+      "latency_ms_p95": 2539.3,
+      "usd_total": 0.047491,
+      "usd_per_call": 0.002375
+    },
+    {
+      "source": "synthetic_overlay",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "background_kind": "driveway",
+      "n": 16,
+      "count_exact": {
+        "value": 0.9375,
+        "k": 15,
+        "n": 16,
+        "ci95": [
+          0.7167,
+          0.9889
+        ]
+      },
+      "count_mae": 0.062,
+      "count_mae_n": 16,
+      "count_wrong": 1,
+      "negatives_false_alarm": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "carrier_accuracy": {
+        "value": 1.0,
+        "k": 16,
+        "n": 16,
+        "ci95": [
+          0.8064,
+          1.0
+        ]
+      },
+      "failures": 0,
+      "latency_ms_p50": 3621.5,
+      "latency_ms_p95": 4946.6,
+      "usd_total": 0.12503,
+      "usd_per_call": 0.007814
+    },
+    {
+      "source": "synthetic_overlay",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "background_kind": "porch",
+      "n": 20,
+      "count_exact": {
+        "value": 0.6,
+        "k": 12,
+        "n": 20,
+        "ci95": [
+          0.3866,
+          0.7812
+        ]
+      },
+      "count_mae": 0.7,
+      "count_mae_n": 20,
+      "count_wrong": 8,
+      "negatives_false_alarm": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "carrier_accuracy": {
+        "value": 1.0,
+        "k": 20,
+        "n": 20,
+        "ci95": [
+          0.8389,
+          1.0
+        ]
+      },
+      "failures": 0,
+      "latency_ms_p50": 3908.7,
+      "latency_ms_p95": 5111.8,
+      "usd_total": 0.164459,
+      "usd_per_call": 0.008223
+    }
+  ],
+  "ledger_total_usd": 0.9045,
   "per_item": [
     {
       "id": "ring_playground:package",
@@ -1206,70 +1360,70 @@
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "The package is clearly labeled with 'DHL' and a tracking number, indicating it was delivered by DHL.",
+        "reasoning": "The image shows a package with a DHL label on it, indicating that DHL is the carrier. There is only one package visible in the image.",
         "carrier": "DHL",
         "package_count": 1,
         "label_text": [
-          "DHL",
-          "DH 18524140735"
+          "DHL"
         ],
-        "confidence": 1.0
+        "confidence": 0.95
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 85,
-      "latency_ms": 1263.6,
-      "bedrock_latency_ms": 1188,
+      "output_tokens": 79,
+      "latency_ms": 1774.1,
+      "bedrock_latency_ms": 1501,
       "structured_output": false,
-      "usd": 0.002278,
-      "called_at": "2026-10-16T03:50:10+00:00"
+      "usd": 0.002258,
+      "called_at": "2026-10-16T18:02:59+00:00"
     },
     {
       "id": "synthetic_overlay:syn_002.jpg",
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "The frames show four distinct packages, all marked with 'Amazon', indicating they were delivered by Amazon.",
+        "reasoning": "Five distinct Amazon packages are visible in the frames, with clear Amazon labels on each.",
         "carrier": "Amazon",
-        "package_count": 4,
+        "package_count": 5,
         "label_text": [
-          "Amazon AM 4044 0780 8 32",
+          "Amazon AM 4044 0780 8 362",
           "Amazon AM 2905 205",
-          "Amazon AM 9834 9854",
+          "Amazon AM 9834 9856",
+          "Amazon AM 2111 7110 2339",
           "Amazon AM 1007 2351 366"
         ],
         "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 130,
-      "latency_ms": 1754.9,
-      "bedrock_latency_ms": 1675,
+      "output_tokens": 147,
+      "latency_ms": 2445.9,
+      "bedrock_latency_ms": 2102,
       "structured_output": false,
-      "usd": 0.002422,
-      "called_at": "2026-10-16T03:50:11+00:00"
+      "usd": 0.002476,
+      "called_at": "2026-10-16T18:03:01+00:00"
     },
     {
       "id": "synthetic_overlay:syn_003.jpg",
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "The package is clearly labeled with 'USPS', indicating it was delivered by the United States Postal Service. There is only one package visible in the frames.",
+        "reasoning": "The package is clearly labeled with 'USPS' and a tracking number, indicating it was delivered by the United States Postal Service.",
         "carrier": "USPS",
         "package_count": 1,
         "label_text": [
-          "USPS"
+          "USPS US292188971380"
         ],
         "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 79,
-      "latency_ms": 1279.7,
-      "bedrock_latency_ms": 1200,
+      "output_tokens": 86,
+      "latency_ms": 1549.7,
+      "bedrock_latency_ms": 1446,
       "structured_output": false,
-      "usd": 0.002258,
-      "called_at": "2026-10-16T03:50:13+00:00"
+      "usd": 0.002281,
+      "called_at": "2026-10-16T18:03:03+00:00"
     },
     {
       "id": "synthetic_overlay:syn_004.jpg",
@@ -1370,71 +1524,74 @@
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "Multiple FedEx packages are visible, with clear FedEx labels and tracking numbers.",
+        "reasoning": "Multiple FedEx packages are visible, with clear logos and tracking numbers.",
         "carrier": "FedEx",
         "package_count": 5,
         "label_text": [
           "FedEx FE 4832 0008 34",
-          "FedEx FE 7617 7018 0497",
-          "FedEx FE 8970 7018 3697",
+          "FedEx FE 7617 7018 9497",
           "FedEx FE 3362 9410 2391",
-          "FedEx FE 6574 7610 2"
+          "FedEx FE 2111 2982 7388",
+          "FedEx FE 8970 7018 3697",
+          "FedEx FE 6574 4761 02"
         ],
         "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 156,
-      "latency_ms": 1830.0,
-      "bedrock_latency_ms": 1751,
+      "output_tokens": 177,
+      "latency_ms": 2042.5,
+      "bedrock_latency_ms": 1904,
       "structured_output": false,
-      "usd": 0.002505,
-      "called_at": "2026-10-16T03:50:20+00:00"
+      "usd": 0.002572,
+      "called_at": "2026-10-16T18:03:05+00:00"
     },
     {
       "id": "synthetic_overlay:syn_009.jpg",
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "The video shows two packages with a US Foods label on one of them, indicating the carrier.",
+        "reasoning": "The image shows two packages with visible labels indicating 'US Foods'. The carrier is identified as US Foods based on the label text.",
         "carrier": "US Foods",
         "package_count": 2,
         "label_text": [
-          "US Foods"
+          "US Foods US/0704 4027 3138",
+          "US Food US/0640 09 10 2085"
         ],
-        "confidence": 0.9
+        "confidence": 0.95
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 68,
-      "latency_ms": 1197.9,
-      "bedrock_latency_ms": 1115,
+      "output_tokens": 115,
+      "latency_ms": 2802.4,
+      "bedrock_latency_ms": 2687,
       "structured_output": false,
-      "usd": 0.002223,
-      "called_at": "2026-10-16T03:50:21+00:00"
+      "usd": 0.002374,
+      "called_at": "2026-10-16T18:03:07+00:00"
     },
     {
       "id": "synthetic_overlay:syn_010.jpg",
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "The frames show two FedEx boxes and one unlabeled box, all left at the back door.",
+        "reasoning": "Three distinct FedEx packages are visible in the frames, with clear FedEx labels and tracking numbers.",
         "carrier": "FedEx",
         "package_count": 3,
         "label_text": [
-          "FedEx",
-          "FedEx"
+          "FE 02211900",
+          "FE 97817 7480 10810",
+          "FE 30734752 0592"
         ],
-        "confidence": 0.9
+        "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 72,
-      "latency_ms": 1341.3,
-      "bedrock_latency_ms": 1259,
+      "output_tokens": 112,
+      "latency_ms": 2202.5,
+      "bedrock_latency_ms": 2109,
       "structured_output": false,
-      "usd": 0.002236,
-      "called_at": "2026-10-16T03:50:23+00:00"
+      "usd": 0.002364,
+      "called_at": "2026-10-16T18:03:10+00:00"
     },
     {
       "id": "synthetic_overlay:syn_011.jpg",
@@ -1445,21 +1602,21 @@
         "carrier": "Sysco",
         "package_count": 4,
         "label_text": [
-          "Sysco SY 7790 5751",
-          "Sysco SY 4214 7297 0008",
-          "Sysco SY 5729 3224 7907",
-          "Sysco SY 4052 1522 7903"
+          "Sysco SY 7750 5751",
+          "Sysco SY 4214 7297 0038",
+          "Sysco SY 5729 3224 7007",
+          "Sysco SY 4052 1522 7003"
         ],
-        "confidence": 1.0
+        "confidence": 0.95
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 138,
-      "latency_ms": 1847.8,
-      "bedrock_latency_ms": 1768,
+      "output_tokens": 141,
+      "latency_ms": 2475.9,
+      "bedrock_latency_ms": 2105,
       "structured_output": false,
-      "usd": 0.002447,
-      "called_at": "2026-10-16T03:50:25+00:00"
+      "usd": 0.002457,
+      "called_at": "2026-10-16T18:03:12+00:00"
     },
     {
       "id": "synthetic_overlay:syn_012.jpg",
@@ -1564,23 +1721,24 @@
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "Two distinct Amazon packages are visible on the steps, with clear Amazon labels.",
+        "reasoning": "Three distinct Amazon packages are visible, each with clear Amazon branding and tracking numbers.",
         "carrier": "Amazon",
-        "package_count": 2,
+        "package_count": 3,
         "label_text": [
-          "Amazon AMR118033937",
-          "Amazon AM442014529021"
+          "Amazon AM180333937",
+          "Amazon AM4420145902",
+          "Amazon AM8983137336875"
         ],
         "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 90,
-      "latency_ms": 1313.6,
-      "bedrock_latency_ms": 1232,
+      "output_tokens": 104,
+      "latency_ms": 1618.0,
+      "bedrock_latency_ms": 1384,
       "structured_output": false,
-      "usd": 0.002294,
-      "called_at": "2026-10-16T03:50:33+00:00"
+      "usd": 0.002338,
+      "called_at": "2026-10-16T18:03:14+00:00"
     },
     {
       "id": "synthetic_overlay:syn_017.jpg",
@@ -1609,25 +1767,26 @@
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "The images show multiple packages with UPS labels, indicating that UPS is the carrier.",
+        "reasoning": "Multiple UPS packages are visible in the frames, with clear UPS labels and tracking numbers.",
         "carrier": "UPS",
         "package_count": 4,
         "label_text": [
-          "UPS",
-          "UPS",
-          "UPS",
-          "UPS"
+          "UPS UP 8253 1909 41",
+          "UPS UP 4057 9422 1339",
+          "UPS UP 2383 1442 2160",
+          "UPS UP 5075 9510 7179",
+          "UPS UP 1608 310 92"
         ],
         "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 73,
-      "latency_ms": 1382.1,
-      "bedrock_latency_ms": 1293,
+      "output_tokens": 153,
+      "latency_ms": 2056.6,
+      "bedrock_latency_ms": 1972,
       "structured_output": false,
-      "usd": 0.002239,
-      "called_at": "2026-10-16T03:50:35+00:00"
+      "usd": 0.002495,
+      "called_at": "2026-10-16T18:03:16+00:00"
     },
     {
       "id": "synthetic_overlay:syn_019.jpg",
@@ -1746,23 +1905,24 @@
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "The frames show two distinct packages with FedEx labels, indicating that FedEx is the carrier.",
+        "reasoning": "Three distinct FedEx packages are visible, each with clear FedEx labels and tracking numbers.",
         "carrier": "FedEx",
-        "package_count": 2,
+        "package_count": 3,
         "label_text": [
-          "FedEx FE 4104 47528",
-          "FedEx FE 6301 800"
+          "FedEx FE 4104 475283",
+          "FedEx FE 3017 81038304",
+          "FedEx FE 6301 8001"
         ],
         "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 91,
-      "latency_ms": 1352.2,
-      "bedrock_latency_ms": 1272,
+      "output_tokens": 112,
+      "latency_ms": 2305.0,
+      "bedrock_latency_ms": 2189,
       "structured_output": false,
-      "usd": 0.002297,
-      "called_at": "2026-10-16T03:50:44+00:00"
+      "usd": 0.002364,
+      "called_at": "2026-10-16T18:03:18+00:00"
     },
     {
       "id": "synthetic_overlay:syn_025.jpg",
@@ -1791,49 +1951,56 @@
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "Three distinct UPS packages are visible in the frames, each with a UPS label and tracking number.",
+        "reasoning": "Four distinct UPS packages are visible in the frames, each with clear UPS branding and tracking numbers.",
         "carrier": "UPS",
-        "package_count": 3,
+        "package_count": 4,
         "label_text": [
-          "UPS UP 7144 2812041",
-          "UPS UP 32478 333",
-          "UPS UP6074 279"
+          "UPS UP 32478333",
+          "UPS UP 3100 0100 333",
+          "UPS UP 0274 2664 06 19",
+          "UPS UP 7144 278 1204"
         ],
         "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 106,
-      "latency_ms": 1724.2,
-      "bedrock_latency_ms": 1643,
+      "output_tokens": 133,
+      "latency_ms": 2088.9,
+      "bedrock_latency_ms": 1988,
       "structured_output": false,
-      "usd": 0.002345,
-      "called_at": "2026-10-16T03:50:47+00:00"
+      "usd": 0.002431,
+      "called_at": "2026-10-16T18:03:20+00:00"
     },
     {
       "id": "synthetic_overlay:syn_027.jpg",
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "Multiple USPS packages are visible in the frames, with clear USPS labels and tracking numbers.",
+        "reasoning": "Multiple packages with clear USPS markings and tracking numbers were left at the door.",
         "carrier": "USPS",
         "package_count": 5,
         "label_text": [
-          "US 186191817491",
-          "US 0275 1877 1860",
+          "USPS",
+          "US 180191817491",
+          "USPS",
           "US 1915 7809 3308",
-          "US 7274 3300"
+          "USPS",
+          "US 7274 3800",
+          "USPS",
+          "US 1915 4504 8566",
+          "USPS",
+          "US 7023 8074 1215"
         ],
         "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 128,
-      "latency_ms": 1911.5,
-      "bedrock_latency_ms": 1829,
+      "output_tokens": 170,
+      "latency_ms": 2362.0,
+      "bedrock_latency_ms": 2195,
       "structured_output": false,
-      "usd": 0.002415,
-      "called_at": "2026-10-16T03:50:49+00:00"
+      "usd": 0.00255,
+      "called_at": "2026-10-16T18:03:23+00:00"
     },
     {
       "id": "synthetic_overlay:syn_028.jpg",
@@ -1936,94 +2103,97 @@
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "The frames show a USPS delivery vehicle and multiple packages with USPS labels.",
+        "reasoning": "Three distinct packages are visible, all marked with USPS labels.",
         "carrier": "USPS",
         "package_count": 3,
         "label_text": [
-          "USPS US 9030 740388",
+          "USPS US 9030 7403 88",
           "USPS US 5813 5220 4867",
-          "USPS US 808 2 2069 6488"
+          "USPS US 5804 1403 7000",
+          "USPS US 808 2 2069 6438"
         ],
         "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 119,
-      "latency_ms": 1522.4,
-      "bedrock_latency_ms": 1442,
+      "output_tokens": 137,
+      "latency_ms": 1671.7,
+      "bedrock_latency_ms": 1594,
       "structured_output": false,
-      "usd": 0.002386,
-      "called_at": "2026-10-16T03:50:58+00:00"
+      "usd": 0.002444,
+      "called_at": "2026-10-16T18:03:24+00:00"
     },
     {
       "id": "synthetic_overlay:syn_033.jpg",
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "Four distinct packages with USPS labels were left at the back door.",
+        "reasoning": "Multiple packages with clear USPS markings were left at the door.",
         "carrier": "USPS",
-        "package_count": 4,
+        "package_count": 5,
         "label_text": [
           "USPS US 8100 5563 297",
-          "USPS US 4328 8618 8813",
-          "USPS",
-          "USPS US 0328 727"
+          "USPS US 4328 8018 8813",
+          "USPS US 5191 6203 661",
+          "USPS US 0328 727",
+          "USPS US 4324 3430 9643"
         ],
         "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 116,
-      "latency_ms": 1653.2,
-      "bedrock_latency_ms": 1573,
+      "output_tokens": 151,
+      "latency_ms": 1982.9,
+      "bedrock_latency_ms": 1813,
       "structured_output": false,
-      "usd": 0.002377,
-      "called_at": "2026-10-16T03:50:59+00:00"
+      "usd": 0.002489,
+      "called_at": "2026-10-16T18:03:26+00:00"
     },
     {
       "id": "synthetic_overlay:syn_034.jpg",
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "The image shows a package with a UPS label, indicating that UPS is the carrier. There is only one package visible in the frame.",
+        "reasoning": "Two UPS packages are clearly visible with UPS labels and tracking numbers.",
         "carrier": "UPS",
-        "package_count": 1,
+        "package_count": 2,
         "label_text": [
-          "UPS"
+          "UPS UP 1907 5286 7472",
+          "UPS UP 1172 0070 8392"
         ],
         "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 72,
-      "latency_ms": 1389.1,
-      "bedrock_latency_ms": 1313,
+      "output_tokens": 94,
+      "latency_ms": 1566.9,
+      "bedrock_latency_ms": 1325,
       "structured_output": false,
-      "usd": 0.002236,
-      "called_at": "2026-10-16T03:51:01+00:00"
+      "usd": 0.002306,
+      "called_at": "2026-10-16T18:03:28+00:00"
     },
     {
       "id": "synthetic_overlay:syn_035.jpg",
       "model": "us.amazon.nova-pro-v1:0",
       "ok": true,
       "result": {
-        "reasoning": "Two UPS packages were left at the back door, as indicated by the UPS labels on the boxes.",
+        "reasoning": "Two distinct UPS packages were left at the back door, as indicated by the UPS labels on each package.",
         "carrier": "UPS",
         "package_count": 2,
         "label_text": [
-          "UPS",
-          "UPS"
+          "UPS UP 0019 4500",
+          "UPS UP 4083 6134 9080"
         ],
         "confidence": 1.0
       },
       "attempts": 1,
       "input_tokens": 2507,
-      "output_tokens": 69,
-      "latency_ms": 1207.5,
-      "bedrock_latency_ms": 1132,
+      "output_tokens": 97,
+      "latency_ms": 2525.4,
+      "bedrock_latency_ms": 2373,
       "structured_output": false,
-      "usd": 0.002226,
-      "called_at": "2026-10-16T03:51:02+00:00"
+      "usd": 0.002316,
+      "called_at": "2026-10-16T18:03:30+00:00"
     },
     {
       "id": "ring_playground:package",
@@ -2898,71 +3068,72 @@
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "A DHL label overlay is visible on the package near the door, showing 'DHL' and a tracking number starting with 'DH 1802 4140 7'. There appears to be at least one cardboard box left at the front door area.",
+        "reasoning": "A brown cardboard box with a visible DHL label is left at the front door in snowy conditions. The DHL branding is clearly visible on the label, and partial tracking numbers can be read. There appears to be one package delivered.",
         "carrier": "DHL",
         "package_count": 1,
         "label_text": [
-          "DHL",
-          "DH 1802 4140 7"
+          "DHL DH 1817 0041 3070",
+          "DHL DH 1802 4140 7"
         ],
-        "confidence": 0.82
+        "confidence": 0.85
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 100,
-      "latency_ms": 2915.7,
-      "bedrock_latency_ms": 2791,
+      "output_tokens": 107,
+      "latency_ms": 3236.2,
+      "bedrock_latency_ms": 2983,
       "structured_output": true,
-      "usd": 0.007514,
-      "called_at": "2026-10-16T03:53:28+00:00"
+      "usd": 0.00763,
+      "called_at": "2026-10-16T18:03:34+00:00"
     },
     {
       "id": "synthetic_overlay:syn_002.jpg",
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "Four Amazon-labeled packages are visible on the front doorstep/mat area, each with an Amazon logo and partial tracking numbers visible on their labels. The packages appear to be boxes of varying sizes left at the front door in snowy conditions.",
+        "reasoning": "Multiple Amazon-labeled packages are visible on the doorstep in the snow. I can count 5 distinct packages with Amazon labels, each showing partial tracking numbers (AM 4044 0780 8..., AM 3990 20..., AM 9934 9..., AM 2111 7110 2898, AM 1007 2351 3...). All packages bear Amazon branding.",
         "carrier": "Amazon",
-        "package_count": 4,
+        "package_count": 5,
         "label_text": [
-          "Amazon AM 4044 0780 8 3??",
-          "Amazon AM 3990 20??",
-          "Amazon AM 8934 9???",
-          "Amazon AM 1007 2351 3??"
+          "Amazon AM 4044 0780 8",
+          "Amazon AM 3990 20",
+          "Amazon AM 9934 9",
+          "Amazon AM 2111 7110 2898",
+          "Amazon AM 1007 2351 3"
         ],
-        "confidence": 0.85
+        "confidence": 0.88
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 123,
-      "latency_ms": 3636.1,
-      "bedrock_latency_ms": 3443,
+      "output_tokens": 169,
+      "latency_ms": 4194.5,
+      "bedrock_latency_ms": 4102,
       "structured_output": true,
-      "usd": 0.007894,
-      "called_at": "2026-10-16T03:53:31+00:00"
+      "usd": 0.008653,
+      "called_at": "2026-10-16T18:03:38+00:00"
     },
     {
       "id": "synthetic_overlay:syn_003.jpg",
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "I can see at least two brown cardboard packages/boxes on the snowy porch area, and a USPS label overlay is visible on one of the packages in the center-right of the frame. The label clearly shows 'USPS' text. There appear to be two distinct cardboard boxes visible on the porch.",
+        "reasoning": "Two packages are visible at the front door, both bearing USPS labels. One is a brown cardboard box/mailer on the left with a clearly visible USPS label, and a second smaller brown package is visible on the right also with a USPS label. Both labels show USPS branding and partial tracking numbers.",
         "carrier": "USPS",
         "package_count": 2,
         "label_text": [
-          "USPS",
-          "US8003717"
+          "USPS US 28 2198671 1100",
+          "USPS US8003 71..."
         ],
-        "confidence": 0.72
+        "confidence": 0.82
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 110,
-      "latency_ms": 3359.9,
-      "bedrock_latency_ms": 3276,
+      "output_tokens": 125,
+      "latency_ms": 3702.6,
+      "bedrock_latency_ms": 3615,
       "structured_output": true,
-      "usd": 0.007679,
-      "called_at": "2026-10-16T03:53:35+00:00"
+      "usd": 0.007927,
+      "called_at": "2026-10-16T18:03:41+00:00"
     },
     {
       "id": "synthetic_overlay:syn_004.jpg",
@@ -3063,97 +3234,100 @@
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "The frame shows multiple FedEx-labeled packages at the front door, with four distinct FedEx detection overlays identifying separate packages. The overlays show partial tracking numbers for each package. There appear to be at least 4 distinct physical packages visible on and around the doormat area.",
+        "reasoning": "Multiple packages are visible at the front door area, all labeled with FedEx tracking identifiers overlaid on the image. I can count 5 distinct packages: a small dark/black package, a purple/blue envelope, a brown cardboard box (open), a larger flat brown box, and a colorful box. All are tagged with FedEx labels.",
         "carrier": "FedEx",
-        "package_count": 4,
+        "package_count": 5,
         "label_text": [
           "FE 4832 0068 3...",
           "FE 7017 2018 ...499",
-          "FE 5302 9410 2311",
+          "FE 5302 9410 2391",
+          "FE 2111 2062 7388",
           "FE 8976 2018 3...",
-          "FE 0674 474 ...02"
+          "FE 0674 479 ...02"
         ],
-        "confidence": 0.72
+        "confidence": 0.82
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 150,
-      "latency_ms": 5801.5,
-      "bedrock_latency_ms": 5702,
+      "output_tokens": 178,
+      "latency_ms": 5027.3,
+      "bedrock_latency_ms": 4946,
       "structured_output": true,
-      "usd": 0.008339,
-      "called_at": "2026-10-16T03:53:54+00:00"
+      "usd": 0.008801,
+      "called_at": "2026-10-16T18:03:47+00:00"
     },
     {
       "id": "synthetic_overlay:syn_009.jpg",
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "The frame shows a US Foods delivery with what appears to be at least one cardboard box/case visible near the door, with a US Foods label overlay showing 'US Foods' and a partial tracking number 'US6704 4027 3...'. There appears to be one package/case left at the door.",
+        "reasoning": "Two packages are visible at the door, both bearing 'US Foods' labels. One label reads 'US Foods' with a partial number 'US 6704 4027 3...' and the other reads 'US Foods' with a partial number 'US 0040 0910 3083'. Both packages appear to be brown cardboard boxes delivered by US Foods.",
         "carrier": "US Foods",
-        "package_count": 1,
+        "package_count": 2,
         "label_text": [
-          "US Foods",
-          "US6704 4027 3"
+          "US Foods US 6704 4027 3...",
+          "US Foods US 0040 0910 3083"
         ],
-        "confidence": 0.72
+        "confidence": 0.82
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 109,
-      "latency_ms": 3164.7,
-      "bedrock_latency_ms": 3085,
+      "output_tokens": 138,
+      "latency_ms": 3638.1,
+      "bedrock_latency_ms": 3554,
       "structured_output": true,
-      "usd": 0.007663,
-      "called_at": "2026-10-16T03:53:57+00:00"
+      "usd": 0.008141,
+      "called_at": "2026-10-16T18:03:50+00:00"
     },
     {
       "id": "synthetic_overlay:syn_010.jpg",
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "The frame shows two FedEx package icons overlaid on the scene, each labeled 'FedEx' with partial tracking numbers visible. There appear to be cardboard boxes on the snowy porch steps consistent with two FedEx deliveries.",
+        "reasoning": "Three FedEx packages are visible at the front door in snowy conditions. Each package has a FedEx label overlay with partially legible tracking numbers. The packages appear to be two standard brown cardboard boxes and one box with product imagery on it.",
         "carrier": "FedEx",
-        "package_count": 2,
+        "package_count": 3,
         "label_text": [
           "FedEx FE 0221 900",
+          "FedEx FE 9761 7400 1080",
           "FedEx FE 0073 4726"
         ],
-        "confidence": 0.72
+        "confidence": 0.82
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 106,
-      "latency_ms": 3258.8,
-      "bedrock_latency_ms": 3160,
+      "output_tokens": 121,
+      "latency_ms": 3521.0,
+      "bedrock_latency_ms": 3423,
       "structured_output": true,
-      "usd": 0.007613,
-      "called_at": "2026-10-16T03:54:01+00:00"
+      "usd": 0.007861,
+      "called_at": "2026-10-16T18:03:54+00:00"
     },
     {
       "id": "synthetic_overlay:syn_011.jpg",
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "The frame shows multiple Sysco-labeled boxes detected by an overlay system, with four distinct Sysco package annotations visible (SY 7750 57?, SY 4214 7297 0008, SY 5729 3224 7007, SY 4052 1522 7003). The packages appear to be cardboard cases consistent with Sysco food service deliveries left at the back/front door area in snowy conditions.",
+        "reasoning": "Multiple boxes with Sysco labels are visible on the doorstep/loading area. I can count 5 distinct labeled packages with Sysco branding and partial item numbers visible on each label.",
         "carrier": "Sysco",
-        "package_count": 4,
+        "package_count": 5,
         "label_text": [
-          "Sysco SY 7750 57",
+          "Sysco SY 7750 575",
           "Sysco SY 4214 7297 0008",
           "Sysco SY 5729 3224 7007",
+          "Sysco SY 7273 1308 0081",
           "Sysco SY 4052 1522 7003"
         ],
-        "confidence": 0.82
+        "confidence": 0.85
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 187,
-      "latency_ms": 4445.8,
-      "bedrock_latency_ms": 4331,
+      "output_tokens": 144,
+      "latency_ms": 3963.9,
+      "bedrock_latency_ms": 3880,
       "structured_output": true,
-      "usd": 0.00895,
-      "called_at": "2026-10-16T03:54:05+00:00"
+      "usd": 0.00824,
+      "called_at": "2026-10-16T18:03:58+00:00"
     },
     {
       "id": "synthetic_overlay:syn_012.jpg",
@@ -3259,23 +3433,24 @@
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "Two Amazon-labeled packages are visible on the doorstep/mat area, with Amazon branding clearly shown on the overlaid detection boxes. A third cardboard box/package is also visible near the bottom center of the frame, suggesting at least 3 packages total. The Amazon labels with partial tracking numbers are legible on two of the packages.",
+        "reasoning": "Three Amazon-labeled packages are visible on the doorstep in snowy conditions. Each package has an Amazon label with partial tracking numbers visible. All three are distinct boxes/packages left at the door.",
         "carrier": "Amazon",
         "package_count": 3,
         "label_text": [
           "Amazon AM 8180 338 9 37",
-          "Amazon AM 4450 148 3 37"
+          "Amazon AM 4450 148...",
+          "Amazon AM 6363 1273 0873"
         ],
-        "confidence": 0.75
+        "confidence": 0.88
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 125,
-      "latency_ms": 3931.2,
-      "bedrock_latency_ms": 3854,
+      "output_tokens": 103,
+      "latency_ms": 3734.8,
+      "bedrock_latency_ms": 3645,
       "structured_output": true,
-      "usd": 0.007927,
-      "called_at": "2026-10-16T03:54:23+00:00"
+      "usd": 0.007564,
+      "called_at": "2026-10-16T18:04:01+00:00"
     },
     {
       "id": "synthetic_overlay:syn_017.jpg",
@@ -3304,25 +3479,26 @@
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "The frame shows multiple packages at the front door, all labeled with UPS identifiers. Four distinct UPS package annotations are visible with partial tracking numbers readable on the labels. The packages include cardboard boxes and what appears to be a purple/blue mailer or soft package.",
+        "reasoning": "The frame shows multiple UPS packages left at the front door in snowy conditions. There are 4 distinct packages visible with UPS labels, including brown cardboard boxes and what appears to be a blue/purple package. Each package has a UPS label with partial tracking numbers visible.",
         "carrier": "UPS",
         "package_count": 4,
         "label_text": [
-          "UPS UP8203 1909 4",
-          "UPS UP4057 9422",
-          "UPS UP5975 9816 7179",
-          "UPS UP1009 316 92"
+          "UPS UP8203 1909 4...",
+          "UPS UP4057 9422 ...",
+          "UPS UP5363 1429 2100",
+          "UPS UP5975 9610 7179",
+          "UPS UP1009 310... 92"
         ],
         "confidence": 0.82
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 128,
-      "latency_ms": 3912.1,
-      "bedrock_latency_ms": 3769,
+      "output_tokens": 147,
+      "latency_ms": 4380.3,
+      "bedrock_latency_ms": 4285,
       "structured_output": true,
-      "usd": 0.007976,
-      "called_at": "2026-10-16T03:54:31+00:00"
+      "usd": 0.00829,
+      "called_at": "2026-10-16T18:04:06+00:00"
     },
     {
       "id": "synthetic_overlay:syn_019.jpg",
@@ -3444,24 +3620,25 @@
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "Three FedEx package labels are visible in the frame with partial tracking numbers readable on each overlay tag. The packages appear to be boxes left at the front door in snowy conditions, with FedEx branding clearly shown on all three detection overlays.",
+        "reasoning": "The frame shows multiple FedEx-labeled packages on a doorstep/mat in snowy conditions. There are at least 4 distinct packages visible with FedEx labels, including what appears to be boxes and a mailer/envelope. The labels show FedEx branding with partial tracking numbers visible on each.",
         "carrier": "FedEx",
-        "package_count": 3,
+        "package_count": 4,
         "label_text": [
-          "FE 4109447023",
-          "FE 4880237",
-          "FE 03018000"
+          "FedEx FE 4109447023",
+          "FedEx FE 4880237",
+          "FedEx FE 39172816038204",
+          "FedEx FE 03018001"
         ],
         "confidence": 0.82
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 105,
-      "latency_ms": 3230.1,
-      "bedrock_latency_ms": 3150,
+      "output_tokens": 141,
+      "latency_ms": 4138.6,
+      "bedrock_latency_ms": 3974,
       "structured_output": true,
-      "usd": 0.007597,
-      "called_at": "2026-10-16T03:54:54+00:00"
+      "usd": 0.008191,
+      "called_at": "2026-10-16T18:04:10+00:00"
     },
     {
       "id": "synthetic_overlay:syn_025.jpg",
@@ -3488,38 +3665,39 @@
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "The frame shows multiple UPS-labeled packages on a doorstep mat in snowy conditions. There are detection overlays identifying 4 distinct UPS packages with partial tracking numbers visible. The brown cardboard boxes are consistent with UPS deliveries.",
+        "reasoning": "The frame shows multiple UPS-labeled packages on a doorstep mat in snowy conditions. There appear to be at least 4 distinct packages visible with UPS labels, including boxes of varying sizes. The labels show UPS tracking numbers on each package.",
         "carrier": "UPS",
         "package_count": 4,
         "label_text": [
-          "UP 7144 28",
-          "UP 32478333",
-          "UP 0074 27",
-          "UP 5100 0100 3"
+          "UPS UP:7144 28",
+          "UPS UP:32478333",
+          "UPS UP:0274 2084 08 19",
+          "UPS UP:5100 0100 3"
         ],
         "confidence": 0.82
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 112,
-      "latency_ms": 3540.3,
-      "bedrock_latency_ms": 3447,
+      "output_tokens": 127,
+      "latency_ms": 6553.1,
+      "bedrock_latency_ms": 6415,
       "structured_output": true,
-      "usd": 0.007712,
-      "called_at": "2026-10-16T03:55:02+00:00"
+      "usd": 0.00796,
+      "called_at": "2026-10-16T18:04:16+00:00"
     },
     {
       "id": "synthetic_overlay:syn_027.jpg",
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "The frame shows multiple packages on a doorstep with USPS labels overlaid on each package thumbnail. Four distinct USPS-labeled packages are visible with partial tracking numbers readable from the overlays. The carrier is clearly USPS based on the labels.",
+        "reasoning": "Multiple packages are visible at the front door, all labeled with USPS tracking numbers. I can count 5 distinct packages with USPS labels visible: a brown box (US 0270 1877 180...), a purple/blue box (US 18619181 7...), a red/brown package (US 1391 400...), a large flat brown box (US 70230074 1215), a white/open box (US 1915 7809 3308), and a small brown box (US 7274 3...). That gives approximately 5-6 distinct packages all delivered by USPS.",
         "carrier": "USPS",
-        "package_count": 4,
+        "package_count": 6,
         "label_text": [
           "US 0270 1877 180",
-          "US 1861 9181 74",
+          "US 18619181 7",
           "US 1391 400",
+          "US 70230074 1215",
           "US 1915 7809 3308",
           "US 7274 3"
         ],
@@ -3527,12 +3705,12 @@
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 130,
-      "latency_ms": 3622.9,
-      "bedrock_latency_ms": 3541,
+      "output_tokens": 223,
+      "latency_ms": 5035.9,
+      "bedrock_latency_ms": 4953,
       "structured_output": true,
-      "usd": 0.008009,
-      "called_at": "2026-10-16T03:55:06+00:00"
+      "usd": 0.009544,
+      "called_at": "2026-10-16T18:04:21+00:00"
     },
     {
       "id": "synthetic_overlay:syn_028.jpg",
@@ -3640,95 +3818,99 @@
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "The frame shows multiple packages on a snowy doorstep with USPS label overlays visible on at least three distinct packages. The overlays clearly identify the carrier as USPS, and I can count approximately 3 separate packages/items left at the door.",
+        "reasoning": "The frame shows multiple packages on a doorstep with USPS labels visible on at least three distinct items. The labels clearly show 'USPS' branding with partial tracking numbers visible on each package. There appear to be 3 separate packages delivered by USPS.",
         "carrier": "USPS",
         "package_count": 3,
         "label_text": [
-          "US9030 740...",
-          "US808 2 2009 3...",
-          "US 9213 5220..."
+          "USPS US9030 740... 088...",
+          "USPS US808 2 2009 34...",
+          "USPS US6 004 1403 7000",
+          "USPS US 9313 5220..."
         ],
-        "confidence": 0.72
+        "confidence": 0.82
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 115,
-      "latency_ms": 4550.8,
-      "bedrock_latency_ms": 4468,
+      "output_tokens": 144,
+      "latency_ms": 3868.5,
+      "bedrock_latency_ms": 3747,
       "structured_output": true,
-      "usd": 0.007762,
-      "called_at": "2026-10-16T03:55:26+00:00"
+      "usd": 0.00824,
+      "called_at": "2026-10-16T18:04:25+00:00"
     },
     {
       "id": "synthetic_overlay:syn_033.jpg",
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "The frame shows multiple USPS-labeled packages detected by an AI overlay on the camera feed. There appear to be at least 4 distinct USPS packages visible in the thumbnails/overlays, with one large flat box visible on the doorstep area. The labels on the overlays show USPS tracking numbers though most are partially legible.",
+        "reasoning": "The frame shows multiple packages on a doorstep with USPS labels visible on all of them. I can count 5 distinct labeled packages: two brown boxes in the upper area, one purple/blue package, one smaller package lower left, and one flat/large brown package in the center, plus one additional package on the right side. The labels all read USPS with partial tracking numbers visible.",
         "carrier": "USPS",
-        "package_count": 4,
+        "package_count": 6,
         "label_text": [
-          "US8 100 5563 2??",
-          "US 4358 8618 8???",
-          "US519???01",
-          "US0235??"
+          "USPS US8100 5563 2??",
+          "USPS US4358 8618 8???",
+          "USPS US5191???",
+          "USPS US0235??",
+          "USPS US4374 3400 0043",
+          "USPS US0239???"
         ],
-        "confidence": 0.55
+        "confidence": 0.72
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 138,
-      "latency_ms": 4075.8,
-      "bedrock_latency_ms": 3984,
+      "output_tokens": 178,
+      "latency_ms": 4738.9,
+      "bedrock_latency_ms": 4648,
       "structured_output": true,
-      "usd": 0.008141,
-      "called_at": "2026-10-16T03:55:30+00:00"
+      "usd": 0.008801,
+      "called_at": "2026-10-16T18:04:30+00:00"
     },
     {
       "id": "synthetic_overlay:syn_034.jpg",
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "The frame shows a UPS label overlay in the upper-left area of the package with 'UPS' and a partial tracking number visible. There appears to be at least one cardboard box on the doormat/porch area with a shipping label visible on it.",
+        "reasoning": "Two UPS packages are visible on the front doorstep/mat area in snowy conditions. Both boxes have UPS shipping labels clearly visible. The smaller inset image in the upper area also shows a UPS-labeled package, but this appears to be the same delivery event showing the same packages from a slightly different angle/zoom.",
         "carrier": "UPS",
-        "package_count": 1,
+        "package_count": 2,
         "label_text": [
-          "UPS",
-          "UP 1907 5286 74"
+          "UPS UP 1907 5286 74",
+          "UPS UP 1172 0079 6 302"
         ],
-        "confidence": 0.72
+        "confidence": 0.85
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 99,
-      "latency_ms": 3134.5,
-      "bedrock_latency_ms": 3053,
+      "output_tokens": 125,
+      "latency_ms": 3926.1,
+      "bedrock_latency_ms": 3844,
       "structured_output": true,
-      "usd": 0.007498,
-      "called_at": "2026-10-16T03:55:33+00:00"
+      "usd": 0.007927,
+      "called_at": "2026-10-16T18:04:34+00:00"
     },
     {
       "id": "synthetic_overlay:syn_035.jpg",
       "model": "us.anthropic.claude-sonnet-4-6",
       "ok": true,
       "result": {
-        "reasoning": "Two UPS-labeled packages are visible on the doorstep/mat area: one upright brown box with a UPS label overlay and one flat/dark package with a second UPS label overlay. Both label overlays clearly show 'UPS' as the carrier with partial tracking numbers visible.",
+        "reasoning": "Three UPS packages are visible on the doorstep/mat area: one brown box in the upper left with a UPS label, one flat/large brown box in the lower center with a UPS label, and one darker package to the right with a UPS label. All labels clearly show UPS branding.",
         "carrier": "UPS",
-        "package_count": 2,
+        "package_count": 3,
         "label_text": [
           "UPS UP 0019400",
-          "UPS UP 2410 09020339"
+          "UPS UP 4063 0 134 9000",
+          "UPS UP 2410 09620 339"
         ],
-        "confidence": 0.82
+        "confidence": 0.88
       },
       "attempts": 1,
       "input_tokens": 1777,
-      "output_tokens": 111,
-      "latency_ms": 3564.8,
-      "bedrock_latency_ms": 3476,
+      "output_tokens": 130,
+      "latency_ms": 3671.5,
+      "bedrock_latency_ms": 3589,
       "structured_output": true,
-      "usd": 0.007696,
-      "called_at": "2026-10-16T03:55:37+00:00"
+      "usd": 0.008009,
+      "called_at": "2026-10-16T18:04:38+00:00"
     }
   ],
   "caveats": [
@@ -3737,20 +3919,7 @@
     "synthetic_overlay images are composites; they test counting and label reading, not realism.",
     "Carrier accuracy exists only where carrier truth exists (synthetic_overlay).",
     "Latency is wall clock per call, run sequentially from one client, including a retry.",
-    "The two models run with different output modes (see models[].structured_output)."
-  ],
-  "post_hoc_diagnosis": {
-    "written_after_results": true,
-    "finding": "On synthetic_overlay porch composites (n=20) both models mostly undercount by exactly 1. Their reasoning shows they count only the pasted, labelled boxes and ignore the unlabelled box already on the step from the Playground footage (base_count=1). On driveway composites (base_count=0, n=16) exact match was 9/16 (Nova Pro) and 15/16 (Sonnet 4.6). Labels were not changed after seeing results.",
-    "synthetic_by_background": {
-      "us.amazon.nova-pro-v1:0": {
-        "porch": "3/20 exact (14 off by -1, 3 by -2)",
-        "driveway": "9/16 exact (6 off by -1, 1 by -2)"
-      },
-      "us.anthropic.claude-sonnet-4-6": {
-        "porch": "3/20 exact (11 off by -1, 4 by -2, 1 by -3, 1 by -4)",
-        "driveway": "15/16 exact (1 off by -1)"
-      }
-    }
-  }
+    "The two models run with different output modes (see models[].structured_output).",
+    "Porch composites were rebuilt under amendment 2 after the first run; first-run synthetic results are in commit c25d058 and are superseded."
+  ]
 }

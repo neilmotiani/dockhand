@@ -18,7 +18,7 @@ docker compose up --build   # Postgres + API on http://localhost:8000
 
 ## Extraction eval (package count and carrier)
 
-`uv run python -m eval.extraction` runs both configured Bedrock models on every labelled item and writes `eval/results/extraction.json`. Selection and labelling rules were committed before any model run (`eval/SELECTION.md`, plus amendment 1). Each source is reported separately and is never pooled. N is shown on every row, with 95% Wilson intervals. Run of 2026-10-16, prompt `v1`, temperature 0; Nova Pro with prompted JSON, Sonnet 4.6 with Converse structured output.
+`uv run python -m eval.extraction` runs both configured Bedrock models on every labelled item and writes `eval/results/extraction.json`. Selection and labelling rules were committed before any model run (`eval/SELECTION.md`, plus amendment 1); amendment 2 rebuilt the porch composites after the first run (see below). Each source is reported separately and is never pooled. N is shown on every row, with 95% Wilson intervals. Run of 2026-10-16, prompt `v1`, temperature 0; Nova Pro with prompted JSON, Sonnet 4.6 with Converse structured output.
 
 | Source | Footage | Model | N | Count exact match | False alarms on empty scenes | Carrier | p50 latency | $/call |
 |---|---|---|---|---|---|---|---|---|
@@ -26,16 +26,21 @@ docker compose up --build   # Postgres + API on http://localhost:8000
 | | | Sonnet 4.6 | 28 | 89.3% (25/28, CI 73–96%) | 5.0% (1/20) | not labelled | 2.55 s | $0.0058 |
 | Packages (Roboflow, Public Domain) | real, hand-held phone photos | Nova Pro | 11 | 90.9% (10/11, CI 62–98%) | n/a | not labelled | 1.71 s | $0.0019 |
 | | | Sonnet 4.6 | 11 | 100% (11/11, CI 74–100%) | n/a | not labelled | 3.77 s | $0.0087 |
-| Synthetic composites | synthetic, on Ring Playground frames | Nova Pro | 36 | 33.3% (12/36, CI 20–50%) | n/a | 97.2% (35/36) | 1.48 s | $0.0023 |
-| | | Sonnet 4.6 | 36 | 50.0% (18/36, CI 34–66%) | n/a | 100% (36/36) | 3.63 s | $0.0079 |
+| Synthetic composites | synthetic, on Ring Playground frames | Nova Pro | 36 | 41.7% (15/36, CI 27–58%) | n/a | 97.2% (35/36) | 1.65 s | $0.0023 |
+| | | Sonnet 4.6 | 36 | 75.0% (27/36, CI 59–86%) | n/a | 100% (36/36) | 3.78 s | $0.0080 |
+| ↳ porch backgrounds | | Nova Pro | 20 | 30.0% (6/20, CI 15–52%) | n/a | 95.0% (19/20) | | |
+| | | Sonnet 4.6 | 20 | 60.0% (12/20, CI 39–78%) | n/a | 100% (20/20) | | |
+| ↳ driveway backgrounds | | Nova Pro | 16 | 56.2% (9/16, CI 33–77%) | n/a | 100% (16/16) | | |
+| | | Sonnet 4.6 | 16 | 93.8% (15/16, CI 72–99%) | n/a | 100% (16/16) | | |
 | Ring Playground live view | Ring Playground | Nova Pro | 2 | 2/2 | 0/1 | not labelled | 2.28 s | $0.0056 |
 | | | Sonnet 4.6 | 2 | 2/2 | 0/1 | not labelled | 4.71 s | $0.0153 |
 
 How to read this:
 - **Small N.** The real-footage rows are small (28 and 11), so the intervals are wide and the two models overlap on every count row. These numbers do not show either model to be more accurate.
-- **Synthetic counts, found after the run.** On the 20 porch composites, both models mostly come in exactly one short. Their reasoning shows they count the pasted, labelled boxes and leave out the unlabelled box that was already on the step in the Playground footage. On the 16 driveway composites, where no box was already present, exact match is 9/16 (Nova Pro) and 15/16 (Sonnet 4.6). The labels were not changed after the results. Details are in `post_hoc_diagnosis` in the results file.
+- **Synthetic porch composites were rebuilt after the first run.** In the first build, the box already on the step in the Playground footage had no carrier label while the pasted boxes did, so each image mixed two deliveries. Both models counted only the labelled boxes (porch exact match 3/20 for both). Every Playground "Package" frame shows that box, so an empty porch was not available. Amendment 2 in `eval/SELECTION.md`, committed before the re-run, gives the existing box the same printed label in the 16 porch composites that have a carrier. Truth labels, layouts and the other 20 composites are unchanged. Only the 16 changed images were re-run (32 calls, $0.17). Because the fix came after seeing results, the porch row is a second build, not a held-out measurement. First-run numbers are in commit `c25d058`.
+- **What is left on porch.** In the 16 rebuilt porch composites, exact match is 5/16 for Nova Pro and 11/16 for Sonnet 4.6; every miss is one short. The models' reasoning does not say which box they left out. The 4 porch composites with no carrier (all boxes unlabelled) were not changed: Nova Pro got 1/4 and Sonnet 4.6 1/4 exact.
 - **Ring Playground items** were also used during development (N=2), so they are a smoke test, not a held-out result.
-- **Cost** uses AWS us-east-1 on-demand prices from the public AWS price list (`eval/prices.json`). Total Bedrock spend for this run was $0.73.
+- **Cost** uses AWS us-east-1 on-demand prices from the public AWS price list (`eval/prices.json`). Total Bedrock spend across both runs was $0.90 (ledger in `data/eval/spend.jsonl`, not committed).
 
 ### Data attribution
 
