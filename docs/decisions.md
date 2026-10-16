@@ -92,3 +92,22 @@ The Ring docs (checked with the knowledge MCP server on 2026-10-16) only describ
 ## Database tests use a real Postgres
 
 The queue's correctness rests on `SKIP LOCKED`, unique constraints and `ON CONFLICT`, which SQLite or a fake wouldn't show. CI runs a Postgres service with `REQUIRE_DB=1`. Locally the tests skip if no database is reachable at `TEST_DATABASE_URL`.
+
+## Frame selection: drop frame 0, spread, score, top K
+
+`app/capture/selection.py` decides which frames reach Bedrock:
+1. **Drop the session's first decoded frame.** In the one Playground capture checked (60 frames), frame 0 had the lowest Laplacian variance of all of them (753 against a median of 1183) and looks smeared. That fits a WebRTC encoder ramping up its bitrate. One frame costs nothing to drop; this is a guard, not a measured rule.
+2. **Spread** `CAPTURE_SAMPLE_FRAMES` (10) evenly over the rest of the clip, the `--spread` logic from the spike. Playground clips ran anywhere from 1.5 s to 26 s, so position-based sampling adapts where a fixed interval would not.
+3. **Score** = `w · sharpness + (1 − w) · change`, each min-max normalised within the clip (only the ranking matters). Sharpness is the variance of the Laplacian. Change is the mean absolute difference from an empty-scene reference, measured on a 64 px wide low-pass copy: at full resolution, motion blur itself counts as change, and a blurry frame could win on that alone. The reference is `CAPTURE_REFERENCE_DIR/<device_id>.jpg` when present, otherwise the per-pixel median of the samples (in a short clip the background is what most frames share).
+4. Send the top `CAPTURE_SELECT_FRAMES` (3), in time order.
+
+Every delivery records `frames_sampled` and `frames_sent`, which is what "LLM image calls saved by frame selection" is computed from.
+
+Known limitation: with the median fallback, an object present in every frame (the Playground's static box) contributes no change, so sharpness decides. That's acceptable because any of those frames shows the box.
+
+## Capture safety rules
+
+- Webhook and poll events carry a device ID, and it must match exactly. Falling back to "the only camera" could film a different device than the one that saw the event. Manual triggers may use a name or no device at all, and only cameras are considered.
+- Offline devices are refused before opening WHEP. Ring answers with 201 and then sends no media.
+- One WHEP session per device at a time (per-device `asyncio.Lock`).
+- The WHEP session is always closed (`DELETE` on the verbatim `Location`) in a `finally`.

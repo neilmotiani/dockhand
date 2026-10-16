@@ -4,6 +4,7 @@ Model IDs, thresholds and secrets live here so they can change without a code ch
 """
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
 from pydantic import SecretStr, field_validator
@@ -37,6 +38,16 @@ class Settings(BaseSettings):
     # A job claimed longer ago than this is assumed to belong to a crashed worker and is retried.
     queue_lease_s: float = 300.0
     queue_idle_poll_s: float = 1.0
+    # Capture (WHEP) and frame selection. See app/ring/whep.py and app/capture/selection.py.
+    capture_stall_s: float = 2.0  # no frame for this long = the clip has ended
+    capture_timeout_s: float = 25.0  # battery cameras end WHEP sessions after 30 s
+    capture_sample_frames: int = 10  # spread evenly over the clip, then scored
+    capture_select_frames: int = 3  # sent to the model (SPEC.md: top K, default 3)
+    capture_sharpness_weight: float = 0.5  # vs. change from the empty-scene reference
+    # Optional `<device_id>.jpg` empty-doorstep references. Without one, the clip median is used.
+    capture_reference_dir: Path | None = None
+    media_dir: Path = Path("data/media")  # selected frames are kept here as evidence
+
     # Event History polling fallback (the Playground does not deliver webhooks). 0 disables it.
     ring_poll_interval_s: float = 0.0
     ring_poll_event_types: str = "motion.human,ding"
