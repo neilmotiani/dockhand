@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # Database
-    database_url: str = "postgresql+asyncpg://dockhand:dockhand@localhost:5432/dockhand"
+    database_url: str = "postgresql+asyncpg://dockhand:dockhand@localhost:55432/dockhand"
 
     # Ring. Device IDs are discovered at runtime from GET /v1/devices, never configured.
     ring_api_base_url: str = "https://api.amazonvision.com"

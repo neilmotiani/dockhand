@@ -97,27 +97,17 @@ Format per entry: task, steps, expected vs. actual, severity, workaround, sugges
 - **Task:** Receive `motion_detected` / `button_press` webhooks while developing against the Developer Playground.
 - **Steps:** Searched the Ring knowledge MCP server for Playground + webhook ("Developer Playground webhooks simulate event", "playground simulate live view event package webhook").
 - **Expected:** A statement of whether Playground events reach a webhook, and if so where to register the URL.
-- **Actual:** No Playground page is indexed. Webhooks are documented only as going to the Webhook URL configured on an app (Configure → Account Linking) for linked staging/connected accounts. A Playground one-click token is not tied to an app, so there is nowhere to point a webhook.
+- **Actual:** Neither search returned a Playground page. The webhook docs only describe a URL registered on an app: Notifications says "Webhook URL is configured during partner onboarding", and the Configure page lists "Webhook URL" under an app's Account Linking settings. We found no place to give the Playground a webhook URL.
 - **Severity:** Medium (the ingest path can't be tested end to end without a real device and a linked account).
 - **Workaround:** Event History poller (`app/ingest/poller.py`) plus a manual trigger endpoint (`POST /v1/trigger`). The webhook path is tested with signed payloads built from the docs' examples.
 - **Suggestion:** Let the Playground send signed test webhooks to a developer-supplied URL (like Stripe's "send test webhook"), and say on the Playground page whether simulated events appear in Event History.
 
-## 2026-10-16 · Motion subtype is in a different place on different docs pages
+## 2026-10-16 · Event History items don't carry the detection subtype, and the docs don't relate their IDs to webhook IDs
 
-- **Task:** Parse the motion subtype (`human`, `vehicle`, ...) from a webhook.
-- **Steps:** Read Notifications → Motion Detection, and the Subscription event pages.
-- **Expected:** One location for event subtypes.
-- **Actual:** The Motion Detection example puts it at `data.subType` (camelCase, outside `attributes`). The generic v1.1 envelope on the Notifications and API Reference pages has no subtype at all. The subscription events use `data.attributes.sub_type` (snake_case).
-- **Severity:** Low–medium (a parser written from the wrong page silently treats every motion as "no subtype" and drops human detections).
-- **Workaround:** `app/ingest/events.py` reads `data.subType`, then `data.attributes.sub_type`, then `data.attributes.subType`.
-- **Suggestion:** Show `subType` in the generic envelope and use one casing across event types.
-
-## 2026-10-16 · Event History items carry no detection subtype, and their IDs aren't related to webhook IDs in the docs
-
-- **Task:** Poll Event History as a webhook fallback and dedupe against webhooks.
-- **Steps:** Read Event History.
-- **Expected:** Each item says whether it was a human or vehicle detection, and the docs say whether `data[].id` equals the webhook's `data.id` for the same event.
-- **Actual:** You can filter by `motion.human` but items only report `event_type: "motion"`. Neither ID's relationship to the other is documented.
+- **Task:** Poll Event History as a webhook fallback, keep only human detections, and dedupe against webhooks for the same event.
+- **Steps:** Read Event History and Notifications → Motion Detection.
+- **Expected:** Each history item says which subtype it was, and the docs say whether a history item's `id` is the same as the webhook's `data.id` for the same event.
+- **Actual:** Event History lets you *filter* by subtype ("`motion.human`, `motion.vehicle`, `motion.other_motion`"), but the documented response fields for an item are only `type`, `id`, `attributes.event_type`, `attributes.is_third_party_reviewed`, `attributes.start`, `attributes.end` and `relationships.source.data`, so a returned motion item doesn't say which subtype matched. Both pages describe the ID only as opaque: Event History's `data[].id` is a "Directed event ID (opaque — do not parse)", and the webhook's `data.id` is a "Unique identifier for this specific motion event (opaque — do not parse)". Neither page says whether they're the same value.
 - **Severity:** Low.
-- **Workaround:** Query with a filter that pins one subtype (`motion.human,ding`) and derive the subtype from the filter. Store Ring's event ID with a unique constraint, so if the IDs do match, a webhook and a poll of the same event dedupe; if they don't, the worst case is a second capture attempt, which the stale-event check usually skips.
-- **Suggestion:** Return the subtype on history items and document the event ID as shared between webhooks and history.
+- **Workaround:** Query with a filter that pins one subtype (`motion.human,ding`) and take the subtype from the filter. Store Ring's event ID under a unique constraint, so if the IDs match, a webhook and a poll of the same event dedupe.
+- **Suggestion:** Return the subtype on history items, and state whether the history event ID equals the webhook `data.id`.

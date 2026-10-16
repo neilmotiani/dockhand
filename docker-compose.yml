@@ -6,7 +6,9 @@ services:
       POSTGRES_PASSWORD: dockhand
       POSTGRES_DB: dockhand
     ports:
-      - "5432:5432"
+      # Host port 55432, not 5432: a system-wide PostgreSQL on the dev machine owns 5432 and
+      # would silently take connections meant for this container.
+      - "55432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

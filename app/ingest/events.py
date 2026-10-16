@@ -59,8 +59,8 @@ def from_webhook(payload: Any) -> NormalizedEvent:
     attrs = data.get("attributes") or {}
     if not isinstance(attrs, dict):
         attrs = {}
-    # The Motion Detection page puts the subtype at `data.subType`; other event pages (and
-    # SPEC.md) use `data.attributes.sub_type`. Accept either (see FRICTION_LOG.md).
+    # Ring documents the motion subtype at `data.subType` (Notifications → Motion Detection).
+    # SPEC.md says `attributes.sub_type`; that is also accepted, as a fallback only.
     sub_type = (
         _str_or_none(data.get("subType"))
         or _str_or_none(attrs.get("sub_type"))
