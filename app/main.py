@@ -14,6 +14,7 @@ from app.db.session import init_db, make_engine
 from app.ingest.api import router as ingest_router
 from app.ingest.poller import HistoryPoller
 from app.ingest.queue import EventQueue, Processor, utcnow
+from app.reconcile.api import router as expected_router
 from app.reconcile.cost import ReconcileConfig
 from app.reconcile.store import ReconcileTimer
 from app.ring.client import RingClient
@@ -97,6 +98,7 @@ def create_app(
     app = FastAPI(title="Dockhand", lifespan=lifespan)
     app.state.settings = settings
     app.include_router(ingest_router)
+    app.include_router(expected_router)
 
     @app.get("/healthz")
     async def healthz() -> dict[str, str]:

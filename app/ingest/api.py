@@ -4,15 +4,15 @@ Both only verify, store and wake the queue; all real work happens in the workers
 webhook acks in a few milliseconds (Ring requires a response within 5 s).
 """
 
-import hmac
 import json
 import logging
 import time
 
-from fastapi import APIRouter, Header, HTTPException, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
+from app.auth import require_admin
 from app.ingest import events, signature
 from app.ingest.queue import insert_event, utcnow
 
@@ -73,21 +73,13 @@ class TriggerRequest(BaseModel):
     )
 
 
-@router.post("/v1/trigger", status_code=202)
-async def manual_trigger(
-    request: Request, body: TriggerRequest, authorization: str | None = Header(default=None)
-) -> JSONResponse:
+@router.post("/v1/trigger", status_code=202, dependencies=[Depends(require_admin)])
+async def manual_trigger(request: Request, body: TriggerRequest) -> JSONResponse:
     """Start the pipeline as if a delivery-relevant event had just happened on the device.
 
     For the Playground demo (no webhooks) and for re-running capture by hand. Requires
     `Authorization: Bearer $ADMIN_TOKEN`; disabled when ADMIN_TOKEN is unset.
     """
-    admin = request.app.state.settings.admin_token
-    if admin is None:
-        raise HTTPException(404, "manual trigger is disabled")
-    expected = f"Bearer {admin.get_secret_value()}"
-    if not hmac.compare_digest((authorization or "").encode(), expected.encode()):
-        raise HTTPException(401, "invalid admin token")
     event = events.manual(body.device, body.idempotency_key, utcnow())
     status, event_id = await _store(request, event)
     return JSONResponse({"status": status, "event_id": event_id}, status_code=202)

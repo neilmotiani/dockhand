@@ -13,7 +13,7 @@ cp .env.example .env        # fill in tokens
 uv sync                     # install dependencies
 uv run pytest               # tests
 uv run ruff check .         # lint
-docker compose up --build   # Postgres + API on http://localhost:8000
+docker compose up --build   # Postgres (host port 55432) + API on http://localhost:8000
 ```
 
 ## Ingest pipeline
@@ -32,8 +32,14 @@ POST /v1/trigger ┘
   curl -X POST localhost:8000/v1/trigger -H "Authorization: Bearer $ADMIN_TOKEN" \
        -H 'Content-Type: application/json' -d '{"device": "Playground", "idempotency_key": "demo-1"}'
   ```
+- Expected deliveries: `POST /v1/expected` (admin token; send your own `id` to make retries safe). For a live Playground test, `uv run python -m scripts.seed_expected` creates today's two demo orders: Sysco expecting 1 box, US Foods expecting 3. Then trigger twice. The two one-box Playground deliveries should come out `matched` and `short`. A dashboard editor replaces this later.
+- Events older than `CAPTURE_MAX_EVENT_AGE_S` (120 s) when a worker picks them up are skipped, since live view can no longer show the delivery.
 - Every delivery stores per-stage timings in `deliveries.latency_ms`. `uv run python -m bench.latency` reports p50/p95 per stage with N. No results are committed yet: there have been no live runs.
-- Tests need Postgres (`docker compose up -d db`, or point `TEST_DATABASE_URL` at one). Without it, the database tests are skipped locally. CI runs them against a Postgres service.
+- Tests need Postgres: `docker compose up -d db` (host port 55432, which `DATABASE_URL` and the test default point at), or point `TEST_DATABASE_URL` at another one. Without it, the database tests are skipped locally. CI runs them against a Postgres service.
+
+### Future work
+
+- **Clip download for late events.** Events too old for live view (Ring retries, a backlog after downtime) are skipped today. They could be processed from the recorded clip (`POST /v1/devices/{device_id}/media/video/download`) instead.
 
 ## Extraction eval (package count and carrier)
 
