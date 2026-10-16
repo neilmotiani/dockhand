@@ -40,7 +40,11 @@ class Settings(BaseSettings):
     queue_idle_poll_s: float = 1.0
     # Capture (WHEP) and frame selection. See app/ring/whep.py and app/capture/selection.py.
     capture_stall_s: float = 2.0  # no frame for this long = the clip has ended
-    capture_timeout_s: float = 25.0  # battery cameras end WHEP sessions after 30 s
+    capture_timeout_s: float = 25.0  # hard maximum; battery cameras end WHEP after 30 s
+    # "Scene settled" early exit (app/capture/settle.py). capture_settle_s = 0 disables it.
+    capture_settle_s: float = 3.0  # stop once nothing has moved for this long...
+    capture_min_s: float = 4.0  # ...but never before this much video
+    capture_settle_threshold: float = 3.0  # max-cell change; tuned on 2 recorded clips
     capture_sample_frames: int = 10  # spread evenly over the clip, then scored
     capture_select_frames: int = 3  # sent to the model (SPEC.md: top K, default 3)
     capture_sharpness_weight: float = 0.5  # vs. change from the empty-scene reference

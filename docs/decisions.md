@@ -144,3 +144,11 @@ The Playground returned the same `on_demand` items for every `event_types` value
 ## Capture time is dominated by the timeout on the Playground
 
 In the 2026-10-16 live run (N=2), the Package stream never stalled, so each capture ran the full `CAPTURE_TIMEOUT_S` (25 s) on top of ~5.5 s of WHEP setup: 31 s of a 33 s event-to-ledger time. Setup plus timeout (~30.5 s) is also right at the 30 s session limit Ring documents for battery cameras. Lowering the timeout is the obvious lever. It's not changed yet, because shorter clips trade latency against the chance of catching the driver mid-drop, which a static Playground scene can't measure.
+
+## "Scene settled" early exit
+
+The capture now stops when nothing has moved for `CAPTURE_SETTLE_S` (3 s), but never before `CAPTURE_MIN_S` (4 s). `CAPTURE_TIMEOUT_S` (25 s) stays as the hard cap. Stall detection (RTP stops) is unchanged. `deliveries.usage.capture_end` records which rule ended each clip (`settled`, `stalled` or `timeout`).
+
+- **Signal:** every 0.5 s, the newest frame against the previous checked frame (not the previous decoded frame). That makes it independent of frame rate and replayable on the spread-sampled clips. The change is the **most-changed 4×4 cell** of the 64 px low-pass copy, with the watermark corners masked. The frame mean doesn't work: the far-away car in the Vehicle clip moves it by 0.6–0.75, the same as encoder noise on the static Package clip (up to 0.62). Max-cell separates them: 26–60 while the car moves against 0.5–1.9 static.
+- **Threshold 3.0**, tuned on exactly two recorded clips (`tests/fixtures/capture/clip_*`, one static, one moving). Replay: Package settles at 4.39 s of a 26.2 s clip; Vehicle never settles (change ≥ 8.6 through 8.1 s; the car is gone by about 6.2 s, but something keeps changing). `tests/test_settle.py` pins both.
+- **Risk:** a driver who stands still for 3 s mid-drop would end the clip early. Frame selection still sees everything captured up to that point, and real footage (the Oct 18 eval) is where this gets measured.

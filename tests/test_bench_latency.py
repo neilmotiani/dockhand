@@ -29,3 +29,17 @@ def test_summarize_reports_n_per_stage_and_skips_missing():
     }
     assert s["ring_to_received"]["n"] == 1
     assert "flag" not in s and s["custom"]["n"] == 1
+
+
+async def test_load_filters_by_detected_at(engine, database_url):
+    from datetime import timedelta
+
+    from bench.latency import load
+    from tests.pipeline_fakes import T0
+    from tests.test_reconcile_store import add_delivery
+
+    for minutes in (0, 30, 60):
+        await add_delivery(engine, T0 + timedelta(minutes=minutes))
+    rows = await load(database_url, None, None, T0 + timedelta(minutes=15), T0 + timedelta(hours=1))
+    assert len(rows) == 1
+    assert len(await load(database_url, None, None)) == 3

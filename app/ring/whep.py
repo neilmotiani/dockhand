@@ -31,9 +31,15 @@ def _jpeg(frame) -> bytes:
     return buf.getvalue()
 
 
-async def buffer_until_stall(track, stall_s: float, buf: list[Frame]) -> None:
+async def buffer_until_stall(
+    track,
+    stall_s: float,
+    buf: list[Frame],
+    should_stop: Callable[[float, bytes], bool] | None = None,
+) -> str:
     """Decode every frame into buf as (seconds since first frame, JPEG bytes) until no frame
-    arrives for stall_s. Before the first frame it waits indefinitely (bounded by the caller)."""
+    arrives for stall_s, or `should_stop(t, jpeg)` says so. Before the first frame it waits
+    indefinitely (bounded by the caller). Returns why it stopped: "stalled" or "settled"."""
     t_first = None
     while True:
         try:
@@ -42,11 +48,15 @@ async def buffer_until_stall(track, stall_s: float, buf: list[Frame]) -> None:
             else:
                 frame = await asyncio.wait_for(track.recv(), timeout=stall_s)
         except (TimeoutError, MediaStreamError):
-            return
+            return "stalled"
         now = time.monotonic()
         t_first = t_first if t_first is not None else now
         # JPEG-encode now: ~300 raw 720p frames would hold ~400 MB of decoded YUV.
-        buf.append((now - t_first, await asyncio.to_thread(_jpeg, frame)))
+        t, jpeg = now - t_first, await asyncio.to_thread(_jpeg, frame)
+        buf.append((t, jpeg))
+        # The detector decodes a frame every 0.5 s; keep that off the event loop too.
+        if should_stop is not None and await asyncio.to_thread(should_stop, t, jpeg):
+            return "settled"
 
 
 @dataclass
@@ -56,6 +66,8 @@ class Clip:
     setup_ms: float | None = None
     total_ms: float = 0.0
     timed_out: bool = False
+    # "settled" (scene stopped changing), "stalled" (RTP stopped) or "timeout".
+    end_reason: str | None = None
 
 
 def default_peer_connection() -> RTCPeerConnection:
@@ -70,8 +82,10 @@ async def capture_clip(
     timeout_s: float = 25.0,
     track_timeout_s: float = 10.0,
     pc_factory: Callable[[], RTCPeerConnection] = default_peer_connection,
+    should_stop: Callable[[float, bytes], bool] | None = None,
 ) -> Clip:
-    """Open a WHEP session, decode until the clip stalls (or timeout_s), always close it."""
+    """Open a WHEP session, decode until the clip stalls, the scene settles (`should_stop`)
+    or timeout_s passes, and always close it."""
     start = time.perf_counter()
     clip = Clip()
     pc = pc_factory()
@@ -94,12 +108,13 @@ async def capture_clip(
         track = await asyncio.wait_for(track_ready, timeout=track_timeout_s)
         clip.setup_ms = round((time.perf_counter() - start) * 1000, 1)
         try:
-            await asyncio.wait_for(
-                buffer_until_stall(track, stall_s, clip.frames), timeout=timeout_s
+            clip.end_reason = await asyncio.wait_for(
+                buffer_until_stall(track, stall_s, clip.frames, should_stop), timeout=timeout_s
             )
         except TimeoutError:
             # Not an error: a stream that keeps going (a real camera) is cut at timeout_s.
             clip.timed_out = True
+            clip.end_reason = "timeout"
     finally:
         await pc.close()
         if session_url:
