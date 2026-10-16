@@ -17,7 +17,6 @@ Usage:
 
 import argparse
 import asyncio
-import io
 import json
 import re
 import sys
@@ -30,7 +29,9 @@ import httpx
 from aiortc import RTCConfiguration, RTCIceServer, RTCPeerConnection, RTCSessionDescription
 from aiortc.mediastreams import MediaStreamError
 
+from app.capture.selection import evenly_spaced
 from app.config import get_settings
+from app.ring.whep import buffer_until_stall
 
 SPIKE_DIR = Path("data/spike")
 FIXTURE_DIR = Path("tests/fixtures/ring")
@@ -172,39 +173,6 @@ async def collect_frames(
         saved.append(path)
         print(f"  saved {path} ({frame.width}x{frame.height})")
     return saved
-
-
-def evenly_spaced(total: int, k: int) -> list[int]:
-    """k indices spread evenly over range(total), always including the first and last."""
-    if total <= k:
-        return list(range(total))
-    if k == 1:
-        return [0]
-    return [round(i * (total - 1) / (k - 1)) for i in range(k)]
-
-
-def _jpeg(frame) -> bytes:
-    buf = io.BytesIO()
-    frame.to_image().save(buf, format="JPEG", quality=92)
-    return buf.getvalue()
-
-
-async def buffer_until_stall(track, stall_s: float, buf: list[tuple[float, bytes]]) -> None:
-    """Decode every frame into buf as (seconds since first frame, JPEG bytes) until no frame
-    arrives for stall_s. Before the first frame it waits indefinitely (bounded by the caller)."""
-    t_first = None
-    while True:
-        try:
-            if t_first is None:
-                frame = await track.recv()
-            else:
-                frame = await asyncio.wait_for(track.recv(), timeout=stall_s)
-        except (TimeoutError, MediaStreamError):
-            return
-        now = time.monotonic()
-        t_first = t_first if t_first is not None else now
-        # JPEG-encode now: ~300 raw 720p frames would hold ~400 MB of decoded YUV.
-        buf.append((now - t_first, await asyncio.to_thread(_jpeg, frame)))
 
 
 async def run(

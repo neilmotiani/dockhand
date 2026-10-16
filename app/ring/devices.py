@@ -44,17 +44,20 @@ def summarize_devices(doc: dict) -> list[Device]:
     return out
 
 
-def pick_device(devices: list[Device], query: str) -> Device:
-    """Exact ID match first, then case-insensitive name substring, then the only camera."""
-    for d in devices:
-        if d.id == query:
-            return d
-    q = query.lower()
-    by_name = [d for d in devices if q in d.name.lower()]
-    if len(by_name) == 1:
-        return by_name[0]
-    if len(by_name) > 1:
-        raise LookupError(f"{len(by_name)} devices match {query!r}: {[d.name for d in by_name]}")
+def pick_device(devices: list[Device], query: str | None) -> Device:
+    """Exact ID match first, then case-insensitive name substring, then the only camera.
+    With no query, only the last rule applies."""
+    if query:
+        for d in devices:
+            if d.id == query:
+                return d
+        q = query.lower()
+        by_name = [d for d in devices if q in d.name.lower()]
+        if len(by_name) == 1:
+            return by_name[0]
+        if len(by_name) > 1:
+            names = [d.name for d in by_name]
+            raise LookupError(f"{len(by_name)} devices match {query!r}: {names}")
     cameras = [d for d in devices if d.is_camera]
     if len(cameras) == 1:
         return cameras[0]
