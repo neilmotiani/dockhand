@@ -1,0 +1,15 @@
+{
+  "_source": "AWS Price List offer files (public, no auth), region us-east-1: https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrock/current/us-east-1/index.json (published 2026-10-14) and .../AmazonBedrockFoundationModels/current/us-east-1/index.json (published 2026-10-12). Checked 2026-10-16. On-demand, USD per 1M tokens.",
+  "us.amazon.nova-pro-v1:0": {
+    "input_per_mtok": 0.80,
+    "output_per_mtok": 3.20,
+    "usage_types": ["USE1-NovaPro-input-tokens", "USE1-NovaPro-output-tokens"],
+    "note": "No separate cross-region SKU is listed for Nova Pro; the in-region rate is assumed for the us. profile."
+  },
+  "us.anthropic.claude-sonnet-4-6": {
+    "input_per_mtok": 3.30,
+    "output_per_mtok": 16.50,
+    "usage_types": ["USE1-MP:USE1_InputTokenCount-Units", "USE1-MP:USE1_OutputTokenCount-Units"],
+    "note": "Regional cross-region inference (us. profile). The global profile is 3.00 / 15.00."
+  }
+}
