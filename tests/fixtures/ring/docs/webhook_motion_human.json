@@ -1,0 +1,28 @@
+{
+  "_source": "Ring docs example payload (amazon_vision_api/notifications/motion_detection.md, v1.1), with placeholders filled in. Not a recorded delivery: the Developer Playground does not send webhooks.",
+  "payload": {
+    "meta": {
+      "version": "1.1",
+      "time": "2026-10-16T17:05:02Z",
+      "request_id": "req-0001",
+      "account_id": "acct-0001"
+    },
+    "data": {
+      "id": "evt-0001",
+      "type": "motion_detected",
+      "subType": "human",
+      "attributes": {
+        "source": "ava1.ring.device.TEST",
+        "source_type": "devices",
+        "timestamp": 1792170300000
+      },
+      "relationships": {
+        "devices": {
+          "links": {
+            "self": "/v1/devices/ava1.ring.device.TEST"
+          }
+        }
+      }
+    }
+  }
+}

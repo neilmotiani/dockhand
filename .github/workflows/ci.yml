@@ -8,6 +8,24 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: dockhand
+          POSTGRES_PASSWORD: dockhand
+          POSTGRES_DB: dockhand
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dockhand"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 15
+    env:
+      TEST_DATABASE_URL: postgresql+asyncpg://dockhand:dockhand@localhost:5432/dockhand_test
+      # Database tests must run in CI, not skip.
+      REQUIRE_DB: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
