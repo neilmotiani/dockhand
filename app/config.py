@@ -73,6 +73,11 @@ class Settings(BaseSettings):
     extraction_max_tokens: int = 1024
     bedrock_timeout_s: float = 60.0
 
+    # Business day boundaries for reconciliation batches (app/reconcile/store.py).
+    business_timezone: str = "America/Los_Angeles"
+    # Timer that re-runs reconciliation so overdue expected deliveries turn `missing`.
+    reconcile_interval_s: float = 300.0
+
     # Reconciliation. See app/reconcile/cost.py for what each term means and
     # docs/decisions.md for how the defaults were chosen.
     reconcile_grace_minutes: float = 60.0
@@ -88,12 +93,14 @@ class Settings(BaseSettings):
         "ring_webhook_secret",
         "aws_bearer_token_bedrock",
         "admin_token",
+        "capture_reference_dir",
         mode="before",
     )
     @classmethod
-    def _blank_secret_is_unset(cls, v: object) -> object:
-        # `.env.example` ships `KEY=` lines. An empty secret must mean "not configured", or
-        # an empty webhook key / admin token would be accepted as valid credentials.
+    def _blank_is_unset(cls, v: object) -> object:
+        # `.env.example` ships `KEY=` lines. Blank must mean "not configured": an empty webhook
+        # key or admin token would otherwise be accepted as valid credentials, and an empty
+        # path would become Path(".").
         if isinstance(v, str) and not v.strip():
             return None
         return v

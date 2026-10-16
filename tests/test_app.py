@@ -45,7 +45,9 @@ def test_blank_secrets_are_unset(monkeypatch) -> None:
     for key in ("RING_WEBHOOK_SECRET", "ADMIN_TOKEN", "RING_ACCESS_TOKEN"):
         monkeypatch.setenv(key, "")
     monkeypatch.setenv("AWS_BEARER_TOKEN_BEDROCK", "  ")
+    monkeypatch.setenv("CAPTURE_REFERENCE_DIR", "")
     s = Settings(_env_file=None)
+    assert s.capture_reference_dir is None
     assert s.ring_webhook_secret is None
     assert s.admin_token is None
     assert s.ring_access_token is None

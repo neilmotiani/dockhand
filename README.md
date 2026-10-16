@@ -16,6 +16,25 @@ uv run ruff check .         # lint
 docker compose up --build   # Postgres + API on http://localhost:8000
 ```
 
+## Ingest pipeline
+
+```
+Ring webhook ─┐                                   ┌─ WHEP clip → drop frame 0 → spread 10 → top 3
+Event History ├─► ring_events (dedupe + queue) ─► worker ─┤  → Bedrock extract → deliveries
+poll          │                                   └─ reconcile the business day → reconciliations
+POST /v1/trigger ┘
+```
+
+- `POST /webhooks/ring` verifies `X-Signature`, dedupes on `meta.request_id` (and Ring's event ID), stores the event and acks. Processing happens in background workers.
+- The Ring Developer Playground does not deliver webhooks (see `docs/decisions.md`). For Playground runs, set `RING_POLL_INTERVAL_S=5` to poll Event History, or start a run by hand:
+
+  ```sh
+  curl -X POST localhost:8000/v1/trigger -H "Authorization: Bearer $ADMIN_TOKEN" \
+       -H 'Content-Type: application/json' -d '{"device": "Playground", "idempotency_key": "demo-1"}'
+  ```
+- Every delivery stores per-stage timings in `deliveries.latency_ms`. `uv run python -m bench.latency` reports p50/p95 per stage with N. No results are committed yet: there have been no live runs.
+- Tests need Postgres (`docker compose up -d db`, or point `TEST_DATABASE_URL` at one). Without it, the database tests are skipped locally. CI runs them against a Postgres service.
+
 ## Extraction eval (package count and carrier)
 
 `uv run python -m eval.extraction` runs both configured Bedrock models on every labelled item and writes `eval/results/extraction.json`. Selection and labelling rules were committed before any model run (`eval/SELECTION.md`, plus amendment 1); amendment 2 rebuilt the porch composites after the first run (see below). Each source is reported separately and is never pooled. N is shown on every row, with 95% Wilson intervals. Run of 2026-10-16, prompt `v1`, temperature 0; Nova Pro with prompted JSON, Sonnet 4.6 with Converse structured output.

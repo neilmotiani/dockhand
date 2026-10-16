@@ -111,3 +111,22 @@ Known limitation: with the median fallback, an object present in every frame (th
 - Offline devices are refused before opening WHEP. Ring answers with 201 and then sends no media.
 - One WHEP session per device at a time (per-device `asyncio.Lock`).
 - The WHEP session is always closed (`DELETE` on the verbatim `Location`) in a `finally`.
+
+## Pipeline idempotency, layer by layer
+
+Replaying an event must never create a second delivery or reconciliation (`tests/test_idempotency.py` replays every webhook 3× in random order, interleaved with Event History polls of the same events):
+1. **Event:** unique `request_id` / `ring_event_id` + `ON CONFLICT DO NOTHING`, so a replay is acked as `duplicate` and never queued.
+2. **Delivery:** `delivery.id = uuid5(event.id)` and `deliveries.event_id` is unique. If a worker dies after storing the delivery, the retried job finds it and skips capture and the model call (`test_reprocessing_after_crash_reuses_stored_delivery`).
+3. **Model call:** results are cached by `sha256(model, prompt version, output mode, frames)`.
+4. **Reconciliation:** one transaction per business day takes `pg_advisory_xact_lock`, deletes the day's rows and inserts the deterministic set. Without the lock, concurrent runs interleave and leave duplicates; the test fails when the lock is removed.
+
+I checked each guarantee by breaking it and confirming its test fails.
+
+## Pipeline behaviour worth knowing
+
+- **Stale events are skipped, not captured.** Live view only shows the delivery while it's happening. An event older than `CAPTURE_MAX_EVENT_AGE_S` (120 s) when a worker claims it is marked `skipped`. Ring's own retries, a backlog after downtime, or a slow queue all end up here. Recorded clips (`media/video/download`) would be the way to process old events; not built yet.
+- **Zero packages = no delivery row.** A person at the door with nothing left is recorded on the event (`outcome`), not in the ledger, so it doesn't show up as an `unexpected` delivery.
+- **`detected_at` is Ring's detection time**, not our processing time, so reconciliation compares against the delivery window using when the driver was actually there.
+- **Auth failures are final.** An expired Playground token fails the event once, with the reason, instead of burning three retries in milliseconds. Other errors retry immediately, up to `QUEUE_MAX_ATTEMPTS`; there's no backoff, because a capture retried later would be stale anyway.
+- **Reconciliation batches are business days** (`BUSINESS_TIMEZONE`). An expected delivery belongs to the day its window starts, a delivery to the day it was detected. Limitation: a delivery just after midnight for a window ending just before it lands in a different batch (`unexpected` + `missing`). The timer (`RECONCILE_INTERVAL_S`) re-runs today and yesterday so overdue windows turn `missing`.
+- **Latency stamps** (`deliveries.latency_ms`): `ring_to_received`, `queue_wait`, `device_resolve`, `whep_setup`, `capture`, `select`, `extract`, `save_frames`, `ledger_insert`, `reconcile`, plus the end-to-end spans `event_to_ledger` and `received_to_ledger`. `bench/latency.py` reports nearest-rank p50/p95 with N per stage.

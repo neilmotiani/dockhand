@@ -77,7 +77,8 @@ class Job:
 
 @dataclass(frozen=True)
 class JobResult:
-    status: Literal["done", "skipped"]
+    # "failed" from a processor is final (no retry), for errors a retry cannot fix.
+    status: Literal["done", "skipped", "failed"]
     outcome: str
 
 
