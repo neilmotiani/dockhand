@@ -3,6 +3,7 @@ import contextlib
 import logging
 from collections.abc import AsyncIterator
 from datetime import timedelta
+from zoneinfo import ZoneInfo
 
 import httpx
 from fastapi import FastAPI
@@ -12,11 +13,24 @@ from app.config import Settings, get_settings
 from app.db.session import init_db, make_engine
 from app.ingest.api import router as ingest_router
 from app.ingest.poller import HistoryPoller
-from app.ingest.queue import EventQueue, Processor
+from app.ingest.queue import EventQueue, Processor, utcnow
+from app.reconcile.cost import ReconcileConfig
+from app.reconcile.store import ReconcileTimer
 from app.ring.client import RingClient
 from app.ring.tokens import PlaygroundTokenProvider
 
 log = logging.getLogger(__name__)
+
+
+def _default_pipeline(app: FastAPI, settings: Settings) -> Processor:
+    # Imported here so the API (and its tests) start without boto3/aiortc being exercised.
+    from app.capture.service import Capturer
+    from app.extract.client import BedrockExtractor, make_bedrock_client
+    from app.pipeline import Pipeline
+
+    capturer = Capturer(app.state.ring, settings, clock=utcnow)
+    extractor = BedrockExtractor(make_bedrock_client(settings), settings)
+    return Pipeline(app.state.engine, settings, capturer, extractor, clock=utcnow)
 
 
 def create_app(
@@ -26,8 +40,9 @@ def create_app(
     processor: Processor | None = None,
     start_background: bool = True,
 ) -> FastAPI:
-    """Build the API. Tests pass their own engine and processor and turn off the background
-    workers and poller so they can drive the queue step by step."""
+    """Build the API. Without a `processor`, events run through the real pipeline (WHEP
+    capture + Bedrock). Tests pass their own engine and processor and turn off the background
+    workers, poller and timer so they can drive the queue step by step."""
     settings = settings or get_settings()
 
     @contextlib.asynccontextmanager
@@ -47,11 +62,18 @@ def create_app(
         app.state.ring = RingClient(http, PlaygroundTokenProvider(settings))
         tasks: list[asyncio.Task] = []
         if start_background:
-            if processor is not None:
-                tasks += [
-                    asyncio.create_task(app.state.queue.worker(processor))
-                    for _ in range(settings.queue_workers)
-                ]
+            proc = processor or _default_pipeline(app, settings)
+            tasks += [
+                asyncio.create_task(app.state.queue.worker(proc))
+                for _ in range(settings.queue_workers)
+            ]
+            timer = ReconcileTimer(
+                app.state.engine,
+                ZoneInfo(settings.business_timezone),
+                ReconcileConfig.from_settings(settings),
+                clock=utcnow,
+            )
+            tasks.append(asyncio.create_task(timer.run(settings.reconcile_interval_s)))
             if settings.ring_poll_interval_s > 0:
                 poller = HistoryPoller(
                     app.state.ring,
