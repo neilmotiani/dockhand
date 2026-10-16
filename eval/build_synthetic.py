@@ -59,7 +59,7 @@ BACKGROUNDS = [
         base_count=1,
         regions=((165, 335, 560, 475), (165, 480, 392, 665), (650, 470, 900, 640)),
         obstacles=((395, 478, 640, 720), (625, 640, 760, 720)),  # existing box, bottle
-        box_width=(110, 170),
+        box_width=(85, 130),
     ),
     Background(
         kind="driveway",
@@ -68,7 +68,7 @@ BACKGROUNDS = [
         base_count=0,
         regions=((80, 420, 560, 670), (420, 280, 880, 560)),
         obstacles=(),
-        box_width=(100, 160),
+        box_width=(80, 130),
     ),
 ]
 

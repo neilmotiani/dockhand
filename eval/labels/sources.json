@@ -1,0 +1,29 @@
+{
+  "porch_piracy": {
+    "title": "Porch Piracy Dataset",
+    "author": "gluwxyws",
+    "url": "https://universe.roboflow.com/gluwxyws/porch-piracy",
+    "version": 8,
+    "license": "CC BY 4.0",
+    "images": 2905,
+    "content_sha256": "d2fbc1b2c84776b42a100ece441bc7c2c14286f10077c5bcc7e05bbbc934bcac"
+  },
+  "mpj_boxes": {
+    "title": "Package Detection Dataset",
+    "author": "MPJ",
+    "url": "https://universe.roboflow.com/mpj/package-detection-f03pa",
+    "version": 1,
+    "license": "CC BY 4.0",
+    "images": 261,
+    "content_sha256": "245826de182e5659d14e6538d99521104667be5c723674ad765cdd9fdf7d7f00"
+  },
+  "packages_pd": {
+    "title": "Packages Dataset",
+    "author": "Roboflow Community",
+    "url": "https://universe.roboflow.com/joseph-nelson/packages-g0ton",
+    "version": 6,
+    "license": "Public Domain",
+    "images": 26,
+    "content_sha256": "a69d8ed8cd254bdb6bf106c2c910c34c608208a4eafd45ef1f13b15d4cb02bbd"
+  }
+}
