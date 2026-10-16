@@ -1,0 +1,3756 @@
+{
+  "script": "eval/extraction.py",
+  "generated_at": "2026-10-16T03:55:37+00:00",
+  "git_commit": "9f8175511b54249ef51cb397cc2b1f7bcb7392da",
+  "prompt_version": "v1",
+  "models": [
+    {
+      "model_id": "us.amazon.nova-pro-v1:0",
+      "structured_output": false
+    },
+    {
+      "model_id": "us.anthropic.claude-sonnet-4-6",
+      "structured_output": true
+    }
+  ],
+  "prices": {
+    "_source": "AWS Price List offer files (public, no auth), region us-east-1: https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrock/current/us-east-1/index.json (published 2026-10-14) and .../AmazonBedrockFoundationModels/current/us-east-1/index.json (published 2026-10-12). Checked 2026-10-16. On-demand, USD per 1M tokens.",
+    "us.amazon.nova-pro-v1:0": {
+      "input_per_mtok": 0.8,
+      "output_per_mtok": 3.2,
+      "usage_types": [
+        "USE1-NovaPro-input-tokens",
+        "USE1-NovaPro-output-tokens"
+      ],
+      "note": "No separate cross-region SKU is listed for Nova Pro; the in-region rate is assumed for the us. profile."
+    },
+    "us.anthropic.claude-sonnet-4-6": {
+      "input_per_mtok": 3.3,
+      "output_per_mtok": 16.5,
+      "usage_types": [
+        "USE1-MP:USE1_InputTokenCount-Units",
+        "USE1-MP:USE1_OutputTokenCount-Units"
+      ],
+      "note": "Regional cross-region inference (us. profile). The global profile is 3.00 / 15.00."
+    }
+  },
+  "items_files": [
+    "eval/labels/items_ring_playground.jsonl",
+    "eval/labels/items_roboflow_packages_pd.jsonl",
+    "eval/labels/items_roboflow_porch_piracy.jsonl",
+    "eval/labels/items_synthetic_overlay.jsonl"
+  ],
+  "selection_rules": "eval/SELECTION.md",
+  "per_source": [
+    {
+      "source": "ring_playground",
+      "model": "us.amazon.nova-pro-v1:0",
+      "n": 2,
+      "count_exact": {
+        "value": 1.0,
+        "k": 2,
+        "n": 2,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "count_mae": 0,
+      "count_mae_n": 2,
+      "count_wrong": 0,
+      "negatives_false_alarm": {
+        "value": 0.0,
+        "k": 0,
+        "n": 1,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "carrier_accuracy": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "failures": 0,
+      "latency_ms_p50": 2283.8,
+      "latency_ms_p95": 2434.5,
+      "usd_total": 0.011137,
+      "usd_per_call": 0.005568
+    },
+    {
+      "source": "ring_playground",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "n": 2,
+      "count_exact": {
+        "value": 1.0,
+        "k": 2,
+        "n": 2,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "count_mae": 0,
+      "count_mae_n": 2,
+      "count_wrong": 0,
+      "negatives_false_alarm": {
+        "value": 0.0,
+        "k": 0,
+        "n": 1,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "carrier_accuracy": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "failures": 0,
+      "latency_ms_p50": 4705.9,
+      "latency_ms_p95": 5284.5,
+      "usd_total": 0.030508,
+      "usd_per_call": 0.015254
+    },
+    {
+      "source": "roboflow_packages_pd",
+      "model": "us.amazon.nova-pro-v1:0",
+      "n": 11,
+      "count_exact": {
+        "value": 0.9091,
+        "k": 10,
+        "n": 11,
+        "ci95": [
+          0.6226,
+          0.9838
+        ]
+      },
+      "count_mae": 0.091,
+      "count_mae_n": 11,
+      "count_wrong": 1,
+      "negatives_false_alarm": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "carrier_accuracy": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "failures": 0,
+      "latency_ms_p50": 1712.2,
+      "latency_ms_p95": 2925.8,
+      "usd_total": 0.020764,
+      "usd_per_call": 0.001888
+    },
+    {
+      "source": "roboflow_packages_pd",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "n": 11,
+      "count_exact": {
+        "value": 1.0,
+        "k": 11,
+        "n": 11,
+        "ci95": [
+          0.7412,
+          1.0
+        ]
+      },
+      "count_mae": 0,
+      "count_mae_n": 11,
+      "count_wrong": 0,
+      "negatives_false_alarm": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "carrier_accuracy": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "failures": 0,
+      "latency_ms_p50": 3767.4,
+      "latency_ms_p95": 5709.9,
+      "usd_total": 0.095306,
+      "usd_per_call": 0.008664
+    },
+    {
+      "source": "roboflow_porch_piracy",
+      "model": "us.amazon.nova-pro-v1:0",
+      "n": 28,
+      "count_exact": {
+        "value": 0.9286,
+        "k": 26,
+        "n": 28,
+        "ci95": [
+          0.7735,
+          0.9802
+        ]
+      },
+      "count_mae": 0.143,
+      "count_mae_n": 28,
+      "count_wrong": 2,
+      "negatives_false_alarm": {
+        "value": 0.05,
+        "k": 1,
+        "n": 20,
+        "ci95": [
+          0.0089,
+          0.2361
+        ]
+      },
+      "carrier_accuracy": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "failures": 0,
+      "latency_ms_p50": 1049.3,
+      "latency_ms_p95": 1633.4,
+      "usd_total": 0.046264,
+      "usd_per_call": 0.001652
+    },
+    {
+      "source": "roboflow_porch_piracy",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "n": 28,
+      "count_exact": {
+        "value": 0.8929,
+        "k": 25,
+        "n": 28,
+        "ci95": [
+          0.728,
+          0.9629
+        ]
+      },
+      "count_mae": 0.107,
+      "count_mae_n": 28,
+      "count_wrong": 3,
+      "negatives_false_alarm": {
+        "value": 0.05,
+        "k": 1,
+        "n": 20,
+        "ci95": [
+          0.0089,
+          0.2361
+        ]
+      },
+      "carrier_accuracy": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "failures": 0,
+      "latency_ms_p50": 2553.9,
+      "latency_ms_p95": 4769.1,
+      "usd_total": 0.16337,
+      "usd_per_call": 0.005835
+    },
+    {
+      "source": "synthetic_overlay",
+      "model": "us.amazon.nova-pro-v1:0",
+      "n": 36,
+      "count_exact": {
+        "value": 0.3333,
+        "k": 12,
+        "n": 36,
+        "ci95": [
+          0.2021,
+          0.4967
+        ]
+      },
+      "count_mae": 0.778,
+      "count_mae_n": 36,
+      "count_wrong": 24,
+      "negatives_false_alarm": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "carrier_accuracy": {
+        "value": 0.9722,
+        "k": 35,
+        "n": 36,
+        "ci95": [
+          0.8583,
+          0.9951
+        ]
+      },
+      "failures": 0,
+      "latency_ms_p50": 1479.5,
+      "latency_ms_p95": 1950.4,
+      "usd_total": 0.083226,
+      "usd_per_call": 0.002312
+    },
+    {
+      "source": "synthetic_overlay",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "n": 36,
+      "count_exact": {
+        "value": 0.5,
+        "k": 18,
+        "n": 36,
+        "ci95": [
+          0.3447,
+          0.6553
+        ]
+      },
+      "count_mae": 0.75,
+      "count_mae_n": 36,
+      "count_wrong": 18,
+      "negatives_false_alarm": {
+        "value": null,
+        "k": 0,
+        "n": 0,
+        "ci95": null
+      },
+      "carrier_accuracy": {
+        "value": 1.0,
+        "k": 36,
+        "n": 36,
+        "ci95": [
+          0.9036,
+          1.0
+        ]
+      },
+      "failures": 0,
+      "latency_ms_p50": 3629.5,
+      "latency_ms_p95": 4904.7,
+      "usd_total": 0.28368,
+      "usd_per_call": 0.00788
+    }
+  ],
+  "ledger_total_usd": 0.7343,
+  "per_item": [
+    {
+      "id": "ring_playground:package",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The package is visible in all frames, but there is no identifiable carrier or vehicle in sight.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 6733,
+      "output_tokens": 60,
+      "latency_ms": 2116.4,
+      "bedrock_latency_ms": 1793,
+      "structured_output": false,
+      "usd": 0.005578,
+      "called_at": "2026-10-16T03:44:00+00:00"
+    },
+    {
+      "id": "ring_playground:vehicle",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "No packages were left at the door in any of the frames.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 6733,
+      "output_tokens": 54,
+      "latency_ms": 2451.2,
+      "bedrock_latency_ms": 1819,
+      "structured_output": false,
+      "usd": 0.005559,
+      "called_at": "2026-10-16T03:44:02+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:package_1_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows two packages, one large brown box and one smaller white box, both with Amazon labels.",
+        "carrier": "Amazon",
+        "package_count": 2,
+        "label_text": [
+          "Amazon",
+          "Priority"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2070,
+      "output_tokens": 72,
+      "latency_ms": 2653.7,
+      "bedrock_latency_ms": 1427,
+      "structured_output": false,
+      "usd": 0.001886,
+      "called_at": "2026-10-16T03:45:30+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:PXL_20201103_181916758_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Two distinct packages are visible, both with Amazon labels.",
+        "carrier": "Amazon",
+        "package_count": 2,
+        "label_text": [
+          "Amazon"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2059,
+      "output_tokens": 56,
+      "latency_ms": 1380.4,
+      "bedrock_latency_ms": 1053,
+      "structured_output": false,
+      "usd": 0.001826,
+      "called_at": "2026-10-16T03:45:32+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:IMG_6823_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows a single package, a cardboard box, left at the door. The box has a shipping label with legible text, but the carrier is not identifiable from the image.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [
+          "UPS"
+        ],
+        "confidence": 0.7
+      },
+      "attempts": 1,
+      "input_tokens": 2070,
+      "output_tokens": 84,
+      "latency_ms": 1720.2,
+      "bedrock_latency_ms": 1339,
+      "structured_output": false,
+      "usd": 0.001925,
+      "called_at": "2026-10-16T03:45:33+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:IMG_6822_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "There are two packages visible: a large cardboard box and a smaller white box on top of it. The box has a label with legible text, but the carrier is not identifiable from the image.",
+        "carrier": "Unknown",
+        "package_count": 2,
+        "label_text": [
+          "New Movement"
+        ],
+        "confidence": 0.7
+      },
+      "attempts": 1,
+      "input_tokens": 2070,
+      "output_tokens": 88,
+      "latency_ms": 1829.1,
+      "bedrock_latency_ms": 1459,
+      "structured_output": false,
+      "usd": 0.001938,
+      "called_at": "2026-10-16T03:45:35+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:IMG_6819_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "A single white package is visible on the doorstep. The package has a barcode and some text, but the carrier's logo is not clearly visible.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [
+          "20231214"
+        ],
+        "confidence": 0.7
+      },
+      "attempts": 1,
+      "input_tokens": 2070,
+      "output_tokens": 84,
+      "latency_ms": 3198.0,
+      "bedrock_latency_ms": 1350,
+      "structured_output": false,
+      "usd": 0.001925,
+      "called_at": "2026-10-16T03:45:39+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:PXL_20201107_191145720_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows a single package with an Amazon logo, indicating it was delivered by Amazon.",
+        "carrier": "Amazon",
+        "package_count": 1,
+        "label_text": [
+          "Amazon"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2070,
+      "output_tokens": 65,
+      "latency_ms": 1604.0,
+      "bedrock_latency_ms": 1396,
+      "structured_output": false,
+      "usd": 0.001864,
+      "called_at": "2026-10-16T03:45:40+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:PXL_20201105_173148569_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "There is one package visible in the frame, but no carrier markings or labels are legible.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 2059,
+      "output_tokens": 60,
+      "latency_ms": 1463.1,
+      "bedrock_latency_ms": 1293,
+      "structured_output": false,
+      "usd": 0.001839,
+      "called_at": "2026-10-16T03:45:42+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:PXL_20201107_021350055_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows a Priority Mail box with a USPS logo and a plastic bag on top, both with visible USPS tracking labels.",
+        "carrier": "USPS",
+        "package_count": 2,
+        "label_text": [
+          "PRIORITY MAIL",
+          "UNITED STATES POSTAL SERVICE",
+          "VISIT US AT USPS.COM"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2059,
+      "output_tokens": 93,
+      "latency_ms": 1712.2,
+      "bedrock_latency_ms": 1528,
+      "structured_output": false,
+      "usd": 0.001945,
+      "called_at": "2026-10-16T03:45:44+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:IMG_6824_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows a single package left at the door, but there are no visible carrier markings, labels, or identifiable features to determine the carrier or read any text.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 2070,
+      "output_tokens": 74,
+      "latency_ms": 2340.1,
+      "bedrock_latency_ms": 1942,
+      "structured_output": false,
+      "usd": 0.001893,
+      "called_at": "2026-10-16T03:45:46+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:PXL_20201107_214721193_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The package has an Amazon label with a barcode and tracking number, indicating it was delivered by Amazon.",
+        "carrier": "Amazon",
+        "package_count": 1,
+        "label_text": [
+          "1543-30"
+        ],
+        "confidence": 0.95
+      },
+      "attempts": 1,
+      "input_tokens": 2059,
+      "output_tokens": 74,
+      "latency_ms": 1131.1,
+      "bedrock_latency_ms": 1064,
+      "structured_output": false,
+      "usd": 0.001884,
+      "called_at": "2026-10-16T03:45:47+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:PXL_20201101_154113387_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Two distinct packages are visible, both with Amazon labels.",
+        "carrier": "Amazon",
+        "package_count": 2,
+        "label_text": [
+          "Amazon",
+          "Amazon"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2059,
+      "output_tokens": 60,
+      "latency_ms": 1294.8,
+      "bedrock_latency_ms": 1175,
+      "structured_output": false,
+      "usd": 0.001839,
+      "called_at": "2026-10-16T03:45:48+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-20-13-43_jpeg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "No packages or carriers are visible in the frame.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2059,
+      "output_tokens": 51,
+      "latency_ms": 61734.1,
+      "bedrock_latency_ms": 1128,
+      "structured_output": false,
+      "usd": 0.00181,
+      "called_at": "2026-10-16T03:49:36+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-20-15-50_jpeg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The bear is interacting with a package, but there is no visible carrier or shipping label.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 59,
+      "latency_ms": 1321.7,
+      "bedrock_latency_ms": 1212,
+      "structured_output": false,
+      "usd": 0.002194,
+      "called_at": "2026-10-16T03:49:38+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-20-16-26_jpeg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows a single package with an Amazon label on the back porch.",
+        "carrier": "Amazon",
+        "package_count": 1,
+        "label_text": [
+          "Amazon"
+        ],
+        "confidence": 0.95
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 63,
+      "latency_ms": 1637.1,
+      "bedrock_latency_ms": 1524,
+      "structured_output": false,
+      "usd": 0.002207,
+      "called_at": "2026-10-16T03:49:39+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-20-11-21_jpeg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows a cardboard box on the ground near the back door, with a car parked nearby. The box appears to be from UPS, as indicated by the visible logo and text on the box.",
+        "carrier": "UPS",
+        "package_count": 1,
+        "label_text": [
+          "UPS"
+        ],
+        "confidence": 0.9
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 87,
+      "latency_ms": 1480.6,
+      "bedrock_latency_ms": 1402,
+      "structured_output": false,
+      "usd": 0.002284,
+      "called_at": "2026-10-16T03:49:41+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-22-36-35_jpeg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual is wearing a uniform and the vehicle is clearly marked with the UPS logo.",
+        "carrier": "UPS",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.95
+      },
+      "attempts": 1,
+      "input_tokens": 2709,
+      "output_tokens": 59,
+      "latency_ms": 1162.5,
+      "bedrock_latency_ms": 1112,
+      "structured_output": false,
+      "usd": 0.002356,
+      "called_at": "2026-10-16T03:49:42+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-22-36-25_jpeg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual is dressed in a uniform and is placing a single package on the doorstep, but there are no visible logos or labels to identify the carrier.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 2709,
+      "output_tokens": 71,
+      "latency_ms": 1626.4,
+      "bedrock_latency_ms": 1579,
+      "structured_output": false,
+      "usd": 0.002394,
+      "called_at": "2026-10-16T03:49:44+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-20-13-58_jpeg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Two packages are visible, but there are no identifiable carrier markings or labels.",
+        "carrier": "Unknown",
+        "package_count": 2,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 2059,
+      "output_tokens": 56,
+      "latency_ms": 1089.7,
+      "bedrock_latency_ms": 1011,
+      "structured_output": false,
+      "usd": 0.001826,
+      "called_at": "2026-10-16T03:49:45+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-20-16-33_jpeg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual is wearing a backpack and is placing a single package on the ground, which is a common practice for Amazon deliveries.",
+        "carrier": "Amazon",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.9
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 66,
+      "latency_ms": 1537.6,
+      "bedrock_latency_ms": 1431,
+      "structured_output": false,
+      "usd": 0.002217,
+      "called_at": "2026-10-16T03:49:46+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:CCTV_293_png",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual in the frame is not wearing a uniform or carrying any packages, and no packages are visible on the ground.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 65,
+      "latency_ms": 969.3,
+      "bedrock_latency_ms": 926,
+      "structured_output": false,
+      "usd": 0.001574,
+      "called_at": "2026-10-16T03:49:47+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:121_png_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual is not wearing a uniform or carrying any identifiable packages, and there are no visible shipping labels or logos.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.9
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 64,
+      "latency_ms": 931.2,
+      "bedrock_latency_ms": 887,
+      "structured_output": false,
+      "usd": 0.00157,
+      "called_at": "2026-10-16T03:49:48+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:465_png",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual in the video is wearing a red cap and a black jacket, which are not indicative of any known delivery service uniform. There are no visible packages left at the door, and no legible shipping labels or markings are present.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 923,
+      "output_tokens": 88,
+      "latency_ms": 1154.0,
+      "bedrock_latency_ms": 1101,
+      "structured_output": false,
+      "usd": 0.00102,
+      "called_at": "2026-10-16T03:49:49+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:291_png_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual is holding documents or a letter and there are no packages visible in the frame.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 59,
+      "latency_ms": 1045.8,
+      "bedrock_latency_ms": 1005,
+      "structured_output": false,
+      "usd": 0.001554,
+      "called_at": "2026-10-16T03:49:50+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:CCTV_673_png",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "No packages were left at the door by the person in the frame.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 53,
+      "latency_ms": 944.1,
+      "bedrock_latency_ms": 909,
+      "structured_output": false,
+      "usd": 0.001535,
+      "called_at": "2026-10-16T03:49:51+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:211_png_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual is not wearing a uniform or carrying any packages, and there are no visible delivery vehicles or packages left at the door.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 67,
+      "latency_ms": 981.5,
+      "bedrock_latency_ms": 935,
+      "structured_output": false,
+      "usd": 0.00158,
+      "called_at": "2026-10-16T03:49:52+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:533_png_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual is dressed in a costume and no packages are visible being delivered.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 56,
+      "latency_ms": 950.6,
+      "bedrock_latency_ms": 904,
+      "structured_output": false,
+      "usd": 0.001545,
+      "called_at": "2026-10-16T03:49:53+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:309_png",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual in the frames is walking away from the back door without leaving any packages.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 923,
+      "output_tokens": 58,
+      "latency_ms": 774.5,
+      "bedrock_latency_ms": 740,
+      "structured_output": false,
+      "usd": 0.000924,
+      "called_at": "2026-10-16T03:49:54+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-23-03-03_jpeg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individuals are walking away from the back door with no visible packages, and there is no delivery vehicle or carrier indication present in the frames.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2539,
+      "output_tokens": 69,
+      "latency_ms": 1425.5,
+      "bedrock_latency_ms": 1315,
+      "structured_output": false,
+      "usd": 0.002252,
+      "called_at": "2026-10-16T03:49:56+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:345_png_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individuals in the frame are not wearing uniforms or using vehicles associated with known carriers, and no packages are visible being left at the door.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 69,
+      "latency_ms": 1134.4,
+      "bedrock_latency_ms": 1087,
+      "structured_output": false,
+      "usd": 0.001586,
+      "called_at": "2026-10-16T03:49:57+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:460_png_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual is walking away from the door without leaving any packages behind.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 55,
+      "latency_ms": 1001.6,
+      "bedrock_latency_ms": 959,
+      "structured_output": false,
+      "usd": 0.001542,
+      "called_at": "2026-10-16T03:49:58+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:90_png",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "No packages were left at the door by the person in the frames.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1675,
+      "output_tokens": 55,
+      "latency_ms": 1101.2,
+      "bedrock_latency_ms": 1061,
+      "structured_output": false,
+      "usd": 0.001516,
+      "called_at": "2026-10-16T03:49:59+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:337_png_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual in the frame is not associated with any recognizable delivery service, and no packages are visible being left at the door.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 64,
+      "latency_ms": 1003.6,
+      "bedrock_latency_ms": 966,
+      "structured_output": false,
+      "usd": 0.00157,
+      "called_at": "2026-10-16T03:50:00+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:9_png",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual is standing at the door without any visible packages or labels, and there is no carrier vehicle or uniform in sight.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 923,
+      "output_tokens": 66,
+      "latency_ms": 841.7,
+      "bedrock_latency_ms": 801,
+      "structured_output": false,
+      "usd": 0.00095,
+      "called_at": "2026-10-16T03:50:01+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:61_png_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual is not wearing a uniform or carrying any packages, and no packages are left at the door.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 62,
+      "latency_ms": 1009.1,
+      "bedrock_latency_ms": 964,
+      "structured_output": false,
+      "usd": 0.001564,
+      "called_at": "2026-10-16T03:50:02+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:235_png_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual in the frame is walking away from the door and does not appear to leave any packages behind.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 62,
+      "latency_ms": 989.5,
+      "bedrock_latency_ms": 950,
+      "structured_output": false,
+      "usd": 0.001564,
+      "called_at": "2026-10-16T03:50:03+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:479_png",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual is wearing a uniform and carrying multiple packages, but there are no visible logos or labels to identify the carrier or the contents of the packages.",
+        "carrier": "Unknown",
+        "package_count": 3,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 923,
+      "output_tokens": 71,
+      "latency_ms": 879.0,
+      "bedrock_latency_ms": 845,
+      "structured_output": false,
+      "usd": 0.000966,
+      "called_at": "2026-10-16T03:50:04+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:40_png_jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individual in the frame is not wearing a uniform or carrying any packages, and there are no visible delivery vehicles or labels. The person appears to be reacting to something, possibly the broken glass on the floor, but this is not related to a delivery event.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 93,
+      "latency_ms": 1219.0,
+      "bedrock_latency_ms": 1170,
+      "structured_output": false,
+      "usd": 0.001663,
+      "called_at": "2026-10-16T03:50:05+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:476_png",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The person in the frames is not interacting with any packages and is not wearing a uniform or carrying anything that indicates a delivery.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 923,
+      "output_tokens": 64,
+      "latency_ms": 967.8,
+      "bedrock_latency_ms": 928,
+      "structured_output": false,
+      "usd": 0.000943,
+      "called_at": "2026-10-16T03:50:06+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:CCTV_400_png",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The individuals are walking away from the back door and there are no packages visible in the frames.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 1707,
+      "output_tokens": 60,
+      "latency_ms": 1052.8,
+      "bedrock_latency_ms": 1011,
+      "structured_output": false,
+      "usd": 0.001558,
+      "called_at": "2026-10-16T03:50:07+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_000.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Three distinct packages are visible in the frames: a small white box, a larger brown box, and a wooden crate. The carrier is unknown as there are no visible logos or uniforms.",
+        "carrier": "Unknown",
+        "package_count": 3,
+        "label_text": [],
+        "confidence": 0.8
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 78,
+      "latency_ms": 1499.3,
+      "bedrock_latency_ms": 1423,
+      "structured_output": false,
+      "usd": 0.002255,
+      "called_at": "2026-10-16T03:50:08+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_001.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The package is clearly labeled with 'DHL' and a tracking number, indicating it was delivered by DHL.",
+        "carrier": "DHL",
+        "package_count": 1,
+        "label_text": [
+          "DHL",
+          "DH 18524140735"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 85,
+      "latency_ms": 1263.6,
+      "bedrock_latency_ms": 1188,
+      "structured_output": false,
+      "usd": 0.002278,
+      "called_at": "2026-10-16T03:50:10+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_002.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The frames show four distinct packages, all marked with 'Amazon', indicating they were delivered by Amazon.",
+        "carrier": "Amazon",
+        "package_count": 4,
+        "label_text": [
+          "Amazon AM 4044 0780 8 32",
+          "Amazon AM 2905 205",
+          "Amazon AM 9834 9854",
+          "Amazon AM 1007 2351 366"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 130,
+      "latency_ms": 1754.9,
+      "bedrock_latency_ms": 1675,
+      "structured_output": false,
+      "usd": 0.002422,
+      "called_at": "2026-10-16T03:50:11+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_003.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The package is clearly labeled with 'USPS', indicating it was delivered by the United States Postal Service. There is only one package visible in the frames.",
+        "carrier": "USPS",
+        "package_count": 1,
+        "label_text": [
+          "USPS"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 79,
+      "latency_ms": 1279.7,
+      "bedrock_latency_ms": 1200,
+      "structured_output": false,
+      "usd": 0.002258,
+      "called_at": "2026-10-16T03:50:13+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_004.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Three DHL packages were delivered, as indicated by the DHL labels on each package.",
+        "carrier": "DHL",
+        "package_count": 3,
+        "label_text": [
+          "DHL",
+          "DH 9722 7798",
+          "DH 9135 0726",
+          "DHL",
+          "DH 3453 2863 918"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 114,
+      "latency_ms": 1597.9,
+      "bedrock_latency_ms": 1506,
+      "structured_output": false,
+      "usd": 0.00237,
+      "called_at": "2026-10-16T03:50:14+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_005.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The package was left by a UPS carrier, as indicated by the UPS logo on the box. There is one distinct package.",
+        "carrier": "UPS",
+        "package_count": 1,
+        "label_text": [
+          "UPS"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 72,
+      "latency_ms": 1407.0,
+      "bedrock_latency_ms": 1308,
+      "structured_output": false,
+      "usd": 0.002236,
+      "called_at": "2026-10-16T03:50:16+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_006.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The Sysco logo is visible on the vehicle, and there is one package with a Sysco label.",
+        "carrier": "Sysco",
+        "package_count": 1,
+        "label_text": [
+          "Sysco"
+        ],
+        "confidence": 0.95
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 71,
+      "latency_ms": 1390.0,
+      "bedrock_latency_ms": 1299,
+      "structured_output": false,
+      "usd": 0.002233,
+      "called_at": "2026-10-16T03:50:17+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_007.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Three distinct packages with Amazon labels were left at the door.",
+        "carrier": "Amazon",
+        "package_count": 3,
+        "label_text": [
+          "Amazon",
+          "Amazon",
+          "Amazon"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 65,
+      "latency_ms": 1459.8,
+      "bedrock_latency_ms": 1364,
+      "structured_output": false,
+      "usd": 0.002214,
+      "called_at": "2026-10-16T03:50:18+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_008.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Multiple FedEx packages are visible, with clear FedEx labels and tracking numbers.",
+        "carrier": "FedEx",
+        "package_count": 5,
+        "label_text": [
+          "FedEx FE 4832 0008 34",
+          "FedEx FE 7617 7018 0497",
+          "FedEx FE 8970 7018 3697",
+          "FedEx FE 3362 9410 2391",
+          "FedEx FE 6574 7610 2"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 156,
+      "latency_ms": 1830.0,
+      "bedrock_latency_ms": 1751,
+      "structured_output": false,
+      "usd": 0.002505,
+      "called_at": "2026-10-16T03:50:20+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_009.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The video shows two packages with a US Foods label on one of them, indicating the carrier.",
+        "carrier": "US Foods",
+        "package_count": 2,
+        "label_text": [
+          "US Foods"
+        ],
+        "confidence": 0.9
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 68,
+      "latency_ms": 1197.9,
+      "bedrock_latency_ms": 1115,
+      "structured_output": false,
+      "usd": 0.002223,
+      "called_at": "2026-10-16T03:50:21+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_010.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The frames show two FedEx boxes and one unlabeled box, all left at the back door.",
+        "carrier": "FedEx",
+        "package_count": 3,
+        "label_text": [
+          "FedEx",
+          "FedEx"
+        ],
+        "confidence": 0.9
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 72,
+      "latency_ms": 1341.3,
+      "bedrock_latency_ms": 1259,
+      "structured_output": false,
+      "usd": 0.002236,
+      "called_at": "2026-10-16T03:50:23+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_011.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The frames show multiple packages with Sysco labels, indicating they are from Sysco.",
+        "carrier": "Sysco",
+        "package_count": 4,
+        "label_text": [
+          "Sysco SY 7790 5751",
+          "Sysco SY 4214 7297 0008",
+          "Sysco SY 5729 3224 7907",
+          "Sysco SY 4052 1522 7903"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 138,
+      "latency_ms": 1847.8,
+      "bedrock_latency_ms": 1768,
+      "structured_output": false,
+      "usd": 0.002447,
+      "called_at": "2026-10-16T03:50:25+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_012.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The FedEx vehicle is seen pulling away after leaving a package at the back door.",
+        "carrier": "FedEx",
+        "package_count": 1,
+        "label_text": [
+          "FedEx"
+        ],
+        "confidence": 0.95
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 66,
+      "latency_ms": 1189.6,
+      "bedrock_latency_ms": 1099,
+      "structured_output": false,
+      "usd": 0.002217,
+      "called_at": "2026-10-16T03:50:26+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_013.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The frames show a US Foods delivery vehicle and multiple packages with US Foods labels.",
+        "carrier": "US Foods",
+        "package_count": 3,
+        "label_text": [
+          "US Foods",
+          "US 5404 9913027",
+          "US Foods",
+          "US 5404 2428 31"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 104,
+      "latency_ms": 1749.6,
+      "bedrock_latency_ms": 1646,
+      "structured_output": false,
+      "usd": 0.002338,
+      "called_at": "2026-10-16T03:50:28+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_014.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The frames show four distinct packages, all marked with 'USPS', indicating they were delivered by the United States Postal Service.",
+        "carrier": "USPS",
+        "package_count": 4,
+        "label_text": [
+          "USPS",
+          "USPS",
+          "USPS",
+          "USPS"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 88,
+      "latency_ms": 1572.3,
+      "bedrock_latency_ms": 1478,
+      "structured_output": false,
+      "usd": 0.002287,
+      "called_at": "2026-10-16T03:50:29+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_015.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Four distinct packages with Sysco labels were left at the door.",
+        "carrier": "Sysco",
+        "package_count": 4,
+        "label_text": [
+          "Sysco SY 0718 9904 08 57",
+          "Sysco SY 2718 6592 3952",
+          "Sysco SY 9745 5187 4240",
+          "Sysco SY 8424 1561 664",
+          "Sysco SY 2047 28 969"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 157,
+      "latency_ms": 2083.7,
+      "bedrock_latency_ms": 1973,
+      "structured_output": false,
+      "usd": 0.002508,
+      "called_at": "2026-10-16T03:50:31+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_016.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Two distinct Amazon packages are visible on the steps, with clear Amazon labels.",
+        "carrier": "Amazon",
+        "package_count": 2,
+        "label_text": [
+          "Amazon AMR118033937",
+          "Amazon AM442014529021"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 90,
+      "latency_ms": 1313.6,
+      "bedrock_latency_ms": 1232,
+      "structured_output": false,
+      "usd": 0.002294,
+      "called_at": "2026-10-16T03:50:33+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_017.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The package is clearly labeled with 'UPS', indicating the carrier. There is only one package visible in the frame.",
+        "carrier": "UPS",
+        "package_count": 1,
+        "label_text": [
+          "UPS"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 71,
+      "latency_ms": 1250.0,
+      "bedrock_latency_ms": 1173,
+      "structured_output": false,
+      "usd": 0.002233,
+      "called_at": "2026-10-16T03:50:34+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_018.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The images show multiple packages with UPS labels, indicating that UPS is the carrier.",
+        "carrier": "UPS",
+        "package_count": 4,
+        "label_text": [
+          "UPS",
+          "UPS",
+          "UPS",
+          "UPS"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 73,
+      "latency_ms": 1382.1,
+      "bedrock_latency_ms": 1293,
+      "structured_output": false,
+      "usd": 0.002239,
+      "called_at": "2026-10-16T03:50:35+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_019.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Three distinct packages are visible: a small box, a medium-sized box, and a large box. The carrier is unknown as there are no identifiable logos or uniforms visible.",
+        "carrier": "Unknown",
+        "package_count": 3,
+        "label_text": [],
+        "confidence": 0.8
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 76,
+      "latency_ms": 1271.2,
+      "bedrock_latency_ms": 1199,
+      "structured_output": false,
+      "usd": 0.002249,
+      "called_at": "2026-10-16T03:50:37+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_020.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Three distinct DHL packages are visible in the frames, each with clear DHL markings and tracking numbers.",
+        "carrier": "DHL",
+        "package_count": 3,
+        "label_text": [
+          "DHL DH 8778 0084 940S",
+          "DHL DH 3054 5841 206",
+          "DHL DH 1427 2166 992"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 122,
+      "latency_ms": 1770.6,
+      "bedrock_latency_ms": 1674,
+      "structured_output": false,
+      "usd": 0.002396,
+      "called_at": "2026-10-16T03:50:38+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_021.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The video shows a US Foods delivery vehicle leaving after dropping off a package. The package is clearly labeled with 'US Foods' and a tracking number.",
+        "carrier": "US Foods",
+        "package_count": 1,
+        "label_text": [
+          "US Foods",
+          "US 7768 0000 027"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 95,
+      "latency_ms": 1600.2,
+      "bedrock_latency_ms": 1499,
+      "structured_output": false,
+      "usd": 0.00231,
+      "called_at": "2026-10-16T03:50:40+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_022.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The video shows a FedEx box being delivered and left at the back door.",
+        "carrier": "FedEx",
+        "package_count": 1,
+        "label_text": [
+          "FedEx FE 5922 35203 9405"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 79,
+      "latency_ms": 1543.6,
+      "bedrock_latency_ms": 1450,
+      "structured_output": false,
+      "usd": 0.002258,
+      "called_at": "2026-10-16T03:50:41+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_023.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The frames show two distinct packages with Amazon labels, indicating they were delivered by Amazon.",
+        "carrier": "Amazon",
+        "package_count": 2,
+        "label_text": [
+          "Amazon AM3788 1019863",
+          "Amazon AM8780 7718 003"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 95,
+      "latency_ms": 1630.8,
+      "bedrock_latency_ms": 1528,
+      "structured_output": false,
+      "usd": 0.00231,
+      "called_at": "2026-10-16T03:50:43+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_024.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The frames show two distinct packages with FedEx labels, indicating that FedEx is the carrier.",
+        "carrier": "FedEx",
+        "package_count": 2,
+        "label_text": [
+          "FedEx FE 4104 47528",
+          "FedEx FE 6301 800"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 91,
+      "latency_ms": 1352.2,
+      "bedrock_latency_ms": 1272,
+      "structured_output": false,
+      "usd": 0.002297,
+      "called_at": "2026-10-16T03:50:44+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_025.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows multiple packages with visible labels, but the carrier is not identifiable from the frames.",
+        "carrier": "Unknown",
+        "package_count": 4,
+        "label_text": [
+          "N\u00d8KA"
+        ],
+        "confidence": 0.7
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 73,
+      "latency_ms": 1261.3,
+      "bedrock_latency_ms": 1173,
+      "structured_output": false,
+      "usd": 0.002239,
+      "called_at": "2026-10-16T03:50:46+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_026.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Three distinct UPS packages are visible in the frames, each with a UPS label and tracking number.",
+        "carrier": "UPS",
+        "package_count": 3,
+        "label_text": [
+          "UPS UP 7144 2812041",
+          "UPS UP 32478 333",
+          "UPS UP6074 279"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 106,
+      "latency_ms": 1724.2,
+      "bedrock_latency_ms": 1643,
+      "structured_output": false,
+      "usd": 0.002345,
+      "called_at": "2026-10-16T03:50:47+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_027.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Multiple USPS packages are visible in the frames, with clear USPS labels and tracking numbers.",
+        "carrier": "USPS",
+        "package_count": 5,
+        "label_text": [
+          "US 186191817491",
+          "US 0275 1877 1860",
+          "US 1915 7809 3308",
+          "US 7274 3300"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 128,
+      "latency_ms": 1911.5,
+      "bedrock_latency_ms": 1829,
+      "structured_output": false,
+      "usd": 0.002415,
+      "called_at": "2026-10-16T03:50:49+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_028.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The frames show multiple packages with legible US Foods labels, indicating the carrier and the contents of the delivery.",
+        "carrier": "US Foods",
+        "package_count": 5,
+        "label_text": [
+          "US Foods US9278 06804",
+          "US Foods US 6339 5679 0386",
+          "US Foods US 2439 2019 8961",
+          "US Foods US 9851 1909 42",
+          "US Foods US 285 723"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 155,
+      "latency_ms": 1978.8,
+      "bedrock_latency_ms": 1887,
+      "structured_output": false,
+      "usd": 0.002502,
+      "called_at": "2026-10-16T03:50:51+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_029.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The video shows four distinct packages with Amazon labels, indicating they were delivered by Amazon.",
+        "carrier": "Amazon",
+        "package_count": 4,
+        "label_text": [
+          "Amazon",
+          "Amazon",
+          "Amazon",
+          "Amazon"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 74,
+      "latency_ms": 1446.4,
+      "bedrock_latency_ms": 1345,
+      "structured_output": false,
+      "usd": 0.002242,
+      "called_at": "2026-10-16T03:50:53+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_030.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The frames show four distinct packages, all labeled with 'Sysco' and unique tracking numbers.",
+        "carrier": "Sysco",
+        "package_count": 4,
+        "label_text": [
+          "Sysco SY 2025 9948 52",
+          "Sysco SY 2058 0443 20",
+          "Sysco SY 5403 8899 39",
+          "Sysco SY 2933 8214 04"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 137,
+      "latency_ms": 1940.9,
+      "bedrock_latency_ms": 1843,
+      "structured_output": false,
+      "usd": 0.002444,
+      "called_at": "2026-10-16T03:50:55+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_031.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The vehicle is clearly marked with DHL branding, and there is one package visible in the frame.",
+        "carrier": "DHL",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 61,
+      "latency_ms": 1291.9,
+      "bedrock_latency_ms": 1203,
+      "structured_output": false,
+      "usd": 0.002201,
+      "called_at": "2026-10-16T03:50:56+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_032.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The frames show a USPS delivery vehicle and multiple packages with USPS labels.",
+        "carrier": "USPS",
+        "package_count": 3,
+        "label_text": [
+          "USPS US 9030 740388",
+          "USPS US 5813 5220 4867",
+          "USPS US 808 2 2069 6488"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 119,
+      "latency_ms": 1522.4,
+      "bedrock_latency_ms": 1442,
+      "structured_output": false,
+      "usd": 0.002386,
+      "called_at": "2026-10-16T03:50:58+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_033.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Four distinct packages with USPS labels were left at the back door.",
+        "carrier": "USPS",
+        "package_count": 4,
+        "label_text": [
+          "USPS US 8100 5563 297",
+          "USPS US 4328 8618 8813",
+          "USPS",
+          "USPS US 0328 727"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 116,
+      "latency_ms": 1653.2,
+      "bedrock_latency_ms": 1573,
+      "structured_output": false,
+      "usd": 0.002377,
+      "called_at": "2026-10-16T03:50:59+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_034.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows a package with a UPS label, indicating that UPS is the carrier. There is only one package visible in the frame.",
+        "carrier": "UPS",
+        "package_count": 1,
+        "label_text": [
+          "UPS"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 72,
+      "latency_ms": 1389.1,
+      "bedrock_latency_ms": 1313,
+      "structured_output": false,
+      "usd": 0.002236,
+      "called_at": "2026-10-16T03:51:01+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_035.jpg",
+      "model": "us.amazon.nova-pro-v1:0",
+      "ok": true,
+      "result": {
+        "reasoning": "Two UPS packages were left at the back door, as indicated by the UPS labels on the boxes.",
+        "carrier": "UPS",
+        "package_count": 2,
+        "label_text": [
+          "UPS",
+          "UPS"
+        ],
+        "confidence": 1.0
+      },
+      "attempts": 1,
+      "input_tokens": 2507,
+      "output_tokens": 69,
+      "latency_ms": 1207.5,
+      "bedrock_latency_ms": 1132,
+      "structured_output": false,
+      "usd": 0.002226,
+      "called_at": "2026-10-16T03:51:02+00:00"
+    },
+    {
+      "id": "ring_playground:package",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "All three frames show the same scene: one brown cardboard box sitting on the front porch/mat area with a shipping label visible on it. No carrier uniform, vehicle, or logo is visible in any frame, and the label text is too small to read clearly. The package count is consistent across all frames as a single box.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.72
+      },
+      "attempts": 1,
+      "input_tokens": 4175,
+      "output_tokens": 99,
+      "latency_ms": 4063.0,
+      "bedrock_latency_ms": 3685,
+      "structured_output": true,
+      "usd": 0.015411,
+      "called_at": "2026-10-16T03:51:06+00:00"
+    },
+    {
+      "id": "ring_playground:vehicle",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "No packages are visible at the door in any of the frames. The camera shows a parking lot/back entrance area with cars driving through, but no delivery person, delivery vehicle (close up), or packages left at the door. Nothing was left behind.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.85
+      },
+      "attempts": 1,
+      "input_tokens": 4175,
+      "output_tokens": 80,
+      "latency_ms": 5348.8,
+      "bedrock_latency_ms": 5118,
+      "structured_output": true,
+      "usd": 0.015097,
+      "called_at": "2026-10-16T03:51:11+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:package_1_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Two packages are visible at the door: one larger Amazon Prime box (with the distinctive blue Prime tape) and one smaller USPS Priority Mail box leaning against it. Since these are two different carriers, this appears to be a single camera event capturing packages from two separate deliveries, but I'll report what's present. The dominant/most recent delivery carrier is ambiguous; however, both packages are present together so I'll note the mixed carriers. Reporting as Unknown since two carriers are represented, but the most prominent package is Amazon.",
+        "carrier": "Unknown",
+        "package_count": 2,
+        "label_text": [
+          "PRIORITY MAIL"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 2145,
+      "output_tokens": 146,
+      "latency_ms": 4839.7,
+      "bedrock_latency_ms": 4712,
+      "structured_output": true,
+      "usd": 0.009487,
+      "called_at": "2026-10-16T03:51:16+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:PXL_20201103_181916758_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Two Amazon packages are visible at the door: one yellow Amazon poly mailer with the Amazon smile logo and one blue/white Amazon Prime bubble mailer. Both bear Amazon branding clearly.",
+        "carrier": "Amazon",
+        "package_count": 2,
+        "label_text": [
+          "BM4",
+          "JM8"
+        ],
+        "confidence": 0.95
+      },
+      "attempts": 1,
+      "input_tokens": 2000,
+      "output_tokens": 75,
+      "latency_ms": 2733.9,
+      "bedrock_latency_ms": 2620,
+      "structured_output": true,
+      "usd": 0.007838,
+      "called_at": "2026-10-16T03:51:19+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:IMG_6823_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Two packages are visible at the door: one large cardboard box to the left of the door and one small white box/mailer on the doorstep to the right. The large box has text that appears to read 'moving equipment' or similar, suggesting it may be a moving/storage supply box rather than a carrier-branded package. No carrier logos, uniforms, or vehicles are visible, and the box markings do not clearly identify a specific carrier.",
+        "carrier": "Unknown",
+        "package_count": 2,
+        "label_text": [
+          "moving equipment",
+          "30"
+        ],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 2145,
+      "output_tokens": 130,
+      "latency_ms": 3930.0,
+      "bedrock_latency_ms": 3732,
+      "structured_output": true,
+      "usd": 0.009223,
+      "called_at": "2026-10-16T03:51:23+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:IMG_6822_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Two packages are visible at the front door: a large cardboard box on the bottom with text that appears to read something like 'moving equipment' and '3.0', and a smaller white box/mailer sitting on top of it. No carrier uniform, vehicle, or clear carrier logo is visible to identify the delivery service.",
+        "carrier": "Unknown",
+        "package_count": 2,
+        "label_text": [
+          "moving equipment",
+          "3.0"
+        ],
+        "confidence": 0.6
+      },
+      "attempts": 1,
+      "input_tokens": 2145,
+      "output_tokens": 104,
+      "latency_ms": 3581.5,
+      "bedrock_latency_ms": 3370,
+      "structured_output": true,
+      "usd": 0.008795,
+      "called_at": "2026-10-16T03:51:26+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:IMG_6819_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "A single small white cardboard box is sitting at the base of a blue front door. The box appears to have some printed text on it that reads partially '4P1250P0' (upside down), but no carrier branding, uniform, or vehicle is visible to identify the carrier definitively.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [
+          "4P1250P0"
+        ],
+        "confidence": 0.6
+      },
+      "attempts": 1,
+      "input_tokens": 2145,
+      "output_tokens": 99,
+      "latency_ms": 3791.7,
+      "bedrock_latency_ms": 3576,
+      "structured_output": true,
+      "usd": 0.008712,
+      "called_at": "2026-10-16T03:51:30+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:PXL_20201107_191145720_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "A single Amazon Prime branded box is visible on the floor next to a door, clearly showing the Amazon smile logo and 'prime' branding on the box. The label text is partially legible but mostly unreadable at this angle/resolution.",
+        "carrier": "Amazon",
+        "package_count": 1,
+        "label_text": [
+          "prime"
+        ],
+        "confidence": 0.97
+      },
+      "attempts": 1,
+      "input_tokens": 2000,
+      "output_tokens": 82,
+      "latency_ms": 2868.9,
+      "bedrock_latency_ms": 2775,
+      "structured_output": true,
+      "usd": 0.007953,
+      "called_at": "2026-10-16T03:51:33+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:PXL_20201105_173148569_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "One plain cardboard box is sitting at the door with shipping labels visible on the side, but no carrier branding (uniform, vehicle, or logo) is visible in the frame. The labels have barcodes but the text is not legible at this resolution.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.6
+      },
+      "attempts": 1,
+      "input_tokens": 2000,
+      "output_tokens": 83,
+      "latency_ms": 2905.0,
+      "bedrock_latency_ms": 2801,
+      "structured_output": true,
+      "usd": 0.00797,
+      "called_at": "2026-10-16T03:51:36+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:PXL_20201107_021350055_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Two distinct packages are visible: a USPS Priority Mail flat-rate box on the bottom and a gray poly mailer bag on top. Both bear USPS branding/markings, confirming the carrier is USPS.",
+        "carrier": "USPS",
+        "package_count": 2,
+        "label_text": [
+          "PRIORITY MAIL",
+          "UNITED STATES POSTAL SERVICE",
+          "VISIT US AT USPS.COM",
+          "ORDER FREE SUPPLIES ONLINE",
+          "USPS TRACKING #",
+          "9400 1112 0306 1870 1681 75"
+        ],
+        "confidence": 0.97
+      },
+      "attempts": 1,
+      "input_tokens": 2000,
+      "output_tokens": 134,
+      "latency_ms": 3767.4,
+      "bedrock_latency_ms": 3693,
+      "structured_output": true,
+      "usd": 0.008811,
+      "called_at": "2026-10-16T03:51:40+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:IMG_6824_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "There is one small white cardboard box sitting at the doorstep. The box appears to have faint Amazon-style smile logo/branding on it, consistent with an Amazon delivery. No carrier vehicle or uniform is visible, but the white box with the subtle Amazon branding suggests an Amazon delivery. A partial second box edge is visible at the far right but appears to be part of the same delivery or the door frame.",
+        "carrier": "Amazon",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.55
+      },
+      "attempts": 1,
+      "input_tokens": 2145,
+      "output_tokens": 116,
+      "latency_ms": 6580.0,
+      "bedrock_latency_ms": 6302,
+      "structured_output": true,
+      "usd": 0.008993,
+      "called_at": "2026-10-16T03:51:46+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:PXL_20201107_214721193_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "One cardboard box is visible with two labels on top. The main shipping label has a barcode and partial text readable as 'IA-503-39' style tracking, and a secondary label shows 'U-3022' or similar. No carrier logo, uniform, or vehicle is visible to definitively identify the carrier, though the label format is somewhat consistent with Amazon but cannot be confirmed with certainty.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [
+          "IA-503-39",
+          "U-3022"
+        ],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 2000,
+      "output_tokens": 127,
+      "latency_ms": 3811.2,
+      "bedrock_latency_ms": 3737,
+      "structured_output": true,
+      "usd": 0.008696,
+      "called_at": "2026-10-16T03:51:50+00:00"
+    },
+    {
+      "id": "roboflow_packages_pd:PXL_20201101_154113387_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Two cardboard boxes are stacked near the door, both bearing the Target bullseye logo and 'target.com' branding visible on the sides. This indicates a Target.com order delivery, which is fulfilled by a carrier (likely UPS or FedEx) but the shipper is Target. Since Target is not in the carrier list and the actual delivery carrier cannot be determined from the image, I'll classify as 'Other' for Target's delivery service.",
+        "carrier": "Other",
+        "package_count": 2,
+        "label_text": [
+          "target.com",
+          "target.com"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 2000,
+      "output_tokens": 135,
+      "latency_ms": 3740.2,
+      "bedrock_latency_ms": 3657,
+      "structured_output": true,
+      "usd": 0.008828,
+      "called_at": "2026-10-16T03:51:54+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-20-13-43_jpeg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "There is one brown paper bag/package visible on the porch near the brick column. No carrier logos, uniforms, or vehicles are visible in the frame, and no legible shipping labels can be read on the bag.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.45
+      },
+      "attempts": 1,
+      "input_tokens": 2145,
+      "output_tokens": 75,
+      "latency_ms": 3433.9,
+      "bedrock_latency_ms": 3352,
+      "structured_output": true,
+      "usd": 0.008316,
+      "called_at": "2026-10-16T03:51:57+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-20-15-50_jpeg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "A bear is visible at the front door investigating what appears to be a small white box/container left on the doormat. There is no carrier uniform, vehicle, or legible shipping label visible, and the 'delivery' appears to be a package left at a residential front door with no identifiable carrier markings. The bear is not a carrier. There appears to be one small white box/container near the door.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.3
+      },
+      "attempts": 1,
+      "input_tokens": 2141,
+      "output_tokens": 115,
+      "latency_ms": 5033.8,
+      "bedrock_latency_ms": 4963,
+      "structured_output": true,
+      "usd": 0.008963,
+      "called_at": "2026-10-16T03:52:02+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-20-16-26_jpeg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "There is one flat cardboard box visible on the front porch near the door. The label appears to show Amazon branding/smile logo based on the label style visible on the package, consistent with an Amazon delivery.",
+        "carrier": "Amazon",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.7
+      },
+      "attempts": 1,
+      "input_tokens": 2141,
+      "output_tokens": 73,
+      "latency_ms": 2792.8,
+      "bedrock_latency_ms": 2681,
+      "structured_output": true,
+      "usd": 0.00827,
+      "called_at": "2026-10-16T03:52:05+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-20-11-21_jpeg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The Ring doorbell camera shows what appears to be flat cardboard/packages left on the front porch \u2014 looks like 2 flat items (possibly mailers or flat boxes) on the porch floor. No carrier uniform, vehicle branding, or legible label text is visible in this frame, so the carrier cannot be determined.",
+        "carrier": "Unknown",
+        "package_count": 2,
+        "label_text": [],
+        "confidence": 0.4
+      },
+      "attempts": 1,
+      "input_tokens": 2141,
+      "output_tokens": 98,
+      "latency_ms": 3711.2,
+      "bedrock_latency_ms": 3591,
+      "structured_output": true,
+      "usd": 0.008682,
+      "called_at": "2026-10-16T03:52:09+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-22-36-35_jpeg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "One cardboard box has been left on the porch; the deliverer is walking away toward what appears to be a personal or unmarked vehicle. The uniform appears to be brown/dark, possibly UPS, but the vehicle visible is a regular car, not a delivery truck, making carrier identification uncertain. No clear carrier logos are visible on the uniform or vehicle. The box has a shipping label and some printed graphics but text is not clearly legible at this resolution.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.55
+      },
+      "attempts": 1,
+      "input_tokens": 1981,
+      "output_tokens": 124,
+      "latency_ms": 4277.6,
+      "bedrock_latency_ms": 4137,
+      "structured_output": true,
+      "usd": 0.008583,
+      "called_at": "2026-10-16T03:52:13+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-22-36-25_jpeg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The delivery person is wearing a brown UPS uniform (brown shirt, brown pants, brown cap) and has just placed one cardboard box on the porch. The box has a shipping label visible but the text is not clearly legible at this resolution.",
+        "carrier": "UPS",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1981,
+      "output_tokens": 82,
+      "latency_ms": 2513.1,
+      "bedrock_latency_ms": 2460,
+      "structured_output": true,
+      "usd": 0.00789,
+      "called_at": "2026-10-16T03:52:16+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-20-13-58_jpeg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "I can see two packages on the porch: one cardboard box near the front door (on the doormat) with what appears to be shipping labels on it, and one brown paper bag near the brick column. The carrier cannot be determined from uniforms, vehicles, or clearly legible logos in this frame. Label text on the box is not legible enough to read verbatim.",
+        "carrier": "Unknown",
+        "package_count": 2,
+        "label_text": [],
+        "confidence": 0.6
+      },
+      "attempts": 1,
+      "input_tokens": 2145,
+      "output_tokens": 109,
+      "latency_ms": 3628.9,
+      "bedrock_latency_ms": 3545,
+      "structured_output": true,
+      "usd": 0.008877,
+      "called_at": "2026-10-16T03:52:19+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-20-16-33_jpeg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "A delivery person wearing dark casual clothing (no visible carrier uniform) is knocking at the front door. At the base of the door, two packages are visible on the ground. No clear carrier branding is visible on the uniform or vehicle, and label text is too small/blurry to read reliably.",
+        "carrier": "Unknown",
+        "package_count": 2,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 2141,
+      "output_tokens": 93,
+      "latency_ms": 3273.2,
+      "bedrock_latency_ms": 3166,
+      "structured_output": true,
+      "usd": 0.0086,
+      "called_at": "2026-10-16T03:52:22+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:CCTV_293_png",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows a person walking away from the door area wearing all black clothing, but no packages, boxes, or delivery items are visible left at the door. No carrier logos, uniforms, or vehicles are identifiable.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.4
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 74,
+      "latency_ms": 2988.4,
+      "bedrock_latency_ms": 2948,
+      "structured_output": true,
+      "usd": 0.004884,
+      "called_at": "2026-10-16T03:52:25+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:121_png_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows a person carrying what appears to be a dark-colored bag/package near what looks like a storefront with Chinese characters (\u56de\u6536). There are no visible carrier logos, uniforms, or shipping labels identifiable in this frame. The setting appears to be in China but no recognizable carrier branding is visible.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.3
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 96,
+      "latency_ms": 2547.8,
+      "bedrock_latency_ms": 2504,
+      "structured_output": true,
+      "usd": 0.005247,
+      "called_at": "2026-10-16T03:52:28+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:465_png",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows people walking through what appears to be a retail or public entrance area. There are no delivery packages, shipping labels, carrier uniforms, or delivery vehicles visible. This does not appear to be a delivery event at a back door.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.85
+      },
+      "attempts": 1,
+      "input_tokens": 681,
+      "output_tokens": 78,
+      "latency_ms": 2130.5,
+      "bedrock_latency_ms": 2077,
+      "structured_output": true,
+      "usd": 0.003534,
+      "called_at": "2026-10-16T03:52:30+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:291_png_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows an interior office/waiting room with a person holding what appears to be a document or small envelope. There is no visible delivery uniform, carrier vehicle, or shipping labels, and no packages appear to have been left at a door. This does not appear to be a standard delivery event at a back door.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.3
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 93,
+      "latency_ms": 2867.2,
+      "bedrock_latency_ms": 2767,
+      "structured_output": true,
+      "usd": 0.005197,
+      "called_at": "2026-10-16T03:52:33+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:CCTV_673_png",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows a person in an Easter Bunny costume dancing on the front porch/walkway. No delivery vehicle, carrier uniform, shipping labels, or packages are visible. Nothing was left at the door.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.95
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 73,
+      "latency_ms": 2332.0,
+      "bedrock_latency_ms": 2287,
+      "structured_output": true,
+      "usd": 0.004868,
+      "called_at": "2026-10-16T03:52:35+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:211_png_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows a person inside what appears to be a retail/convenience store interior, not a delivery event at a back door. There are no packages, no carrier uniforms, no delivery vehicles, and no shipping labels visible. No delivery occurred in this frame.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.9
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 82,
+      "latency_ms": 2466.8,
+      "bedrock_latency_ms": 2374,
+      "structured_output": true,
+      "usd": 0.005016,
+      "called_at": "2026-10-16T03:52:38+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:533_png_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The security camera frame shows a person in a clown costume standing on the front walkway at night. There are no packages, boxes, or deliveries visible at the door, and no carrier vehicle, uniform, or shipping labels are present. This is not a delivery event.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.95
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 85,
+      "latency_ms": 2660.6,
+      "bedrock_latency_ms": 2582,
+      "structured_output": true,
+      "usd": 0.005066,
+      "called_at": "2026-10-16T03:52:40+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:309_png",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows an interior hallway with people walking. There are no packages, delivery vehicles, uniforms, or shipping labels visible. This does not appear to be a delivery event at a back door.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.85
+      },
+      "attempts": 1,
+      "input_tokens": 681,
+      "output_tokens": 70,
+      "latency_ms": 1946.5,
+      "bedrock_latency_ms": 1908,
+      "structured_output": true,
+      "usd": 0.003402,
+      "called_at": "2026-10-16T03:52:42+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:WhatsApp-Image-2026-09-27-at-23-03-03_jpeg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows two people embracing on the front lawn next to a private black SUV. There is no delivery vehicle, no carrier uniform, no packages left at the door, and no shipping labels visible. This does not appear to be a delivery event.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.95
+      },
+      "attempts": 1,
+      "input_tokens": 2118,
+      "output_tokens": 81,
+      "latency_ms": 3897.4,
+      "bedrock_latency_ms": 3789,
+      "structured_output": true,
+      "usd": 0.008326,
+      "called_at": "2026-10-16T03:52:46+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:345_png_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "This image does not show a delivery event. It appears to show individuals attempting to break into a building. There are no packages, carriers, delivery vehicles, or shipping labels visible. No delivery occurred.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.95
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 69,
+      "latency_ms": 2331.7,
+      "bedrock_latency_ms": 2263,
+      "structured_output": true,
+      "usd": 0.004802,
+      "called_at": "2026-10-16T03:52:49+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:460_png_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows a person standing in a parking lot with no visible delivery vehicle, carrier uniform, or packages left at the door. No delivery appears to have taken place in this frame.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 66,
+      "latency_ms": 3055.1,
+      "bedrock_latency_ms": 3007,
+      "structured_output": true,
+      "usd": 0.004752,
+      "called_at": "2026-10-16T03:52:52+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:90_png",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows a person in casual clothing (purple shirt, shorts) walking near a residential entrance \u2014 no delivery uniform, vehicle, or carrier markings are visible. No packages are clearly visible being left at the door, though there appears to be a white object at the bottom right corner that is ambiguous. No shipping labels are legible.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.4
+      },
+      "attempts": 1,
+      "input_tokens": 981,
+      "output_tokens": 98,
+      "latency_ms": 11773.8,
+      "bedrock_latency_ms": 11724,
+      "structured_output": true,
+      "usd": 0.004854,
+      "called_at": "2026-10-16T03:53:04+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:337_png_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows a person walking down an interior hallway with no packages, delivery vehicle, carrier uniform, or shipping labels visible. No delivery appears to have taken place in this frame.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 66,
+      "latency_ms": 2059.9,
+      "bedrock_latency_ms": 2014,
+      "structured_output": true,
+      "usd": 0.004752,
+      "called_at": "2026-10-16T03:53:06+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:9_png",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows a person standing near what appears to be a building entrance/door, but there is no delivery vehicle, carrier uniform, or packages visible. No delivery event can be confirmed from this frame.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.2
+      },
+      "attempts": 1,
+      "input_tokens": 837,
+      "output_tokens": 70,
+      "latency_ms": 2289.2,
+      "bedrock_latency_ms": 2244,
+      "structured_output": true,
+      "usd": 0.003917,
+      "called_at": "2026-10-16T03:53:08+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:61_png_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows a person walking toward a door but no packages, boxes, or delivery items are visible, and there are no carrier logos, uniforms, or vehicles identifiable in the scene. No delivery appears to have been made.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 76,
+      "latency_ms": 2265.6,
+      "bedrock_latency_ms": 2228,
+      "structured_output": true,
+      "usd": 0.004917,
+      "called_at": "2026-10-16T03:53:10+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:235_png_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows an interior hallway with a person walking away from the camera. There are no packages, delivery vehicles, carrier uniforms, or shipping labels visible. No delivery appears to have taken place in this frame.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.9
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 73,
+      "latency_ms": 2254.9,
+      "bedrock_latency_ms": 2213,
+      "structured_output": true,
+      "usd": 0.004868,
+      "called_at": "2026-10-16T03:53:12+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:479_png",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows a person in dark clothing standing near a door, appearing to be scanning or handling something, but no packages are visible on the ground and no carrier logos, uniforms, or vehicles are clearly identifiable. No delivery appears to have been completed in this frame.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.4
+      },
+      "attempts": 1,
+      "input_tokens": 681,
+      "output_tokens": 84,
+      "latency_ms": 2471.2,
+      "bedrock_latency_ms": 2434,
+      "structured_output": true,
+      "usd": 0.003633,
+      "called_at": "2026-10-16T03:53:15+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:40_png_jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows a person standing near a broken glass door/entrance with shattered glass on the floor. There are no packages, no delivery carrier uniforms, no vehicles, and no shipping labels visible. This does not appear to be a delivery event at all.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.95
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 82,
+      "latency_ms": 2560.0,
+      "bedrock_latency_ms": 2519,
+      "structured_output": true,
+      "usd": 0.005016,
+      "called_at": "2026-10-16T03:53:17+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:476_png",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows a person walking down an indoor hallway. There are no packages, delivery vehicles, uniforms, or shipping labels visible. This does not appear to be a delivery event.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 681,
+      "output_tokens": 67,
+      "latency_ms": 1822.8,
+      "bedrock_latency_ms": 1791,
+      "structured_output": true,
+      "usd": 0.003353,
+      "called_at": "2026-10-16T03:53:19+00:00"
+    },
+    {
+      "id": "roboflow_porch_piracy:CCTV_400_png",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows two pedestrians walking on a sidewalk. There are no packages, delivery vehicles, uniforms, or shipping labels visible. No delivery appears to have taken place in this frame.",
+        "carrier": "Unknown",
+        "package_count": 0,
+        "label_text": [],
+        "confidence": 0.85
+      },
+      "attempts": 1,
+      "input_tokens": 1110,
+      "output_tokens": 68,
+      "latency_ms": 2127.2,
+      "bedrock_latency_ms": 2083,
+      "structured_output": true,
+      "usd": 0.004785,
+      "called_at": "2026-10-16T03:53:21+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_000.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "One cardboard box is visible on the doorstep with what appears to be a shipping label with a barcode. No carrier branding, uniform, or vehicle is visible in the frame, and the label text is not legible enough to identify the carrier. The two inset thumbnail images appear to show the same or related box from different angles, but they represent the same delivery item, not additional packages.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 112,
+      "latency_ms": 3429.0,
+      "bedrock_latency_ms": 3346,
+      "structured_output": true,
+      "usd": 0.007712,
+      "called_at": "2026-10-16T03:53:25+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_001.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "A DHL label overlay is visible on the package near the door, showing 'DHL' and a tracking number starting with 'DH 1802 4140 7'. There appears to be at least one cardboard box left at the front door area.",
+        "carrier": "DHL",
+        "package_count": 1,
+        "label_text": [
+          "DHL",
+          "DH 1802 4140 7"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 100,
+      "latency_ms": 2915.7,
+      "bedrock_latency_ms": 2791,
+      "structured_output": true,
+      "usd": 0.007514,
+      "called_at": "2026-10-16T03:53:28+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_002.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Four Amazon-labeled packages are visible on the front doorstep/mat area, each with an Amazon logo and partial tracking numbers visible on their labels. The packages appear to be boxes of varying sizes left at the front door in snowy conditions.",
+        "carrier": "Amazon",
+        "package_count": 4,
+        "label_text": [
+          "Amazon AM 4044 0780 8 3??",
+          "Amazon AM 3990 20??",
+          "Amazon AM 8934 9???",
+          "Amazon AM 1007 2351 3??"
+        ],
+        "confidence": 0.85
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 123,
+      "latency_ms": 3636.1,
+      "bedrock_latency_ms": 3443,
+      "structured_output": true,
+      "usd": 0.007894,
+      "called_at": "2026-10-16T03:53:31+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_003.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "I can see at least two brown cardboard packages/boxes on the snowy porch area, and a USPS label overlay is visible on one of the packages in the center-right of the frame. The label clearly shows 'USPS' text. There appear to be two distinct cardboard boxes visible on the porch.",
+        "carrier": "USPS",
+        "package_count": 2,
+        "label_text": [
+          "USPS",
+          "US8003717"
+        ],
+        "confidence": 0.72
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 110,
+      "latency_ms": 3359.9,
+      "bedrock_latency_ms": 3276,
+      "structured_output": true,
+      "usd": 0.007679,
+      "called_at": "2026-10-16T03:53:35+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_004.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Three packages are visible on the driveway/loading area, each tagged with a DHL label overlay. The labels show 'DHL' branding with partial tracking numbers visible on each package. All three are distinct physical items left at the location.",
+        "carrier": "DHL",
+        "package_count": 3,
+        "label_text": [
+          "DHL DH 3453 2863 1918",
+          "DHL DH 9126 67..",
+          "DHL DH 0772 7.."
+        ],
+        "confidence": 0.85
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 118,
+      "latency_ms": 3593.6,
+      "bedrock_latency_ms": 3453,
+      "structured_output": true,
+      "usd": 0.007811,
+      "called_at": "2026-10-16T03:53:38+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_005.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "A single brown cardboard box is visible on the ground near the door, with a shipping label clearly showing 'UPS' and a partial tracking number. The package appears to be one box left at the entrance.",
+        "carrier": "UPS",
+        "package_count": 1,
+        "label_text": [
+          "UPS",
+          "1Z9A117163434"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 85,
+      "latency_ms": 3173.7,
+      "bedrock_latency_ms": 2894,
+      "structured_output": true,
+      "usd": 0.007267,
+      "called_at": "2026-10-16T03:53:42+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_006.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Two thumbnail overlays are visible in the frame, both labeled 'Sysco' with partial item numbers visible (SY-0277... and SY-3049.3212...). These appear to be Sysco food service delivery items. The thumbnails show Sysco-branded packaging/cases consistent with a Sysco delivery.",
+        "carrier": "Sysco",
+        "package_count": 2,
+        "label_text": [
+          "Sysco SY-0277...",
+          "Sysco SY-3049.32120593"
+        ],
+        "confidence": 0.6
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 127,
+      "latency_ms": 3848.0,
+      "bedrock_latency_ms": 3720,
+      "structured_output": true,
+      "usd": 0.00796,
+      "called_at": "2026-10-16T03:53:45+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_007.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Three Amazon-labeled packages are visible in the frame, each with an Amazon label overlay showing partial tracking numbers. The packages appear to be boxes left at the delivery area, identified by the Amazon labels on each.",
+        "carrier": "Amazon",
+        "package_count": 3,
+        "label_text": [
+          "Amazon AM-5137 01",
+          "Amazon AM-1731 807",
+          "Amazon AM-1004 887"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 95,
+      "latency_ms": 3079.1,
+      "bedrock_latency_ms": 2979,
+      "structured_output": true,
+      "usd": 0.007432,
+      "called_at": "2026-10-16T03:53:48+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_008.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows multiple FedEx-labeled packages at the front door, with four distinct FedEx detection overlays identifying separate packages. The overlays show partial tracking numbers for each package. There appear to be at least 4 distinct physical packages visible on and around the doormat area.",
+        "carrier": "FedEx",
+        "package_count": 4,
+        "label_text": [
+          "FE 4832 0068 3...",
+          "FE 7017 2018 ...499",
+          "FE 5302 9410 2311",
+          "FE 8976 2018 3...",
+          "FE 0674 474 ...02"
+        ],
+        "confidence": 0.72
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 150,
+      "latency_ms": 5801.5,
+      "bedrock_latency_ms": 5702,
+      "structured_output": true,
+      "usd": 0.008339,
+      "called_at": "2026-10-16T03:53:54+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_009.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows a US Foods delivery with what appears to be at least one cardboard box/case visible near the door, with a US Foods label overlay showing 'US Foods' and a partial tracking number 'US6704 4027 3...'. There appears to be one package/case left at the door.",
+        "carrier": "US Foods",
+        "package_count": 1,
+        "label_text": [
+          "US Foods",
+          "US6704 4027 3"
+        ],
+        "confidence": 0.72
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 109,
+      "latency_ms": 3164.7,
+      "bedrock_latency_ms": 3085,
+      "structured_output": true,
+      "usd": 0.007663,
+      "called_at": "2026-10-16T03:53:57+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_010.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows two FedEx package icons overlaid on the scene, each labeled 'FedEx' with partial tracking numbers visible. There appear to be cardboard boxes on the snowy porch steps consistent with two FedEx deliveries.",
+        "carrier": "FedEx",
+        "package_count": 2,
+        "label_text": [
+          "FedEx FE 0221 900",
+          "FedEx FE 0073 4726"
+        ],
+        "confidence": 0.72
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 106,
+      "latency_ms": 3258.8,
+      "bedrock_latency_ms": 3160,
+      "structured_output": true,
+      "usd": 0.007613,
+      "called_at": "2026-10-16T03:54:01+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_011.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows multiple Sysco-labeled boxes detected by an overlay system, with four distinct Sysco package annotations visible (SY 7750 57?, SY 4214 7297 0008, SY 5729 3224 7007, SY 4052 1522 7003). The packages appear to be cardboard cases consistent with Sysco food service deliveries left at the back/front door area in snowy conditions.",
+        "carrier": "Sysco",
+        "package_count": 4,
+        "label_text": [
+          "Sysco SY 7750 57",
+          "Sysco SY 4214 7297 0008",
+          "Sysco SY 5729 3224 7007",
+          "Sysco SY 4052 1522 7003"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 187,
+      "latency_ms": 4445.8,
+      "bedrock_latency_ms": 4331,
+      "structured_output": true,
+      "usd": 0.00895,
+      "called_at": "2026-10-16T03:54:05+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_012.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "A single small package is visible on the driveway/apron area with a label clearly reading 'FedEx' and a partial tracking number below it. No other packages are visible in the frame.",
+        "carrier": "FedEx",
+        "package_count": 1,
+        "label_text": [
+          "FedEx",
+          "FE 1042 78..."
+        ],
+        "confidence": 0.85
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 87,
+      "latency_ms": 2722.3,
+      "bedrock_latency_ms": 2641,
+      "structured_output": true,
+      "usd": 0.0073,
+      "called_at": "2026-10-16T03:54:08+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_013.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The image shows four package thumbnails, each labeled 'US Foods' with partial tracking/order numbers visible. This appears to be a composite frame showing multiple packages from a US Foods delivery, with labels reading 'US Foods' and partial numbers on each package.",
+        "carrier": "US Foods",
+        "package_count": 4,
+        "label_text": [
+          "US Foods US 4601 7 2",
+          "US Foods US 5404 9913 02",
+          "US Foods US 9082 0 34",
+          "US Foods US 4309 2428 31"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 130,
+      "latency_ms": 3774.9,
+      "bedrock_latency_ms": 3676,
+      "structured_output": true,
+      "usd": 0.008009,
+      "called_at": "2026-10-16T03:54:12+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_014.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows four packages with USPS labels overlaid on them, each tagged with 'USPS' and partial tracking numbers. All four distinct packages are identified as USPS deliveries based on the visible labels.",
+        "carrier": "USPS",
+        "package_count": 4,
+        "label_text": [
+          "USPS US 0255 7388 9",
+          "USPS US 3327 8...019",
+          "USPS US 38110674 2019",
+          "USPS US 73505..."
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 124,
+      "latency_ms": 3388.8,
+      "bedrock_latency_ms": 3294,
+      "structured_output": true,
+      "usd": 0.00791,
+      "called_at": "2026-10-16T03:54:15+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_015.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Multiple packages are visible with Sysco labels and tracking numbers overlaid on the image. I can see at least 4-5 distinct Sysco-labeled packages/boxes on the loading area, including what appears to be a brown cardboard box and several other cases. The labels clearly identify the carrier as Sysco.",
+        "carrier": "Sysco",
+        "package_count": 5,
+        "label_text": [
+          "SY 2718 6592 3902",
+          "SY 9745 5187 420",
+          "SY 8424 1...",
+          "SY 0718 9904 0857",
+          "SY 2004 2871 9..."
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 155,
+      "latency_ms": 4207.4,
+      "bedrock_latency_ms": 4112,
+      "structured_output": true,
+      "usd": 0.008422,
+      "called_at": "2026-10-16T03:54:19+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_016.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Two Amazon-labeled packages are visible on the doorstep/mat area, with Amazon branding clearly shown on the overlaid detection boxes. A third cardboard box/package is also visible near the bottom center of the frame, suggesting at least 3 packages total. The Amazon labels with partial tracking numbers are legible on two of the packages.",
+        "carrier": "Amazon",
+        "package_count": 3,
+        "label_text": [
+          "Amazon AM 8180 338 9 37",
+          "Amazon AM 4450 148 3 37"
+        ],
+        "confidence": 0.75
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 125,
+      "latency_ms": 3931.2,
+      "bedrock_latency_ms": 3854,
+      "structured_output": true,
+      "usd": 0.007927,
+      "called_at": "2026-10-16T03:54:23+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_017.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "I can see two packages on the doorstep: one brown cardboard box/mailer with a visible shipping label, and one white box that appears to be an AncestryDNA or similar DNA kit (white box with colorful logo visible in the inset thumbnail). The carrier cannot be definitively identified from the uniform or vehicle, but the brown cardboard package has a shipping label visible. The inset thumbnail shows what appears to be a 23andMe or AncestryDNA branded white box.",
+        "carrier": "Unknown",
+        "package_count": 2,
+        "label_text": [
+          "23andMe"
+        ],
+        "confidence": 0.5
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 141,
+      "latency_ms": 3891.3,
+      "bedrock_latency_ms": 3770,
+      "structured_output": true,
+      "usd": 0.008191,
+      "called_at": "2026-10-16T03:54:27+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_018.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows multiple packages at the front door, all labeled with UPS identifiers. Four distinct UPS package annotations are visible with partial tracking numbers readable on the labels. The packages include cardboard boxes and what appears to be a purple/blue mailer or soft package.",
+        "carrier": "UPS",
+        "package_count": 4,
+        "label_text": [
+          "UPS UP8203 1909 4",
+          "UPS UP4057 9422",
+          "UPS UP5975 9816 7179",
+          "UPS UP1009 316 92"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 128,
+      "latency_ms": 3912.1,
+      "bedrock_latency_ms": 3769,
+      "structured_output": true,
+      "usd": 0.007976,
+      "called_at": "2026-10-16T03:54:31+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_019.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows what appears to be packages on a doorstep/mat in snowy conditions. There is at least one cardboard box visible with a shipping label, and several overlaid thumbnail images (which appear to be AI-generated package illustrations, not real packages). The real deliverable appears to be one cardboard box/package on the mat with a visible barcode label. No carrier branding, uniform, or vehicle is visible to identify the carrier. The overlaid cartoon/illustrated images of chests and boxes appear to be UI overlays, not actual packages.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.35
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 146,
+      "latency_ms": 3780.0,
+      "bedrock_latency_ms": 3703,
+      "structured_output": true,
+      "usd": 0.008273,
+      "called_at": "2026-10-16T03:54:35+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_020.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Three packages are visible on the driveway/loading area, each with a DHL label overlay clearly identifying the carrier. The labels show partial tracking numbers starting with 'DH' on all three packages.",
+        "carrier": "DHL",
+        "package_count": 3,
+        "label_text": [
+          "DHL DH 8778 0082 9406",
+          "DHL DH 3054 9384 1203",
+          "DHL DH 1427 2198 9"
+        ],
+        "confidence": 0.9
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 114,
+      "latency_ms": 3463.7,
+      "bedrock_latency_ms": 3371,
+      "structured_output": true,
+      "usd": 0.007745,
+      "called_at": "2026-10-16T03:54:38+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_021.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "A single cardboard box is visible on the driveway/loading area with a US Foods label clearly visible on it. The US Foods logo (diamond shape) and text are legible on the package label overlay.",
+        "carrier": "US Foods",
+        "package_count": 1,
+        "label_text": [
+          "US Foods",
+          "US 4824",
+          "US Foods US 7038 000 027"
+        ],
+        "confidence": 0.85
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 93,
+      "latency_ms": 3178.3,
+      "bedrock_latency_ms": 3084,
+      "structured_output": true,
+      "usd": 0.007399,
+      "called_at": "2026-10-16T03:54:41+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_022.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows three FedEx-labeled packages visible on the driveway/loading area, each with a FedEx label overlay. The packages appear to be distinct boxes, and the FedEx branding is clearly visible on the labels. Partial tracking numbers are visible on the labels but are not fully legible at this resolution.",
+        "carrier": "FedEx",
+        "package_count": 3,
+        "label_text": [
+          "FedEx FF 8010 9...",
+          "FedEx FF 4847 006... 4",
+          "FedEx FF 4922 3920... 340"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 139,
+      "latency_ms": 3666.2,
+      "bedrock_latency_ms": 3571,
+      "structured_output": true,
+      "usd": 0.008158,
+      "called_at": "2026-10-16T03:54:45+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_023.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Two Amazon-labeled boxes are visible near the door, each with an Amazon shipping label overlay showing partial tracking numbers. The labels clearly read 'Amazon' on both packages.",
+        "carrier": "Amazon",
+        "package_count": 2,
+        "label_text": [
+          "Amazon AM 3788 1019 80",
+          "Amazon AM 8780 7718"
+        ],
+        "confidence": 0.9
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 84,
+      "latency_ms": 5969.2,
+      "bedrock_latency_ms": 5879,
+      "structured_output": true,
+      "usd": 0.00725,
+      "called_at": "2026-10-16T03:54:51+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_024.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Three FedEx package labels are visible in the frame with partial tracking numbers readable on each overlay tag. The packages appear to be boxes left at the front door in snowy conditions, with FedEx branding clearly shown on all three detection overlays.",
+        "carrier": "FedEx",
+        "package_count": 3,
+        "label_text": [
+          "FE 4109447023",
+          "FE 4880237",
+          "FE 03018000"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 105,
+      "latency_ms": 3230.1,
+      "bedrock_latency_ms": 3150,
+      "structured_output": true,
+      "usd": 0.007597,
+      "called_at": "2026-10-16T03:54:54+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_025.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows what appears to be a doorstep with a cardboard box/mailer visible with a shipping label, along with several inset thumbnail images showing various packages including what appears to be a NOKA branded box and other items. The main scene shows a brown cardboard box on the doorstep with a visible shipping label with a barcode. No clear carrier branding (UPS, FedEx, USPS, etc.) is visible on the vehicle, uniform, or labels. The inset images appear to show contents/product shots rather than additional delivered packages. There is one primary package visible at the door.",
+        "carrier": "Unknown",
+        "package_count": 1,
+        "label_text": [],
+        "confidence": 0.4
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 160,
+      "latency_ms": 4237.9,
+      "bedrock_latency_ms": 4169,
+      "structured_output": true,
+      "usd": 0.008504,
+      "called_at": "2026-10-16T03:54:59+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_026.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows multiple UPS-labeled packages on a doorstep mat in snowy conditions. There are detection overlays identifying 4 distinct UPS packages with partial tracking numbers visible. The brown cardboard boxes are consistent with UPS deliveries.",
+        "carrier": "UPS",
+        "package_count": 4,
+        "label_text": [
+          "UP 7144 28",
+          "UP 32478333",
+          "UP 0074 27",
+          "UP 5100 0100 3"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 112,
+      "latency_ms": 3540.3,
+      "bedrock_latency_ms": 3447,
+      "structured_output": true,
+      "usd": 0.007712,
+      "called_at": "2026-10-16T03:55:02+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_027.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows multiple packages on a doorstep with USPS labels overlaid on each package thumbnail. Four distinct USPS-labeled packages are visible with partial tracking numbers readable from the overlays. The carrier is clearly USPS based on the labels.",
+        "carrier": "USPS",
+        "package_count": 4,
+        "label_text": [
+          "US 0270 1877 180",
+          "US 1861 9181 74",
+          "US 1391 400",
+          "US 1915 7809 3308",
+          "US 7274 3"
+        ],
+        "confidence": 0.72
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 130,
+      "latency_ms": 3622.9,
+      "bedrock_latency_ms": 3541,
+      "structured_output": true,
+      "usd": 0.008009,
+      "called_at": "2026-10-16T03:55:06+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_028.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Five packages are visible on the loading dock area, all tagged with 'US Foods' labels with partial tracking numbers visible on each. The carrier is clearly US Foods based on the labels on all packages.",
+        "carrier": "US Foods",
+        "package_count": 5,
+        "label_text": [
+          "US Foods US 0223 04 904",
+          "US Foods US 0339 5679 0",
+          "US Foods US 0951 1909 42",
+          "US Foods US 2439 2019 8",
+          "US Foods US 2385 723 3"
+        ],
+        "confidence": 0.85
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 129,
+      "latency_ms": 4605.8,
+      "bedrock_latency_ms": 4463,
+      "structured_output": true,
+      "usd": 0.007993,
+      "called_at": "2026-10-16T03:55:10+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_029.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows 5 Amazon-labeled packages (boxes/items) detected on the driveway/delivery area, each with an Amazon label overlay visible. The labels show Amazon branding and partial tracking numbers (AM 1900 8 178 56..., AM 8 778 080..., AM 0222 10..., AM 1030 5400..., AM 0329 1...). All packages are Amazon-branded boxes indicating an Amazon delivery.",
+        "carrier": "Amazon",
+        "package_count": 5,
+        "label_text": [
+          "Amazon AM 1900 8 178 56",
+          "Amazon AM 8 778 080",
+          "Amazon AM 0222 10",
+          "Amazon AM 1030 5400",
+          "Amazon AM 0329 1"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 177,
+      "latency_ms": 4363.5,
+      "bedrock_latency_ms": 4262,
+      "structured_output": true,
+      "usd": 0.008785,
+      "called_at": "2026-10-16T03:55:15+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_030.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Multiple frames show Sysco-branded cases/boxes with Sysco labels visible on each package. Five distinct labeled packages are shown across the frames with Sysco branding and item numbers visible.",
+        "carrier": "Sysco",
+        "package_count": 5,
+        "label_text": [
+          "Sysco SY 2038 6443 20",
+          "Sysco SY 2025 9948 52",
+          "Sysco SY 8071 1000",
+          "Sysco SY 04038899 39",
+          "Sysco SY 2933 8214 049"
+        ],
+        "confidence": 0.85
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 138,
+      "latency_ms": 3649.4,
+      "bedrock_latency_ms": 3544,
+      "structured_output": true,
+      "usd": 0.008141,
+      "called_at": "2026-10-16T03:55:18+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_031.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "A single package is visible in the driveway area with a DHL shipping label clearly showing 'DHL' and a tracking number beginning with 'DH 0200 8512 2'. The DHL branding confirms the carrier.",
+        "carrier": "DHL",
+        "package_count": 1,
+        "label_text": [
+          "DHL",
+          "DH 0200 8512 2"
+        ],
+        "confidence": 0.9
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 96,
+      "latency_ms": 2892.6,
+      "bedrock_latency_ms": 2789,
+      "structured_output": true,
+      "usd": 0.007448,
+      "called_at": "2026-10-16T03:55:21+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_032.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows multiple packages on a snowy doorstep with USPS label overlays visible on at least three distinct packages. The overlays clearly identify the carrier as USPS, and I can count approximately 3 separate packages/items left at the door.",
+        "carrier": "USPS",
+        "package_count": 3,
+        "label_text": [
+          "US9030 740...",
+          "US808 2 2009 3...",
+          "US 9213 5220..."
+        ],
+        "confidence": 0.72
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 115,
+      "latency_ms": 4550.8,
+      "bedrock_latency_ms": 4468,
+      "structured_output": true,
+      "usd": 0.007762,
+      "called_at": "2026-10-16T03:55:26+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_033.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows multiple USPS-labeled packages detected by an AI overlay on the camera feed. There appear to be at least 4 distinct USPS packages visible in the thumbnails/overlays, with one large flat box visible on the doorstep area. The labels on the overlays show USPS tracking numbers though most are partially legible.",
+        "carrier": "USPS",
+        "package_count": 4,
+        "label_text": [
+          "US8 100 5563 2??",
+          "US 4358 8618 8???",
+          "US519???01",
+          "US0235??"
+        ],
+        "confidence": 0.55
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 138,
+      "latency_ms": 4075.8,
+      "bedrock_latency_ms": 3984,
+      "structured_output": true,
+      "usd": 0.008141,
+      "called_at": "2026-10-16T03:55:30+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_034.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "The frame shows a UPS label overlay in the upper-left area of the package with 'UPS' and a partial tracking number visible. There appears to be at least one cardboard box on the doormat/porch area with a shipping label visible on it.",
+        "carrier": "UPS",
+        "package_count": 1,
+        "label_text": [
+          "UPS",
+          "UP 1907 5286 74"
+        ],
+        "confidence": 0.72
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 99,
+      "latency_ms": 3134.5,
+      "bedrock_latency_ms": 3053,
+      "structured_output": true,
+      "usd": 0.007498,
+      "called_at": "2026-10-16T03:55:33+00:00"
+    },
+    {
+      "id": "synthetic_overlay:syn_035.jpg",
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "ok": true,
+      "result": {
+        "reasoning": "Two UPS-labeled packages are visible on the doorstep/mat area: one upright brown box with a UPS label overlay and one flat/dark package with a second UPS label overlay. Both label overlays clearly show 'UPS' as the carrier with partial tracking numbers visible.",
+        "carrier": "UPS",
+        "package_count": 2,
+        "label_text": [
+          "UPS UP 0019400",
+          "UPS UP 2410 09020339"
+        ],
+        "confidence": 0.82
+      },
+      "attempts": 1,
+      "input_tokens": 1777,
+      "output_tokens": 111,
+      "latency_ms": 3564.8,
+      "bedrock_latency_ms": 3476,
+      "structured_output": true,
+      "usd": 0.007696,
+      "called_at": "2026-10-16T03:55:37+00:00"
+    }
+  ],
+  "caveats": [
+    "Sources are reported separately and must not be pooled into one headline number.",
+    "ring_playground has N=2 and its frames were seen in the 2026-10-15 smoke test.",
+    "synthetic_overlay images are composites; they test counting and label reading, not realism.",
+    "Carrier accuracy exists only where carrier truth exists (synthetic_overlay).",
+    "Latency is wall clock per call, run sequentially from one client, including a retry.",
+    "The two models run with different output modes (see models[].structured_output)."
+  ],
+  "post_hoc_diagnosis": {
+    "written_after_results": true,
+    "finding": "On synthetic_overlay porch composites (n=20) both models mostly undercount by exactly 1. Their reasoning shows they count only the pasted, labelled boxes and ignore the unlabelled box already on the step from the Playground footage (base_count=1). On driveway composites (base_count=0, n=16) exact match was 9/16 (Nova Pro) and 15/16 (Sonnet 4.6). Labels were not changed after seeing results.",
+    "synthetic_by_background": {
+      "us.amazon.nova-pro-v1:0": {
+        "porch": "3/20 exact (14 off by -1, 3 by -2)",
+        "driveway": "9/16 exact (6 off by -1, 1 by -2)"
+      },
+      "us.anthropic.claude-sonnet-4-6": {
+        "porch": "3/20 exact (11 off by -1, 4 by -2, 1 by -3, 1 by -4)",
+        "driveway": "15/16 exact (1 off by -1)"
+      }
+    }
+  }
+}
