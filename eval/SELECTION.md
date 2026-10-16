@@ -149,3 +149,30 @@ Changes:
    allowed". The row is reported as hand-held photos, not camera footage. All 26 images in version
    6 (the raw upload, no resize or augmentation; version 5 is augmented) are reviewed; rules 4 and 6
    still apply.
+
+## Amendment 2 (2026-10-16, after the first model run, before the porch composites were rebuilt)
+
+Why: the first run (results in commit `c25d058`) showed a design flaw in source 3, not a labelling
+error. On porch composites the existing Playground box is unlabelled while the pasted boxes carry
+a carrier label, so each image mixes two deliveries, and the prompt asks about one delivery event.
+Both models counted only the labelled boxes (porch 3/20 exact for both; driveway 9/16 and 15/16).
+No frame of the Playground "Package" clip shows the porch without that box (all 60 saved frames
+were checked), so composites on an empty porch are not possible with these backgrounds.
+
+Changes:
+
+1. Porch composites with a carrier also get the same printed label (same carrier, its own made-up
+   tracking number) on the existing box, placed on its front face at a fixed position and angle
+   (identical on all four porch frames, because the camera is static). The existing box becomes
+   part of the one delivery event. Porch composites with carrier `Unknown` are unchanged: every
+   box in them is already unlabelled.
+2. Everything else is unchanged: the same seed, plan, frames, carriers, pasted counts and layouts,
+   so the only difference is the label on the existing box. Truth is unchanged: `package_count` =
+   1 + pasted boxes, `carrier` = the pasted carrier.
+3. Item ids stay the same. Changed images have a new media hash, so they are new model calls; the
+   4 unchanged `Unknown` porch images and the 16 driveway images keep their cached results.
+4. The report gives the synthetic row split by background (`porch`, `driveway`), computed by
+   `eval/extraction.py`. The first-run synthetic numbers stay in the history at `c25d058` and are
+   superseded, not deleted.
+5. This change was made after seeing results, so the rebuilt porch numbers are reported as a
+   second build of the composites, not as a held-out measurement.
