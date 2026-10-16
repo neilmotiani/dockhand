@@ -109,3 +109,43 @@ is reported but supports no accuracy claim on its own.
   composites; modified: cropped, scaled and labelled).
 - Packages Dataset, Roboflow Community, Roboflow Universe, Public Domain,
   https://universe.roboflow.com/joseph-nelson/packages-g0ton.
+
+## Amendment 1 (2026-10-16, before any model run)
+
+Why: after download, screening showed the original rules could not be met from the data, for
+reasons unrelated to how easy any image is.
+
+- Porch Piracy v8 is an aggregate. Most of its 2,905 images are studio, hand-held or stock photos,
+  and it contains many re-encoded or flipped copies of the same photo (same name before `.rf.`).
+  Only 31 distinct images from a fixed doorbell or security camera have a package box, so the
+  quota of 50 to 60 positives cannot be met.
+- The Packages (Public Domain) set is 26 hand-held phone photos at doors. Porch Piracy also
+  contains copies of these same photos (the `IMG_`, `PXL_` and `package_` series), so the two sources overlap.
+- One Porch Piracy image (`WhatsApp-Image-2026-09-27-at-20-04-07`) is the same footage as the
+  Ring Playground "Package" scene.
+
+Changes:
+
+1. Series screening. Porch Piracy file names fall into series by origin (for example `Opeeen_Packages`,
+   `pexels-*`, `CCTV_`, `WhatsApp-Image-`). Two positives and one negative from every series with
+   five or more images were viewed (`eval.review_sheet --ranks`, sheets not committed) to classify
+   the series by scene type:
+   - eligible for positives and negatives: `WhatsApp-Image-*` (doorbell and security camera
+     screenshots);
+   - eligible for negatives only (no package boxes in the series): `CCTV_*`, `<n>_png`,
+     `<n>_png_jpg`, `video*_mp4-*`, `IMG_*_mov-*`; each image must still pass rule 3 by eye;
+   - excluded, not a fixed camera at an entrance: studio and hand-held series (`*Opeeen*`, `*Booo*`,
+     `*Packageee*`, `*packaaaageeeees*`, `*Open_booo*`), stock photos (`pexels-*`, `<n>_jpg` stock
+     images), an indoor test camera aimed at desks and room corners (`chn5-*`), an indoor living
+     room (`not-fallen*`);
+   - excluded as copies of the Public Domain source: `IMG_<n>_jpg`, `PXL_*`, `package_<n>_jpg`.
+2. Duplicates are identified by file name before `.rf.`; only the first copy in review order is
+   reviewed.
+3. Porch Piracy quotas: every eligible positive is reviewed (the pool is exhausted, not sampled),
+   and negatives are the first 20 in review order that pass rule 3 and show no package by eye.
+4. Porch Piracy images that show the Ring Playground footage are excluded, so the same scene is
+   never scored under two sources.
+5. Packages (Public Domain): rule 3 becomes "a photo of a door, porch, stoop or entry area; hand-held
+   allowed". The row is reported as hand-held photos, not camera footage. All 26 images in version
+   6 (the raw upload, no resize or augmentation; version 5 is augmented) are reviewed; rules 4 and 6
+   still apply.

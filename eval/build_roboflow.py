@@ -59,7 +59,7 @@ DATASETS = {
     for d in [
         Dataset("porch_piracy", "gluwxyws", "porch-piracy", 8, "CC BY 4.0",
                 "Porch Piracy Dataset", "gluwxyws"),
-        Dataset("packages_pd", "joseph-nelson", "packages-g0ton", 5, "Public Domain",
+        Dataset("packages_pd", "joseph-nelson", "packages-g0ton", 6, "Public Domain",
                 "Packages Dataset", "Roboflow Community"),
         # Box crops for the synthetic composites only; its images are not eval items.
         Dataset("mpj_boxes", "mpj", "package-detection-f03pa", 1, "CC BY 4.0",
@@ -144,8 +144,12 @@ def candidates(root: Path, ds: Dataset) -> list[dict]:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("keys", nargs="*", default=list(DATASETS), choices=list(DATASETS))
+    p.add_argument("keys", nargs="*", help=f"any of {', '.join(DATASETS)} (default: all)")
     args = p.parse_args()
+    unknown = set(args.keys) - DATASETS.keys()
+    if unknown:
+        p.error(f"unknown dataset(s): {', '.join(sorted(unknown))}")
+    args.keys = args.keys or list(DATASETS)
     key = api_key()
     sources = json.loads(SOURCES_FILE.read_text()) if SOURCES_FILE.exists() else {}
     for k in args.keys:

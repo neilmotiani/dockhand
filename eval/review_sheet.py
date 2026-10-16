@@ -4,7 +4,8 @@ Draws each candidate with its bounding boxes (package boxes in yellow, other cla
 caption with its review rank and box count, 3 x 3 per sheet so counts stay readable.
 
 Usage:
-    uv run python -m eval.review_sheet porch_piracy 0 9     # ranks 0-8
+    uv run python -m eval.review_sheet porch_piracy 0 9            # ranks 0-8
+    uv run python -m eval.review_sheet porch_piracy --ranks 4 17 230
 """
 
 import argparse
@@ -37,18 +38,24 @@ def render(row: dict, package_class: str) -> Image.Image:
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("key", choices=list(DATASETS))
-    p.add_argument("start", type=int)
-    p.add_argument("count", type=int)
+    p.add_argument("start", type=int, nargs="?", default=0)
+    p.add_argument("count", type=int, nargs="?", default=9)
+    p.add_argument("--ranks", type=int, nargs="+", help="explicit review ranks instead")
+    p.add_argument("--name", help="output file stem")
     args = p.parse_args()
     ds = DATASETS[args.key]
     rows = [json.loads(line) for line in (DATA_DIR / ds.key / "candidates.jsonl").open()]
-    rows = rows[args.start : args.start + args.count]
+    if args.ranks:
+        by_rank = {r["review_rank"]: r for r in rows}
+        rows = [by_rank[k] for k in args.ranks]
+    else:
+        rows = rows[args.start : args.start + args.count]
     rows_n = (len(rows) + COLS - 1) // COLS
     sheet = Image.new("RGB", (CELL_W * COLS, CELL_H * rows_n), "black")
     for i, row in enumerate(rows):
         sheet.paste(render(row, ds.package_class), ((i % COLS) * CELL_W, (i // COLS) * CELL_H))
     SHEET_DIR.mkdir(parents=True, exist_ok=True)
-    out = SHEET_DIR / f"{ds.key}_{args.start:04d}.jpg"
+    out = SHEET_DIR / f"{args.name or f'{ds.key}_{args.start:04d}'}.jpg"
     sheet.save(out, quality=85)
     print(out)
 
