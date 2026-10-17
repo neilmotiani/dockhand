@@ -42,12 +42,13 @@ POST /v1/trigger ┘
   | Fixed 25 s timeout | `bench/results/latency_playground_manual.json` | 33.2 s, 33.5 s | 31.0 s, 31.0 s | timeout, inferred: not recorded yet then, but capture = setup + the 25 s cap |
   | Scene settled (3 s still, min 4 s) | `bench/results/latency_playground_manual_settle.json` | 12.5 s, 14.7 s | 10.5 s, 12.1 s | settled after 4.1 s and 4.4 s of video |
 
-  Bedrock extraction took 1.9–2.3 s in all four runs. WHEP setup (about 5.5 s) is now the largest single stage. Both runs reconciled as seeded: one `matched`, one `short`. The rule is in `docs/decisions.md`; its threshold was tuned on two recorded clips.
+  Bedrock extraction took 1.9–2.3 s in all four runs. WHEP setup (about 5.5 s) is now the largest single stage. Both runs reconciled as seeded: one `matched`, one `short`. The rule is in `docs/decisions.md`. Its motion threshold was tuned and validated on two Ring Playground clips only (Package and Vehicle). It hasn't been tested on real delivery video.
 - Tests need Postgres: `docker compose up -d db` (host port 55432, which `DATABASE_URL` and the test default point at), or point `TEST_DATABASE_URL` at another one. Without it, the database tests are skipped locally. CI runs them against a Postgres service.
 
 ### Future work
 
 - **Clip download for late events.** Events too old for live view (Ring retries, a backlog after downtime) are skipped today. They could be processed from the recorded clip (`POST /v1/devices/{device_id}/media/video/download`) instead.
+- **Validate the settle threshold on real delivery video.** `CAPTURE_SETTLE_THRESHOLD` (3.0) comes from the two Playground clips only. Real deliveries (a driver who pauses mid-drop, lighting changes, wind, other cameras) may need a different value or a different signal.
 
 ## Extraction eval (package count and carrier)
 
