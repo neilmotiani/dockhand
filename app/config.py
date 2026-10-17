@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     # "Scene settled" early exit (app/capture/settle.py). capture_settle_s = 0 disables it.
     capture_settle_s: float = 3.0  # stop once nothing has moved for this long...
     capture_min_s: float = 4.0  # ...but never before this much video
-    capture_settle_threshold: float = 3.0  # max-cell change; tuned on 2 recorded clips
+    capture_settle_threshold: float = 3.0  # max-cell change; 2 Playground clips only
     capture_sample_frames: int = 10  # spread evenly over the clip, then scored
     capture_select_frames: int = 3  # sent to the model (SPEC.md: top K, default 3)
     capture_sharpness_weight: float = 0.5  # vs. change from the empty-scene reference

@@ -15,8 +15,9 @@ moves the frame mean (0.6–0.75) no more than encoder noise on the static Packa
 (up to 0.62), while its max-cell change is 26–60 against the static clip's 0.5–1.9.
 The Ring watermark corners are masked: the overlay clocks change every second.
 
-THRESHOLD = 3.0 was chosen on exactly two recorded clips (one static, one moving), so treat
-it as a starting point, not a measured operating point.
+THRESHOLD = 3.0 was tuned and validated on two Ring Playground clips only (one static, one
+moving; no real delivery video was available), so treat it as a starting point, not a measured
+operating point.
 """
 
 from dataclasses import dataclass, field
