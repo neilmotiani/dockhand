@@ -516,3 +516,13 @@ def test_next_missing_deadline() -> None:
     res = reconcile([], [a, b], at(13.5))
     assert next_missing_deadline([a, b], res) == at(15) + CFG.grace
     assert next_missing_deadline([a, b], reconcile([], [a, b], END_OF_DAY)) is None
+
+
+def test_reasons_use_the_given_timezone():
+    from zoneinfo import ZoneInfo
+
+    t = datetime(2026, 10, 17, 0, 53, tzinfo=UTC)  # 17:53 on the 16th in Los Angeles
+    d = DetectedDelivery(id=uuid.uuid4(), detected_at=t, carrier="UPS", package_count=1)
+    la = ZoneInfo("America/Los_Angeles")
+    assert "at 2026-10-16 17:53" in reconcile([d], [], t, tz=la).reconciliations[0].reason
+    assert "at 2026-10-17 00:53" in reconcile([d], [], t).reconciliations[0].reason

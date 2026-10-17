@@ -83,7 +83,7 @@ async def reconcile_day(
         ).mappings()
         es = [ExpectedDelivery(**row) for row in erows]
 
-        result = reconcile(ds, es, now, cfg)
+        result = reconcile(ds, es, now, cfg, tz)
 
         d_ids = [x.id for x in ds]
         e_ids = [x.id for x in es]

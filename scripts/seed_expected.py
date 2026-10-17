@@ -88,7 +88,7 @@ def main() -> None:
     settings = get_settings()
     tz = ZoneInfo(settings.business_timezone)
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("--api", default="http://localhost:8000")
+    p.add_argument("--api", default="http://localhost:8010")
     p.add_argument("--date", type=date.fromisoformat, default=datetime.now(tz).date())
     p.add_argument("--start", type=time.fromisoformat, default=time(6, 0))
     p.add_argument("--end", type=time.fromisoformat, default=time(22, 0))

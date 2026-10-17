@@ -9,6 +9,9 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
 COPY app ./app
+# Committed eval and bench results, served by GET /v1/metrics.
+COPY eval/results ./eval/results
+COPY bench/results ./bench/results
 
 EXPOSE 8000
 CMD ["uv", "run", "--no-dev", "uvicorn", "--factory", "app.main:create_app", "--host", "0.0.0.0", "--port", "8000"]

@@ -25,7 +25,9 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://dockhand:dockhand@db:5432/dockhand
     ports:
-      - "8000:8000"
+      # Host port 8010: 8000 is commonly taken by other local projects. The dashboard (web/)
+      # runs on 3010 for the same reason.
+      - "8010:8000"
     depends_on:
       db:
         condition: service_healthy

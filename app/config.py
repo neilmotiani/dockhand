@@ -51,6 +51,8 @@ class Settings(BaseSettings):
     # Optional `<device_id>.jpg` empty-doorstep references. Without one, the clip median is used.
     capture_reference_dir: Path | None = None
     media_dir: Path = Path("data/media")  # selected frames are kept here as evidence
+    # Directory holding eval/results/ and bench/results/, read by GET /v1/metrics.
+    results_root: Path = Path(".")
 
     # Event History polling fallback (the Playground does not deliver webhooks). 0 disables it.
     ring_poll_interval_s: float = 0.0

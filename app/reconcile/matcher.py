@@ -8,7 +8,7 @@ same inputs in one transaction.
 """
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime, tzinfo
 
 import numpy as np
 from scipy.optimize import linear_sum_assignment
@@ -64,8 +64,9 @@ def solve_assignment(cost: np.ndarray, max_cost: float) -> list[tuple[int, int]]
     return [(int(r), int(c)) for r, c in zip(rows, cols, strict=True) if r < n and c < m]
 
 
-def _fmt_time(t: datetime) -> str:
-    return t.strftime("%Y-%m-%d %H:%M")
+def _fmt_time(t: datetime, tz: tzinfo) -> str:
+    # Reasons are read by the business, so times are in its timezone, not UTC.
+    return t.astimezone(tz).strftime("%Y-%m-%d %H:%M")
 
 
 def _fmt_offset(hours: float) -> str:
@@ -78,7 +79,7 @@ def _boxes(n: int) -> str:
     return f"{n} box" if n == 1 else f"{n} boxes"
 
 
-def _pair_reason(status: Status, d: DetectedDelivery, e: ExpectedDelivery) -> str:
+def _pair_reason(status: Status, d: DetectedDelivery, e: ExpectedDelivery, tz: tzinfo) -> str:
     if status is Status.MATCHED:
         head = f"Matched: {_boxes(d.package_count)} as expected"
     elif status is Status.SHORT:
@@ -87,7 +88,7 @@ def _pair_reason(status: Status, d: DetectedDelivery, e: ExpectedDelivery) -> st
     else:
         extra = d.package_count - e.expected_count
         head = f"Over by {extra}: {d.package_count} boxes delivered, {e.expected_count} expected"
-    notes = [f"{e.supplier} at {_fmt_time(d.detected_at)}"]
+    notes = [f"{e.supplier} at {_fmt_time(d.detected_at, tz)}"]
     off = hours_outside_window(d, e)
     if off:
         notes.append(_fmt_offset(off))
@@ -99,12 +100,13 @@ def _pair_reason(status: Status, d: DetectedDelivery, e: ExpectedDelivery) -> st
     return f"{head} ({'; '.join(notes)})."
 
 
-def _missing_reason(e: ExpectedDelivery, cfg: ReconcileConfig) -> str:
+def _missing_reason(e: ExpectedDelivery, cfg: ReconcileConfig, tz: tzinfo) -> str:
     grace_min = round(cfg.grace.total_seconds() / 60)
     ref = f" {e.reference}" if e.reference else ""
     return (
         f"Missing: no delivery matched {e.supplier}{ref} ({_boxes(e.expected_count)}, window "
-        f"{_fmt_time(e.window_start)} to {_fmt_time(e.window_end)}, +{grace_min} min grace)."
+        f"{_fmt_time(e.window_start, tz)} to {_fmt_time(e.window_end, tz)}, "
+        f"+{grace_min} min grace)."
     )
 
 
@@ -114,10 +116,11 @@ def _unexpected_reason(
     expected: list[ExpectedDelivery],
     taken: set[int],
     cfg: ReconcileConfig,
+    tz: tzinfo,
 ) -> str:
     base = (
         f"Unexpected: {d.carrier} delivery of {_boxes(d.package_count)} at "
-        f"{_fmt_time(d.detected_at)} matched no expected delivery"
+        f"{_fmt_time(d.detected_at, tz)} matched no expected delivery"
     )
     # Explain the nearest miss so a human can override the decision if it was wrong.
     feasible = [j for j in range(len(expected)) if np.isfinite(row[j])]
@@ -137,12 +140,15 @@ def reconcile(
     expected: list[ExpectedDelivery],
     now: datetime,
     cfg: ReconcileConfig | None = None,
+    tz: tzinfo = UTC,
 ) -> ReconcileResult:
     """Reconcile one batch (typically one business day) of deliveries against expectations.
 
     - Each delivery ends up in exactly one row: paired (matched/short/over) or unexpected.
     - Each expected delivery ends up in exactly one row (paired or missing), or in
       `pending_expected_ids` if it is unpaired and `now` is before `window_end + grace`.
+
+    `tz` only affects how times are written in the reasons.
     """
     cfg = cfg or ReconcileConfig()
     if now.tzinfo is None:
@@ -174,7 +180,7 @@ def reconcile(
                 delivery_id=d.id,
                 status=status,
                 score=round(max(0.0, 1.0 - float(cost[i, j]) / cfg.max_cost), 4),
-                reason=_pair_reason(status, d, e),
+                reason=_pair_reason(status, d, e, tz),
                 decided_at=now,
             )
         )
@@ -193,7 +199,7 @@ def reconcile(
                 delivery_id=None,
                 status=Status.MISSING,
                 score=None,
-                reason=_missing_reason(e, cfg),
+                reason=_missing_reason(e, cfg, tz),
                 decided_at=now,
             )
         )
@@ -208,7 +214,7 @@ def reconcile(
                 delivery_id=d.id,
                 status=Status.UNEXPECTED,
                 score=None,
-                reason=_unexpected_reason(d, cost[i], es, paired_e, cfg),
+                reason=_unexpected_reason(d, cost[i], es, paired_e, cfg, tz),
                 decided_at=now,
             )
         )
