@@ -6,15 +6,42 @@ Work in progress.
 
 ## Development
 
-Requires Python 3.12, [uv](https://docs.astral.sh/uv/) and Docker.
+Requires Python 3.12, [uv](https://docs.astral.sh/uv/), Node.js 24+ and Docker.
 
 ```sh
-cp .env.example .env        # fill in tokens
+cp .env.example .env        # fill in tokens; set ADMIN_TOKEN
 uv sync                     # install dependencies
 uv run pytest               # tests
 uv run ruff check .         # lint
-docker compose up --build   # Postgres (host port 55432) + API on http://localhost:8000
+docker compose up --build   # Postgres (host port 55432) + API on http://localhost:8010
 ```
+
+Run the API and dashboard locally (two terminals):
+
+```sh
+docker compose up -d db
+uv run uvicorn --factory app.main:create_app --port 8010
+
+cd web
+cp .env.example .env.local  # DOCKHAND_ADMIN_TOKEN = the API's ADMIN_TOKEN
+npm install
+npm run dev                 # http://localhost:3010
+```
+
+## Dashboard
+
+`web/` is a Next.js + TypeScript app on port 3010 with four pages:
+
+- **Today:** the live delivery ledger (snapshot, time, carrier, box count, status, and the reason for it). It refreshes every 3 s. Events still being captured appear as `pending` rows, and the activity list says why an event produced no delivery (no packages, stale, Ring auth).
+- **Expected:** add an order (supplier, carrier, box count, time window, PO) and see today's orders with their status. Times are entered in `BUSINESS_TIMEZONE`.
+- **Discrepancies:** each short, over, missing or unexpected item with its reason, the snapshot and the other frames the model read (or the clip, when one is stored), and a **Copy dispute summary** button that produces a short email to the supplier. Set `DOCKHAND_BUSINESS_NAME` to sign it.
+- **How it works:** the pipeline at a glance, and the accuracy and latency numbers read from `eval/results/` and `bench/results/` through `GET /v1/metrics`, each with its N, file and commit.
+
+**Simulate delivery** in the header calls `POST /v1/trigger`, so a demo can show an event flowing in live.
+
+The admin token stays on the dashboard's server. Pages fetch from the API in server components, writes go through server actions, and images go through a proxy route that forwards only evidence paths. Read endpoints, all admin-only: `GET /v1/deliveries`, `/v1/expected`, `/v1/discrepancies`, `/v1/activity` (each takes `?date=YYYY-MM-DD`, default today in `BUSINESS_TIMEZONE`), `/v1/metrics`, and `/v1/deliveries/{id}/snapshot|frames/{rank}|clip`.
+
+Checks: `npm run lint`, `npm run typecheck`, `npm test`, `npm run format:check` (all run in CI).
 
 ## Ingest pipeline
 
@@ -29,10 +56,10 @@ POST /v1/trigger ┘
 - The Ring Developer Playground does not deliver webhooks (see `docs/decisions.md`). For Playground runs, set `RING_POLL_INTERVAL_S=5` to poll Event History, or start a run by hand:
 
   ```sh
-  curl -X POST localhost:8000/v1/trigger -H "Authorization: Bearer $ADMIN_TOKEN" \
+  curl -X POST localhost:8010/v1/trigger -H "Authorization: Bearer $ADMIN_TOKEN" \
        -H 'Content-Type: application/json' -d '{"device": "Playground", "idempotency_key": "demo-1"}'
   ```
-- Expected deliveries: `POST /v1/expected` (admin token; send your own `id` to make retries safe). For a live Playground test, `uv run python -m scripts.seed_expected` creates today's two demo orders: Sysco expecting 1 box, US Foods expecting 3. Then trigger twice. The two one-box Playground deliveries should come out `matched` and `short`; in the 2026-10-16 live run they did (N=2, results below). A dashboard editor replaces this later.
+- Expected deliveries: `POST /v1/expected` (admin token; send your own `id` to make retries safe). For a live Playground test, `uv run python -m scripts.seed_expected` creates today's two demo orders: Sysco expecting 1 box, US Foods expecting 3. Then trigger twice. The two one-box Playground deliveries should come out `matched` and `short`; in the 2026-10-16 live run they did (N=2, results below). Orders can also be added from the dashboard's Expected page.
 - Events older than `CAPTURE_MAX_EVENT_AGE_S` (120 s) when a worker picks them up are skipped, since live view can no longer show the delivery.
 - Every delivery stores per-stage timings in `deliveries.latency_ms`. `uv run python -m bench.latency` reports nearest-rank p50/p95 per stage with N.
 - Live Playground runs, 2026-10-16, manual trigger, Package scene, Nova Pro. **N = 2 per row**, so these are individual observations, not a distribution:
