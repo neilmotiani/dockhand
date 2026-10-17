@@ -35,7 +35,14 @@ POST /v1/trigger ┘
 - Expected deliveries: `POST /v1/expected` (admin token; send your own `id` to make retries safe). For a live Playground test, `uv run python -m scripts.seed_expected` creates today's two demo orders: Sysco expecting 1 box, US Foods expecting 3. Then trigger twice. The two one-box Playground deliveries should come out `matched` and `short`; in the 2026-10-16 live run they did (N=2, results below). A dashboard editor replaces this later.
 - Events older than `CAPTURE_MAX_EVENT_AGE_S` (120 s) when a worker picks them up are skipped, since live view can no longer show the delivery.
 - Every delivery stores per-stage timings in `deliveries.latency_ms`. `uv run python -m bench.latency` reports nearest-rank p50/p95 per stage with N.
-- Live Playground run, 2026-10-16, manual trigger, Package scene, Nova Pro (`bench/results/latency_playground_manual.json`): **N = 2**, so these are two observations, not a distribution. Event → ledger took 33.2 s and 33.5 s. Of that, WHEP capture took 31.0 s each time: about 5.5 s of session setup plus the full 25 s `CAPTURE_TIMEOUT_S`, because the Package stream never stalled. Bedrock extraction took 2.1–2.2 s (3 frames, 6,733 input tokens). Since then, capture stops early once the scene has settled (3 s without motion, minimum 4 s; see `docs/decisions.md`).
+- Live Playground runs, 2026-10-16, manual trigger, Package scene, Nova Pro. **N = 2 per row**, so these are individual observations, not a distribution:
+
+  | Capture rule | Results file | Event → ledger | WHEP capture (incl. ~5.5 s setup) | Why capture ended |
+  |---|---|---|---|---|
+  | Fixed 25 s timeout | `bench/results/latency_playground_manual.json` | 33.2 s, 33.5 s | 31.0 s, 31.0 s | timeout, inferred: not recorded yet then, but capture = setup + the 25 s cap |
+  | Scene settled (3 s still, min 4 s) | `bench/results/latency_playground_manual_settle.json` | 12.5 s, 14.7 s | 10.5 s, 12.1 s | settled after 4.1 s and 4.4 s of video |
+
+  Bedrock extraction took 1.9–2.3 s in all four runs. WHEP setup (about 5.5 s) is now the largest single stage. Both runs reconciled as seeded: one `matched`, one `short`. The rule is in `docs/decisions.md`; its threshold was tuned on two recorded clips.
 - Tests need Postgres: `docker compose up -d db` (host port 55432, which `DATABASE_URL` and the test default point at), or point `TEST_DATABASE_URL` at another one. Without it, the database tests are skipped locally. CI runs them against a Postgres service.
 
 ### Future work
