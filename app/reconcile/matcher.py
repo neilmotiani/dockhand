@@ -18,8 +18,10 @@ from app.reconcile.cost import (
     build_cost_matrix,
     carriers_agree,
     hours_outside_window,
+    normalize_carrier,
 )
 from app.reconcile.models import (
+    UNKNOWN_CARRIERS,
     DetectedDelivery,
     ExpectedDelivery,
     ReconcileResult,
@@ -65,8 +67,14 @@ def solve_assignment(cost: np.ndarray, max_cost: float) -> list[tuple[int, int]]
 
 
 def _fmt_time(t: datetime, tz: tzinfo) -> str:
-    # Reasons are read by the business, so times are in its timezone, not UTC.
-    return t.astimezone(tz).strftime("%Y-%m-%d %H:%M")
+    """'11:00 AM' in the business timezone. Reasons are read by the business, and every item
+    in a batch is on the same business day, so the date would only repeat the page header."""
+    local = t.astimezone(tz)
+    return f"{local.hour % 12 or 12}:{local:%M} {'AM' if local.hour < 12 else 'PM'}"
+
+
+def _carrier_not_visible(carrier: str | None) -> bool:
+    return normalize_carrier(carrier) in UNKNOWN_CARRIERS
 
 
 def _fmt_offset(hours: float) -> str:
@@ -96,7 +104,7 @@ def _pair_reason(status: Status, d: DetectedDelivery, e: ExpectedDelivery, tz: t
     if agree is False:
         notes.append(f"carrier read as {d.carrier}, expected {e.carrier}")
     elif agree is None and e.carrier:
-        notes.append(f"carrier unreadable ({d.carrier or 'blank'}), expected {e.carrier}")
+        notes.append(f"carrier not visible, expected {e.carrier}")
     return f"{head} ({'; '.join(notes)})."
 
 
@@ -118,10 +126,12 @@ def _unexpected_reason(
     cfg: ReconcileConfig,
     tz: tzinfo,
 ) -> str:
-    base = (
-        f"Unexpected: {d.carrier} delivery of {_boxes(d.package_count)} at "
-        f"{_fmt_time(d.detected_at, tz)} matched no expected delivery"
+    what = (
+        f"delivery of {_boxes(d.package_count)} (carrier not visible)"
+        if _carrier_not_visible(d.carrier)
+        else f"{d.carrier} delivery of {_boxes(d.package_count)}"
     )
+    base = f"Unexpected: {what} at {_fmt_time(d.detected_at, tz)} matched no expected delivery"
     # Explain the nearest miss so a human can override the decision if it was wrong.
     feasible = [j for j in range(len(expected)) if np.isfinite(row[j])]
     if not feasible:

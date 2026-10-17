@@ -5,6 +5,8 @@ export type DiscrepancyStatus = "short" | "over" | "missing" | "unexpected";
 
 export interface Media {
   snapshot: string | null;
+  /** Rank of the snapshot among `frames` (the best-scoring frame), when known. */
+  snapshot_frame: number | null;
   frames: string[];
   clip: string | null;
 }

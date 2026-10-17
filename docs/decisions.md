@@ -169,3 +169,19 @@ The read endpoints (`app/ledger/api.py`) also require the admin token. The ledge
 - **The order form sends a client-chosen ID** (`POST /v1/expected` already accepts one). After a failure the same ID is reused, so a retry after a timeout can't create the order twice. After a success a new one is issued.
 - **Metrics are copied, not computed.** `GET /v1/metrics` (`app/ledger/metrics.py`) reads the committed results files and returns each number with its N, file and commit. A missing file gives `null`, never a default. A test checks every value against the files.
 - **Dispute summary** (`web/lib/dispute.ts`) is plain text built from the stored facts (ordered, received, time, PO), worded per status. It asks for a specific remedy: send the rest or credit (short), confirm billing (over), status (missing), which order (unexpected). It never claims more than the camera saw.
+
+## Playground token: re-read on every call
+
+`PlaygroundTokenProvider` reads `RING_ACCESS_TOKEN` again for each Ring call: an exported environment variable first, then `.env`, then the value loaded at startup (the same precedence as Settings). Playground tokens last 30 minutes (the token's own `exp − iat`) and can't be refreshed by the app. Requiring a restart for each one would interrupt every demo take. Parsing a small file per call costs microseconds; a capture takes seconds.
+
+Two guards come with it. After a 401, that exact token is marked dead and refused until a different one appears, so a rejected token isn't retried. And the JWT `exp` claim is read (unverified; Ring still checks the signature), so an expired token fails locally with "expired at HH:MM UTC" instead of a round trip ending in an empty 401. The OAuth provider for real devices will replace this behind the same `TokenProvider` interface.
+
+## Reasons read like a receiving clerk wrote them
+
+Reconciliation reasons give times as "11:00 AM" in `BUSINESS_TIMEZONE`, without the date. Every row in a batch belongs to the same business day, which the page already shows. A carrier the model reported as `Unknown` is written "carrier not visible" in reasons, and the dashboard shows **Not visible** with a tooltip. `Unknown` stays in the database and the API, because it's the model's enum value and the eval compares against it.
+
+## Demo reset: an endpoint behind two switches
+
+`POST /v1/admin/reset-day` (called by `scripts/reset_demo_day.py`) deletes a day's Playground deliveries and evidence files, the orders whose window starts that day, their reconciliations, and the day's pipeline events. It needs the admin token and `ALLOW_DEMO_RESET=true`, which defaults to off, so a deployed API can't be wiped with the admin token alone. It goes through the API rather than straight to Postgres, so it works against a deployment without database credentials, and it reuses the reconciliation advisory lock.
+
+Safety rules: dry run unless asked; `ring_device` deliveries and their events are never deleted (the remaining day is reconciled again); refused while an event of the day is queued or processing, because the running capture would then write to a deleted event; media folders are removed only when they are a direct child of `MEDIA_DIR` named by a deleted delivery's ID.

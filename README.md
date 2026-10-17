@@ -33,11 +33,25 @@ npm run dev                 # http://localhost:3010
 `web/` is a Next.js + TypeScript app on port 3010 with four pages:
 
 - **Today:** the live delivery ledger (snapshot, time, carrier, box count, status, and the reason for it). It refreshes every 3 s. Events still being captured appear as `pending` rows, and the activity list says why an event produced no delivery (no packages, stale, Ring auth).
-- **Expected:** add an order (supplier, carrier, box count, time window, PO) and see today's orders with their status. Times are entered in `BUSINESS_TIMEZONE`.
+- **Expected:** add an order (supplier, carrier, box count, time window, PO) and see today's orders with their status. Times are entered in `BUSINESS_TIMEZONE` (an IANA name such as `America/New_York`; it also sets the business day and every time shown, reasons included).
 - **Discrepancies:** each short, over, missing or unexpected item with its reason, the snapshot and the other frames the model read (or the clip, when one is stored), and a **Copy dispute summary** button that produces a short email to the supplier. Set `DOCKHAND_BUSINESS_NAME` to sign it.
 - **How it works:** the pipeline at a glance, and the accuracy and latency numbers read from `eval/results/` and `bench/results/` through `GET /v1/metrics`, each with its N, file and commit.
 
 **Simulate delivery** in the header calls `POST /v1/trigger`, so a demo can show an event flowing in live.
+
+Snapshots open full size on click, with ← / → through every frame the model read. When no uniform, vehicle, logo or label was readable, the carrier shows as **Not visible** (the model is told not to guess). A tooltip explains why.
+
+Recording takes:
+
+```sh
+uv run python -m scripts.reset_demo_day          # dry run: what would be deleted today
+uv run python -m scripts.reset_demo_day --yes    # clear today's Playground deliveries, orders, events
+uv run python -m scripts.seed_expected           # fresh demo orders
+```
+
+The reset needs `ADMIN_TOKEN` and `ALLOW_DEMO_RESET=true` on the API (off by default; keep it off in deployments). It never deletes deliveries from a real Ring device, and it refuses while a capture is still running.
+
+Ring Playground tokens last 30 minutes (from the token's own `iat`/`exp`). Paste a new one into `RING_ACCESS_TOKEN` in `.env`. The API re-reads it on every Ring call, so there's no restart.
 
 The admin token stays on the dashboard's server. Pages fetch from the API in server components, writes go through server actions, and images go through a proxy route that forwards only evidence paths. Read endpoints, all admin-only: `GET /v1/deliveries`, `/v1/expected`, `/v1/discrepancies`, `/v1/activity` (each takes `?date=YYYY-MM-DD`, default today in `BUSINESS_TIMEZONE`), `/v1/metrics`, and `/v1/deliveries/{id}/snapshot|frames/{rank}|clip`.
 

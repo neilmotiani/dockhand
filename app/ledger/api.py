@@ -15,10 +15,12 @@ from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse
+from pydantic import BaseModel, Field
 
 from app.auth import require_admin
 from app.ingest.queue import utcnow
-from app.ledger import metrics, queries
+from app.ledger import metrics, queries, reset
+from app.reconcile.cost import ReconcileConfig
 from app.reconcile.store import business_day, day_bounds
 
 router = APIRouter(dependencies=[Depends(require_admin)])
@@ -86,6 +88,34 @@ async def list_activity(
     async with request.app.state.engine.connect() as conn:
         rows = await queries.recent_activity(conn, start, end, limit)
     return _envelope(day, tz, events=rows)
+
+
+class ResetRequest(BaseModel):
+    day: date | None = Field(default=None, alias="date", description="Business day; default today")
+    dry_run: bool = Field(default=True, description="Count what would be deleted, delete nothing")
+
+
+@router.post("/v1/admin/reset-day")
+async def reset_demo_day(request: Request, body: ResetRequest) -> dict:
+    """Clear a day's Playground deliveries, orders and events so a demo can be re-recorded.
+    Needs the admin token and ALLOW_DEMO_RESET=true (404 otherwise). Dry run by default."""
+    settings = request.app.state.settings
+    if not settings.allow_demo_reset:
+        raise HTTPException(404, "demo reset is disabled (set ALLOW_DEMO_RESET=true)")
+    day, tz = _day(request, body.day)
+    try:
+        result = await reset.reset_day(
+            request.app.state.engine,
+            day,
+            tz,
+            Path(settings.media_dir),
+            utcnow(),
+            ReconcileConfig.from_settings(settings),
+            dry_run=body.dry_run,
+        )
+    except reset.ResetBlocked as e:
+        raise HTTPException(409, str(e)) from None
+    return result.as_dict()
 
 
 @router.get("/v1/metrics")

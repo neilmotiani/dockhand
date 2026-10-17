@@ -7,8 +7,10 @@ with no reconciliation row yet is `pending` (an expected delivery before window_
 a delivery in the instant between its insert and its reconciliation run).
 """
 
+import re
 import uuid
 from datetime import date, datetime
+from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -24,6 +26,9 @@ PENDING = "pending"
 DISCREPANCY_ORDER = ("missing", "short", "unexpected", "over")
 assert set(DISCREPANCY_ORDER) == {s.value for s in DISCREPANCY_STATUSES}
 
+# File names written by app/pipeline.py `_save_frames`: frame_<rank>_i<index>_t<seconds>s.jpg
+SNAPSHOT_RANK = re.compile(r"^frame_(\d+)_")
+
 d, e, r, ev = deliveries.c, expected_deliveries.c, reconciliations.c, ring_events.c
 
 
@@ -31,8 +36,12 @@ def media_urls(delivery_id: uuid.UUID, row: dict) -> dict[str, Any]:
     """API paths for a delivery's evidence. Frames are addressed by rank (0 = best scoring at
     capture time), never by file name, so a request cannot name an arbitrary file."""
     base = f"/v1/deliveries/{delivery_id}"
+    # The snapshot is the best-scoring frame, which isn't always rank 0; its file name
+    # (frame_<rank>_...) says which rank it is, so a client can skip it among the frames.
+    m = SNAPSHOT_RANK.match(Path(row["snapshot_path"]).name) if row["snapshot_path"] else None
     return {
         "snapshot": f"{base}/snapshot" if row["snapshot_path"] else None,
+        "snapshot_frame": int(m.group(1)) if m else None,
         "frames": [f"{base}/frames/{i}" for i in range(row["frames_sent"] or 0)]
         if row["snapshot_path"]
         else [],
