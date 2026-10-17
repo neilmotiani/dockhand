@@ -139,6 +139,17 @@ def test_seed_requests_are_deterministic_per_day():
         build_requests(day, LA, time(22), time(6))
 
 
+def test_seed_run_label_makes_a_separate_idempotent_set():
+    day = date(2026, 10, 16)
+    base = build_requests(day, LA, time(6), time(22))
+    run = build_requests(day, LA, time(17, 40), time(18, 40), run="settle")
+    assert {r["id"] for r in base}.isdisjoint(r["id"] for r in run)
+    assert run == build_requests(day, LA, time(17, 40), time(18, 40), run="settle")
+    assert run[0]["reference"] == "PO-DEMO-SYSCO-20261016-settle"
+    # Without a run label the IDs are unchanged from the first version of the script.
+    assert base[0]["reference"] == "PO-DEMO-SYSCO-20261016"
+
+
 async def test_seed_scenario_yields_matched_and_short(engine):
     """Two one-box Playground deliveries (carrier unreadable) against the seeded orders."""
     day = T0.astimezone(LA).date()

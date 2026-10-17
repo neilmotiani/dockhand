@@ -13,11 +13,16 @@ no motion events for the poller). With only one delivery so far, it pairs with S
 US Foods stays pending until its window plus grace has passed.
 
 IDs are uuid5(date, supplier) and the windows are fixed clock times on the given date, so
-re-running on the same day reports `duplicate` instead of creating a second set.
+re-running on the same day reports `duplicate` instead of creating a second set. To seed a
+second, separate set on the same day, pass `--run NAME`: it goes into the IDs and references,
+and re-running with the same NAME is again a no-op. Give it a narrow window (--start/--end)
+around the test, so the matcher pairs the new deliveries with the new orders: deliveries
+outside a window cost more to pair with it.
 
 Usage:
     uv run python -m scripts.seed_expected                      # today, 06:00–22:00 local
     uv run python -m scripts.seed_expected --date 2026-10-17 --start 08:00 --end 18:00
+    uv run python -m scripts.seed_expected --run settle --start 17:40 --end 18:40
 """
 
 import argparse
@@ -44,20 +49,24 @@ class Order:
 PLAYGROUND = [Order("Sysco", 1, "PO-DEMO-SYSCO"), Order("US Foods", 3, "PO-DEMO-USFOODS")]
 
 
-def build_requests(day: date, tz: ZoneInfo, start: time, end: time) -> list[dict]:
+def build_requests(
+    day: date, tz: ZoneInfo, start: time, end: time, run: str | None = None
+) -> list[dict]:
     window_start = datetime.combine(day, start, tzinfo=tz)
     window_end = datetime.combine(day, end, tzinfo=tz)
     if window_end < window_start:
         raise ValueError("--end must not be before --start")
+    # No run: the original IDs, so earlier seeds stay idempotent.
+    run_key = f"{run}|" if run else ""
     return [
         {
-            "id": str(uuid.uuid5(SEED_NAMESPACE, f"{day.isoformat()}|{o.supplier}")),
+            "id": str(uuid.uuid5(SEED_NAMESPACE, f"{day.isoformat()}|{run_key}{o.supplier}")),
             "supplier": o.supplier,
             "carrier": None,
             "expected_count": o.expected_count,
             "window_start": window_start.isoformat(),
             "window_end": window_end.isoformat(),
-            "reference": f"{o.reference}-{day:%Y%m%d}",
+            "reference": f"{o.reference}-{day:%Y%m%d}" + (f"-{run}" if run else ""),
         }
         for o in PLAYGROUND
     ]
@@ -83,11 +92,12 @@ def main() -> None:
     p.add_argument("--date", type=date.fromisoformat, default=datetime.now(tz).date())
     p.add_argument("--start", type=time.fromisoformat, default=time(6, 0))
     p.add_argument("--end", type=time.fromisoformat, default=time(22, 0))
+    p.add_argument("--run", help="label for a separate set of orders on the same day")
     args = p.parse_args()
     if settings.admin_token is None:
         sys.exit("ADMIN_TOKEN is not set (in .env or the environment)")
 
-    reqs = build_requests(args.date, tz, args.start, args.end)
+    reqs = build_requests(args.date, tz, args.start, args.end, args.run)
     with httpx.Client(base_url=args.api, timeout=30) as client:
         results = seed(client, settings.admin_token.get_secret_value(), reqs)
     for res in results:
