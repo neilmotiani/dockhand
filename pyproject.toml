@@ -16,6 +16,7 @@ dependencies = [
     "scipy>=1.18.1",
     "aiortc>=1.15.0",
     "pillow>=12.3.0",
+    "python-dotenv>=1.2.4",
 ]
 
 [dependency-groups]

@@ -1,3 +1,4 @@
+import pydantic
 import pytest
 from fastapi.testclient import TestClient
 
@@ -59,3 +60,9 @@ def test_blank_secrets_are_unset(monkeypatch) -> None:
 def test_relevant_events_parse_from_json_env(monkeypatch) -> None:
     monkeypatch.setenv("INGEST_RELEVANT_EVENTS", '["button_press"]')
     assert Settings(_env_file=None).ingest_relevant_events == ["button_press"]
+
+
+def test_business_timezone_must_be_a_real_zone():
+    assert Settings(_env_file=None, business_timezone="America/New_York").business_timezone
+    with pytest.raises(pydantic.ValidationError, match="unknown timezone"):
+        Settings(_env_file=None, business_timezone="Eastern")

@@ -6,6 +6,7 @@ Model IDs, thresholds and secrets live here so they can change without a code ch
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -59,6 +60,9 @@ class Settings(BaseSettings):
     ring_poll_event_types: str = "motion.human,ding"
     # Bearer token for the manual trigger endpoint. Unset disables the endpoint.
     admin_token: SecretStr | None = None
+    # POST /v1/admin/reset-day deletes a day's demo data. Off unless set: a deployment must
+    # opt in, even with the admin token.
+    allow_demo_reset: bool = False
 
     # Bedrock. Model IDs are cross-region inference profiles; confirm availability with a small
     # Converse call (listing a profile does not mean the account can invoke it). See
@@ -79,7 +83,8 @@ class Settings(BaseSettings):
     extraction_max_tokens: int = 1024
     bedrock_timeout_s: float = 60.0
 
-    # Business day boundaries for reconciliation batches (app/reconcile/store.py).
+    # IANA name. Sets the business day for reconciliation batches (app/reconcile/store.py) and
+    # every time shown in reasons and on the dashboard. Set BUSINESS_TIMEZONE in .env.
     business_timezone: str = "America/Los_Angeles"
     # Timer that re-runs reconciliation so overdue expected deliveries turn `missing`.
     reconcile_interval_s: float = 300.0
@@ -93,6 +98,17 @@ class Settings(BaseSettings):
     reconcile_time_cost_per_hour: float = 0.15
     reconcile_max_offset_hours: float = 8.0
     reconcile_count_cost_weight: float = 0.5
+
+    @field_validator("business_timezone")
+    @classmethod
+    def _known_timezone(cls, v: str) -> str:
+        # Fail at startup on a typo, not on the first request that needs the business day.
+        try:
+            ZoneInfo(v)
+        except (ZoneInfoNotFoundError, ValueError):
+            msg = f"unknown timezone {v!r}; use an IANA name like America/New_York"
+            raise ValueError(msg) from None
+        return v
 
     @field_validator(
         "ring_access_token",

@@ -2,7 +2,9 @@ import { ApiProblem } from "@/components/ApiProblem";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { CopyButton } from "@/components/CopyButton";
 import { DayNav } from "@/components/DayNav";
-import { EvidenceImage, Frames, mediaSrc } from "@/components/Media";
+import { carrierVisible, NOT_VISIBLE_HELP } from "@/components/Carrier";
+import { EvidenceImage, Frames } from "@/components/Media";
+import { evidence, mediaSrc } from "@/lib/media";
 import { StatusBadge } from "@/components/StatusBadge";
 import { apiGet, withQuery } from "@/lib/api";
 import { disputeSummary } from "@/lib/dispute";
@@ -21,7 +23,9 @@ function title(x: Discrepancy): string {
     case "missing":
       return `${who}: never arrived`;
     case "unexpected":
-      return `${d!.carrier === "Unknown" ? "Unidentified" : d!.carrier} delivery, no matching order`;
+      return carrierVisible(d!.carrier)
+        ? `${d!.carrier} delivery, no matching order`
+        : "Delivery with no matching order";
   }
 }
 
@@ -49,9 +53,19 @@ function Card({ x, tz, business }: { x: Discrepancy; tz: string; business?: stri
           )}
           <dt>Camera saw</dt>
           <dd>
-            {d
-              ? `${d.package_count} box${d.package_count === 1 ? "" : "es"}, carrier ${d.carrier}, at ${formatTime(d.detected_at, tz)}`
-              : "Nothing matching during the window"}
+            {d ? (
+              <>
+                {d.package_count} box{d.package_count === 1 ? "" : "es"} at{" "}
+                {formatTime(d.detected_at, tz)},{" "}
+                {carrierVisible(d.carrier) ? (
+                  `carrier ${d.carrier}`
+                ) : (
+                  <span title={NOT_VISIBLE_HELP}>carrier not visible</span>
+                )}
+              </>
+            ) : (
+              "Nothing matching during the window"
+            )}
           </dd>
           <dt>Why</dt>
           <dd style={{ fontWeight: 400 }}>{x.reason}</dd>
@@ -73,10 +87,12 @@ function Card({ x, tz, business }: { x: Discrepancy; tz: string; business?: stri
             preload="metadata"
             poster={d.media.snapshot ? mediaSrc(d.media.snapshot) : undefined}
           />
-        ) : d?.media.snapshot ? (
+        ) : d && evidence(d.media).main ? (
           <EvidenceImage
-            src={d.media.snapshot}
+            src={evidence(d.media).main!}
+            gallery={d.media.frames}
             alt={`Ring snapshot at ${formatTime(d.detected_at, tz)}`}
+            caption={`Ring camera, ${formatTime(d.detected_at, tz)}`}
           />
         ) : (
           <div className="evidence-none">
@@ -85,7 +101,14 @@ function Card({ x, tz, business }: { x: Discrepancy; tz: string; business?: stri
               : "No delivery was recorded, so there is no footage."}
           </div>
         )}
-        {d && <Frames frames={d.media.frames.slice(1)} alt="Other frames read by the model" />}
+        {d && (
+          <Frames
+            frames={evidence(d.media).others}
+            gallery={d.media.frames}
+            alt="Other frames read by the model"
+            caption={`Ring camera, ${formatTime(d.detected_at, tz)}`}
+          />
+        )}
         {d && (
           <div className="small muted">
             Ring camera ·{" "}

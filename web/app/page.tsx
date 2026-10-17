@@ -1,7 +1,9 @@
 import { ApiProblem } from "@/components/ApiProblem";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { DayNav } from "@/components/DayNav";
+import { Carrier } from "@/components/Carrier";
 import { Thumb } from "@/components/Media";
+import { evidence } from "@/lib/media";
 import { StatusBadge } from "@/components/StatusBadge";
 import { apiGet, withQuery } from "@/lib/api";
 import { formatTime, seconds } from "@/lib/time";
@@ -146,13 +148,15 @@ export default async function TodayPage({ searchParams }: PageProps<"/">) {
                   >
                     <td>
                       <Thumb
-                        src={r.media.snapshot}
+                        src={evidence(r.media).main}
+                        gallery={r.media.frames}
                         alt={`Delivery at ${formatTime(r.detected_at, tz)}`}
+                        caption={`${formatTime(r.detected_at, tz)} · ${r.package_count} box${r.package_count === 1 ? "" : "es"}`}
                       />
                     </td>
                     <td className="big-num">{formatTime(r.detected_at, tz)}</td>
                     <td>
-                      <strong>{r.carrier}</strong>
+                      <Carrier carrier={r.carrier} />
                       {r.label_text.length > 0 && (
                         <div className="small muted mono">
                           {r.label_text.slice(0, 2).join(" · ")}

@@ -121,3 +121,23 @@ Format per entry: task, steps, expected vs. actual, severity, workaround, sugges
 - **Severity:** Medium. A client that trusts the filter would treat every returned item as a match. Ours would have labelled any motion item `human`.
 - **Workaround:** The poller checks each page against the requested types, and only infers a subtype when the page is consistent with the filter. It enqueues only items that pass its own relevance rules. For Playground demos, use `POST /v1/trigger`.
 - **Suggestion:** Apply `event_types` in the Playground (or say it's unsupported there), return `400` for unknown types, document `cv_detections` and `riid`, and have simulated events (Package) create history entries.
+
+## 2026-10-17 · Playground tokens expire after 30 minutes; the docs don't say so and a 401 doesn't say why
+
+- **Task:** Record the demo: trigger live captures from the dashboard over a session longer than half an hour.
+- **Steps:** Generated a Playground one-click token, put it in `RING_ACCESS_TOKEN` and ran captures. The next morning, triggered a capture with the previous token still configured. Then generated a new token and decoded its JWT payload (without printing the token) to read `iat` and `exp`.
+- **Expected:** The token's lifetime stated in the docs or next to the token, and a 401 that says the token expired.
+- **Actual:** The new token's claims give `iat` 17:56:04 UTC and `exp` 18:26:04 UTC: a 30-minute lifetime. The Authentication, Access Tokens and Refresh Tokens pages describe OAuth access tokens (~4 hours, with `expires_in` in the token response) and refresh tokens (~30 days). None of them mentions the Playground token's lifetime. The expired token's `GET /v1/devices` returned `401` with an empty body.
+- **Severity:** Medium. Every capture fails once the token lapses mid-session. An app that loads the token at startup also needs a restart for each new one, which takes longer than a demo take.
+- **Workaround:** `PlaygroundTokenProvider` re-reads `RING_ACCESS_TOKEN` from `.env` on every Ring call, so a fresh token works without a restart. It reads `exp` from the token and refuses an expired one with the exact expiry time instead of calling Ring. After a 401 it won't reuse that token until a different one is pasted. The dashboard's activity list shows the failure with a hint to paste a fresh token.
+- **Suggestion:** Show the expiry time next to the token in the Playground. State the Playground token lifetime in the docs. Put a reason in the 401 body or a `WWW-Authenticate` header (for example `error="invalid_token", error_description="expired"`). Or offer a refresh path or longer-lived tokens for Playground development.
+
+## 2026-10-17 · The docs give two different authorization-code lifetimes
+
+- **Task:** Check token lifetimes in the Ring docs (Ring knowledge MCP server) while writing the entry above.
+- **Steps:** Searched the docs for token lifetimes and compared the token tables.
+- **Expected:** One lifetime for the OAuth authorization code.
+- **Actual:** The Authentication overview and Access Tokens pages say 60 seconds ("One-time use; exchanged for access and refresh tokens"). The Account Linking page's token table says "10 minutes (single-use)".
+- **Severity:** Low for this project (we use Playground tokens). For a partner implementing the token exchange, the 60-second figure is the one to design for, but the docs don't say which is right.
+- **Workaround:** None needed yet. When the OAuth provider is built, exchange the code immediately on receipt.
+- **Suggestion:** Use one value in every token table.

@@ -30,7 +30,7 @@ const delivery: Delivery = {
   frames_sampled: 10,
   frames_sent: 3,
   event_to_ledger_ms: 12500,
-  media: { snapshot: "/v1/deliveries/d1/snapshot", frames: [], clip: null },
+  media: { snapshot: "/v1/deliveries/d1/snapshot", snapshot_frame: null, frames: [], clip: null },
 };
 
 function disc(over: Partial<Discrepancy>): Discrepancy {

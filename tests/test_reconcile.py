@@ -3,6 +3,7 @@ import math
 import random
 import uuid
 from datetime import UTC, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import pydantic
@@ -251,7 +252,7 @@ def test_exact_match() -> None:
     assert (r.expected_id, r.delivery_id) == (e.id, d.id)
     assert r.score == 1.0
     assert r.decided_at == END_OF_DAY
-    assert r.reason.startswith("Matched: 4 boxes as expected (Acme at 2026-10-15 10:00")
+    assert r.reason.startswith("Matched: 4 boxes as expected (Acme at 10:00 AM")
 
 
 def test_short() -> None:
@@ -294,10 +295,7 @@ def test_only_deliveries_are_unexpected() -> None:
     r = only(reconcile([d], [], at(15)))
     assert r.status is Status.UNEXPECTED
     assert r.delivery_id == d.id and r.expected_id is None
-    assert (
-        r.reason
-        == "Unexpected: DHL delivery of 1 box at 2026-10-15 15:00 matched no expected delivery."
-    )
+    assert r.reason == "Unexpected: DHL delivery of 1 box at 3:00 PM matched no expected delivery."
 
 
 def test_unexpected_is_decided_immediately_even_while_expected_pending() -> None:
@@ -320,7 +318,7 @@ def test_carrier_mislabel_still_matches_with_note() -> None:
 def test_unknown_carrier_matches_with_note() -> None:
     r = only(reconcile([det(carrier="Unknown")], [exp(carrier="UPS")], END_OF_DAY))
     assert r.status is Status.MATCHED
-    assert "carrier unreadable (Unknown), expected UPS" in r.reason
+    assert "carrier not visible, expected UPS" in r.reason
 
 
 def test_expected_without_carrier_matches_silently() -> None:
@@ -519,10 +517,25 @@ def test_next_missing_deadline() -> None:
 
 
 def test_reasons_use_the_given_timezone():
-    from zoneinfo import ZoneInfo
-
     t = datetime(2026, 10, 17, 0, 53, tzinfo=UTC)  # 17:53 on the 16th in Los Angeles
     d = DetectedDelivery(id=uuid.uuid4(), detected_at=t, carrier="UPS", package_count=1)
     la = ZoneInfo("America/Los_Angeles")
-    assert "at 2026-10-16 17:53" in reconcile([d], [], t, tz=la).reconciliations[0].reason
-    assert "at 2026-10-17 00:53" in reconcile([d], [], t).reconciliations[0].reason
+    assert "at 5:53 PM" in reconcile([d], [], t, tz=la).reconciliations[0].reason
+    assert "at 12:53 AM" in reconcile([d], [], t).reconciliations[0].reason
+
+
+def test_reason_times_read_like_a_clock():
+    ny = ZoneInfo("America/New_York")
+    cases = {0: "12:05 AM", 9: "9:05 AM", 12: "12:05 PM", 23: "11:05 PM"}
+    for hour, text in cases.items():
+        t = datetime(2026, 10, 17, hour, 5, tzinfo=ny)
+        d = DetectedDelivery(id=uuid.uuid4(), detected_at=t, carrier="UPS", package_count=1)
+        assert f" at {text} " in reconcile([d], [], t, tz=ny).reconciliations[0].reason
+
+
+def test_unexpected_unknown_carrier_says_not_visible():
+    t = datetime(2026, 10, 17, 15, 0, tzinfo=UTC)
+    d = DetectedDelivery(id=uuid.uuid4(), detected_at=t, carrier="Unknown", package_count=2)
+    reason = reconcile([d], [], t).reconciliations[0].reason
+    assert reason.startswith("Unexpected: delivery of 2 boxes (carrier not visible) at 3:00 PM")
+    assert "Unknown" not in reason

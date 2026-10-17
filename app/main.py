@@ -3,6 +3,7 @@ import contextlib
 import logging
 from collections.abc import AsyncIterator
 from datetime import timedelta
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import httpx
@@ -41,6 +42,7 @@ def create_app(
     engine: AsyncEngine | None = None,
     processor: Processor | None = None,
     start_background: bool = True,
+    token_env_file: Path | None = Path(".env"),
 ) -> FastAPI:
     """Build the API. Without a `processor`, events run through the real pipeline (WHEP
     capture + Bedrock). Tests pass their own engine and processor and turn off the background
@@ -61,7 +63,9 @@ def create_app(
         http = httpx.AsyncClient(
             base_url=settings.ring_api_base_url, timeout=settings.ring_http_timeout_s
         )
-        app.state.ring = RingClient(http, PlaygroundTokenProvider(settings))
+        # Re-read from .env on every call, so a fresh Playground token needs no restart.
+        tokens = PlaygroundTokenProvider(settings, env_file=token_env_file)
+        app.state.ring = RingClient(http, tokens)
         tasks: list[asyncio.Task] = []
         if start_background:
             proc = processor or _default_pipeline(app, settings)

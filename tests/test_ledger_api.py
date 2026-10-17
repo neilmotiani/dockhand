@@ -57,7 +57,9 @@ async def add_event(engine, at, status="done", outcome=None) -> uuid.UUID:
     return ev
 
 
-async def add_delivery(engine, media_dir: Path, at, count=1, carrier="UPS", frames=3):
+async def add_delivery(
+    engine, media_dir: Path, at, count=1, carrier="UPS", frames=3, snapshot_rank=0
+):
     """A delivery with evidence frames on disk, laid out as the pipeline writes them."""
     ev = await add_event(engine, at)
     did = uuid.uuid4()
@@ -79,7 +81,7 @@ async def add_delivery(engine, media_dir: Path, at, count=1, carrier="UPS", fram
                 package_count=count,
                 label_text=["1Z999"],
                 confidence=0.9,
-                snapshot_path=paths[0] if paths else None,
+                snapshot_path=paths[snapshot_rank] if paths else None,
                 model_id="m",
                 prompt_version="v1",
                 frames_sampled=10,
@@ -146,6 +148,7 @@ async def test_day_ledger_with_statuses(engine, media):
     assert s["event_to_ledger_ms"] == 12510.7 and s["label_text"] == ["1Z999"]
     assert s["media"] == {
         "snapshot": f"/v1/deliveries/{short}/snapshot",
+        "snapshot_frame": 0,
         "frames": [f"/v1/deliveries/{short}/frames/{i}" for i in range(3)],
         "clip": None,
     }
@@ -293,3 +296,13 @@ def test_metrics_missing_files_are_null_not_defaults(tmp_path):
     (tmp_path / "bench/results").mkdir(parents=True)
     (tmp_path / "bench/results/latency_broken.json").write_text("{not json")
     assert metrics.load(tmp_path)["latency"] == []
+
+
+async def test_snapshot_frame_names_the_rank_of_the_best_frame(engine, media):
+    d = await add_delivery(engine, media, T0, snapshot_rank=2)
+    async with client_for(engine, media) as c:
+        rows = (await c.get("/v1/deliveries", params={"date": DAY})).json()["deliveries"]
+        snap = await c.get(f"/v1/deliveries/{d}/snapshot")
+        f2 = await c.get(f"/v1/deliveries/{d}/frames/2")
+    assert rows[0]["media"]["snapshot_frame"] == 2
+    assert snap.content == f2.content
