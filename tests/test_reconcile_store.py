@@ -38,7 +38,7 @@ async def add_delivery(engine, at, count=2, carrier="UPS") -> uuid.UUID:
                 package_count=count,
                 label_text=[],
                 latency_ms={},
-                source="own_footage",
+                source="ring_playground",
             )
         )
     return d

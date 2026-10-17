@@ -31,7 +31,7 @@ metadata = MetaData()
 
 EVENT_STATUSES = ("pending", "processing", "done", "ignored", "skipped", "failed")
 ORIGINS = ("webhook", "poll", "manual")
-SOURCES = ("ring_playground", "ring_device", "own_footage")
+SOURCES = ("ring_playground", "ring_device")
 RECONCILIATION_STATUSES = ("matched", "short", "over", "missing", "unexpected")
 
 

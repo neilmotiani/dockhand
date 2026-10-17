@@ -27,7 +27,7 @@ from pathlib import Path
 from sqlalchemy import select
 
 from app.config import get_settings
-from app.db.models import deliveries, ring_events
+from app.db.models import SOURCES, deliveries, ring_events
 from app.db.session import make_engine
 
 DEFAULT_OUT = Path("bench/results/latency.json")
@@ -111,7 +111,7 @@ def _git_commit() -> str | None:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("--source", choices=["ring_playground", "ring_device", "own_footage"])
+    p.add_argument("--source", choices=list(SOURCES))
     p.add_argument("--origin", choices=["webhook", "poll", "manual"])
     p.add_argument("--since", type=datetime.fromisoformat, help="detected_at >= (ISO, with tz)")
     p.add_argument("--until", type=datetime.fromisoformat, help="detected_at < (ISO, with tz)")

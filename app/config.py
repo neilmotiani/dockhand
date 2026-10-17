@@ -10,7 +10,7 @@ from typing import Literal
 from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-MediaSource = Literal["ring_playground", "ring_device", "own_footage"]
+MediaSource = Literal["ring_playground", "ring_device"]
 
 
 class Settings(BaseSettings):

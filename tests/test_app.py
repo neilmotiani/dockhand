@@ -1,3 +1,4 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from app.config import Settings
@@ -15,20 +16,21 @@ def test_healthz() -> None:
 def test_settings_read_from_env(monkeypatch) -> None:
     monkeypatch.setenv("BEDROCK_MODEL_ID", "test-model")
     monkeypatch.setenv("RING_ACCESS_TOKEN", "secret-token")
-    monkeypatch.setenv("MEDIA_SOURCE", "own_footage")
+    monkeypatch.setenv("MEDIA_SOURCE", "ring_device")
     settings = Settings(_env_file=None)
     assert settings.bedrock_model_id == "test-model"
     assert settings.ring_access_token.get_secret_value() == "secret-token"
-    assert settings.media_source == "own_footage"
+    assert settings.media_source == "ring_device"
     # Secrets must not leak through repr/logging.
     assert "secret-token" not in repr(settings)
 
 
-def test_settings_reject_unknown_media_source(monkeypatch) -> None:
+@pytest.mark.parametrize("value", ["youtube", "own_footage"])
+def test_settings_reject_unknown_media_source(monkeypatch, value) -> None:
     import pydantic
-    import pytest
 
-    monkeypatch.setenv("MEDIA_SOURCE", "youtube")
+    # own_footage was removed: there is no self-filmed footage in this project.
+    monkeypatch.setenv("MEDIA_SOURCE", value)
     with pytest.raises(pydantic.ValidationError):
         Settings(_env_file=None)
 
