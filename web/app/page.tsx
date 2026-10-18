@@ -4,8 +4,11 @@ import { DayNav } from "@/components/DayNav";
 import { Carrier } from "@/components/Carrier";
 import { Thumb } from "@/components/Media";
 import { evidence } from "@/lib/media";
+import { SimToggle } from "@/components/SimToggle";
+import { SimulatedBadge } from "@/components/SimulatedBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { apiGet, withQuery } from "@/lib/api";
+import { showSimulated, simApiQuery, simPageQuery, toggleHref } from "@/lib/sim";
 import { formatTime, seconds } from "@/lib/time";
 import type { Day, LedgerDelivery, LedgerExpected, PipelineEvent } from "@/lib/types";
 
@@ -37,12 +40,17 @@ function eventText(e: PipelineEvent): string {
 }
 
 export default async function TodayPage({ searchParams }: PageProps<"/">) {
-  const { date } = await searchParams;
+  const { date, sim } = await searchParams;
+  const show = showSimulated(sim);
   let data;
   try {
     const [d, e, a] = await Promise.all([
-      apiGet<Day & { deliveries: LedgerDelivery[] }>(withQuery("/v1/deliveries", date)),
-      apiGet<Day & { expected: LedgerExpected[] }>(withQuery("/v1/expected", date)),
+      apiGet<Day & { deliveries: LedgerDelivery[] }>(
+        withQuery("/v1/deliveries", date, simApiQuery(show)),
+      ),
+      apiGet<Day & { expected: LedgerExpected[] }>(
+        withQuery("/v1/expected", date, simApiQuery(show)),
+      ),
       apiGet<Day & { events: PipelineEvent[] }>(withQuery("/v1/activity", date, { limit: "8" })),
     ]);
     data = { d, e, a };
@@ -60,6 +68,7 @@ export default async function TodayPage({ searchParams }: PageProps<"/">) {
     rows.filter((r) => ["short", "over", "unexpected"].includes(r.status)).length +
     e.expected.filter((x) => x.status === "missing").length;
   const now = new Date(d.generated_at).getTime();
+  const pageQuery: Record<string, string> = d.date === today ? {} : { date: d.date };
 
   return (
     <>
@@ -69,7 +78,13 @@ export default async function TodayPage({ searchParams }: PageProps<"/">) {
           <h1>Delivery ledger</h1>
           <p>Every drop-off the back-door camera saw, checked against what you expected.</p>
         </div>
-        <DayNav path="/" date={d.date} today={today} />
+        <div className="head-tools">
+          <DayNav path="/" date={d.date} today={today} query={simPageQuery(show)} />
+          <SimToggle
+            show={show}
+            href={toggleHref("/", { ...pageQuery, ...simPageQuery(show) }, show)}
+          />
+        </div>
       </div>
 
       <div className="tiles">
@@ -150,7 +165,7 @@ export default async function TodayPage({ searchParams }: PageProps<"/">) {
                       <Thumb
                         src={evidence(r.media).main}
                         gallery={r.media.frames}
-                        alt={`Delivery at ${formatTime(r.detected_at, tz)}`}
+                        alt={`${r.simulated ? "Simulated delivery" : "Delivery"} at ${formatTime(r.detected_at, tz)}`}
                         caption={`${formatTime(r.detected_at, tz)} · ${r.package_count} box${r.package_count === 1 ? "" : "es"}`}
                       />
                     </td>
@@ -165,7 +180,10 @@ export default async function TodayPage({ searchParams }: PageProps<"/">) {
                     </td>
                     <td className="num big-num">{r.package_count}</td>
                     <td>
-                      <StatusBadge status={r.status} />
+                      <div className="badge-stack">
+                        <StatusBadge status={r.status} />
+                        {r.simulated && <SimulatedBadge />}
+                      </div>
                     </td>
                     <td className="reason">
                       {r.expected && (

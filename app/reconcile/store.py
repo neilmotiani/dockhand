@@ -10,6 +10,10 @@ and serial:
 
 A day is a calendar day in BUSINESS_TIMEZONE. Each expected delivery belongs to the day its
 window starts, each delivery to the day it was detected, so every item is in exactly one batch.
+
+Simulated demo history (scripts/seed_demo_history.py) is matched in its own batch: a simulated
+order can never be paired with a real Ring delivery, nor a real order with a simulated delivery,
+even when both land on the same day.
 """
 
 import asyncio
@@ -25,6 +29,7 @@ from sqlalchemy import delete, or_, select, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+from app.config import SIMULATED_SOURCE
 from app.db.models import deliveries, expected_deliveries, reconciliations
 from app.reconcile.cost import ReconcileConfig
 from app.reconcile.matcher import reconcile
@@ -62,12 +67,14 @@ async def reconcile_day(
         await conn.execute(text("select pg_advisory_xact_lock(:k)"), {"k": ADVISORY_LOCK_KEY})
         drows = (
             await conn.execute(
-                select(d.id, d.detected_at, d.carrier, d.package_count).where(
+                select(d.id, d.detected_at, d.carrier, d.package_count, d.source).where(
                     d.detected_at >= start, d.detected_at < end
                 )
             )
         ).mappings()
-        ds = [DetectedDelivery(**row) for row in drows]
+        ds: list[tuple[bool, DetectedDelivery]] = [
+            (row["source"] == SIMULATED_SOURCE, DetectedDelivery(**row)) for row in drows
+        ]
         erows = (
             await conn.execute(
                 select(
@@ -78,15 +85,33 @@ async def reconcile_day(
                     e.window_start,
                     e.window_end,
                     e.reference,
+                    e.simulated,
                 ).where(e.window_start >= start, e.window_start < end)
             )
         ).mappings()
-        es = [ExpectedDelivery(**row) for row in erows]
+        es: list[tuple[bool, ExpectedDelivery]] = [
+            (row["simulated"], ExpectedDelivery(**row)) for row in erows
+        ]
 
-        result = reconcile(ds, es, now, cfg, tz)
+        parts = [
+            reconcile(
+                [x for sim, x in ds if sim is simulated],
+                [x for sim, x in es if sim is simulated],
+                now,
+                cfg,
+                tz,
+            )
+            for simulated in (False, True)
+        ]
+        result = ReconcileResult(
+            reconciliations=sorted(
+                (rec for p in parts for rec in p.reconciliations), key=lambda rec: rec.id
+            ),
+            pending_expected_ids=[i for p in parts for i in p.pending_expected_ids],
+        )
 
-        d_ids = [x.id for x in ds]
-        e_ids = [x.id for x in es]
+        d_ids = [x.id for _, x in ds]
+        e_ids = [x.id for _, x in es]
         if d_ids or e_ids:
             await conn.execute(
                 delete(reconciliations).where(

@@ -9,6 +9,7 @@ extract, save_frames, ledger_insert, reconcile, and the end-to-end spans event_t
 Percentiles use the nearest-rank method, so every reported value is an observed one. N is
 reported per stage, because some stages are missing for some events (manual triggers have no
 Ring detection time). Filter by provenance with --source and by ingest path with --origin.
+Simulated demo history (`source = simulated`, scripts/seed_demo_history.py) is always excluded.
 
 Usage:
     uv run python -m bench.latency                                  # all deliveries
@@ -27,7 +28,7 @@ from pathlib import Path
 from sqlalchemy import select
 
 from app.config import get_settings
-from app.db.models import SOURCES, deliveries, ring_events
+from app.db.models import LIVE_SOURCES, deliveries, ring_events
 from app.db.session import make_engine
 
 DEFAULT_OUT = Path("bench/results/latency.json")
@@ -86,6 +87,8 @@ async def load(
     stmt = select(deliveries.c.latency_ms).join(
         ring_events, ring_events.c.id == deliveries.c.event_id
     )
+    # Simulated demo history never feeds a benchmark, whatever the filters.
+    stmt = stmt.where(deliveries.c.source.in_(LIVE_SOURCES))
     if source:
         stmt = stmt.where(deliveries.c.source == source)
     if origin:
@@ -111,7 +114,7 @@ def _git_commit() -> str | None:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("--source", choices=list(SOURCES))
+    p.add_argument("--source", choices=list(LIVE_SOURCES))
     p.add_argument("--origin", choices=["webhook", "poll", "manual"])
     p.add_argument("--since", type=datetime.fromisoformat, help="detected_at >= (ISO, with tz)")
     p.add_argument("--until", type=datetime.fromisoformat, help="detected_at < (ISO, with tz)")

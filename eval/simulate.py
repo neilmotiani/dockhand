@@ -45,6 +45,9 @@ class Supplier:
     window: tuple[time, time]
     count_range: tuple[int, int]
     probability: float = 1.0  # chance an order is placed on a scheduled day
+    # Per-supplier problem rates; None uses the run's rates. Lets one supplier be less
+    # reliable than the rest (scripts/seed_demo_history.py).
+    rates: "Rates | None" = None
 
 
 CAFE_SUPPLIERS = [
@@ -114,16 +117,17 @@ def simulate(
     start: date = date(2026, 3, 2),  # a Monday
     rates: Rates = DEFAULT_RATES,
     suppliers: list[Supplier] = CAFE_SUPPLIERS,
+    n_days: int | None = None,  # overrides weeks * 7
 ) -> list[Day]:
     rng = random.Random(seed)
     days: list[Day] = []
-    for offset in range(weeks * 7):
+    for offset in range(weeks * 7 if n_days is None else n_days):
         d = start + timedelta(days=offset)
         day = Day(d)
         for s in suppliers:
             if d.weekday() not in s.weekdays or rng.random() >= s.probability:
                 continue
-            _simulate_order(rng, day, s, rates)
+            _simulate_order(rng, day, s, s.rates or rates)
         if rng.random() < rates.extra_per_day:
             _simulate_extra(rng, day)
         days.append(day)

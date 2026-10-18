@@ -69,6 +69,7 @@ async def test_dry_run_counts_and_deletes_nothing(engine, media):
         "events": 3,
         "media_dirs": 2,
         "kept_device_deliveries": 0,
+        "kept_simulated": 0,
     }
     after = [await count(engine, t) for t in (deliveries, expected_deliveries, ring_events)]
     assert after == before
@@ -90,6 +91,7 @@ async def test_reset_clears_only_that_day_and_is_repeatable(engine, media):
         "events": 0,
         "media_dirs": 0,
         "kept_device_deliveries": 0,
+        "kept_simulated": 0,
     }
     assert ledger["deliveries"] == [] and activity["events"] == []
     # The next day is untouched, files included.

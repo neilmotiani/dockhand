@@ -9,6 +9,9 @@ Additions to the SPEC columns, all in service of idempotency or the queue:
 - ring_events.origin/status/attempts/claimed_at/...: the table doubles as the durable work queue.
 - deliveries.event_id is unique: one delivery per event, however often the event is replayed.
 - extraction_cache: Bedrock results keyed by a hash of the frames, model and prompt version.
+- expected_deliveries.simulated: orders written by scripts/seed_demo_history.py, so they can be
+  shown, hidden, kept on reset and reconciled apart from real orders. Simulated deliveries are
+  marked by `deliveries.source = 'simulated'`.
 """
 
 from sqlalchemy import (
@@ -31,12 +34,16 @@ metadata = MetaData()
 
 EVENT_STATUSES = ("pending", "processing", "done", "ignored", "skipped", "failed")
 ORIGINS = ("webhook", "poll", "manual")
-SOURCES = ("ring_playground", "ring_device")
+SOURCES = ("ring_playground", "ring_device", "simulated")
+LIVE_SOURCES = ("ring_playground", "ring_device")
 RECONCILIATION_STATUSES = ("matched", "short", "over", "missing", "unexpected")
 
 
 def _in(col: str, values: tuple[str, ...]) -> str:
     return f"{col} in ({', '.join(repr(v) for v in values)})"
+
+
+SOURCE_CHECK = _in("source", SOURCES)
 
 
 ring_events = Table(
@@ -91,7 +98,7 @@ deliveries = Table(
     Column("latency_ms", JSONB, nullable=False),
     Column("source", Text, nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
-    CheckConstraint(_in("source", SOURCES), name="deliveries_source"),
+    CheckConstraint(SOURCE_CHECK, name="deliveries_source"),
 )
 Index("deliveries_detected_at", deliveries.c.detected_at)
 
@@ -105,6 +112,7 @@ expected_deliveries = Table(
     Column("window_start", DateTime(timezone=True), nullable=False),
     Column("window_end", DateTime(timezone=True), nullable=False),
     Column("reference", Text),
+    Column("simulated", Boolean, nullable=False, server_default="false"),
     Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
     CheckConstraint("expected_count >= 1", name="expected_count_positive"),
     CheckConstraint("window_end >= window_start", name="expected_window_ordered"),

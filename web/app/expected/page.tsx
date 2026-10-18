@@ -4,6 +4,7 @@ import { ApiProblem } from "@/components/ApiProblem";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { DayNav } from "@/components/DayNav";
 import { ExpectedForm } from "@/components/ExpectedForm";
+import { SimulatedBadge } from "@/components/SimulatedBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { apiGet, withQuery } from "@/lib/api";
 import { formatTime } from "@/lib/time";
@@ -79,7 +80,10 @@ export default async function ExpectedPage({ searchParams }: PageProps<"/expecte
                       {r.delivery ? r.delivery.package_count : <span className="muted">–</span>}
                     </td>
                     <td>
-                      <StatusBadge status={r.status} />
+                      <div className="badge-stack">
+                        <StatusBadge status={r.status} />
+                        {r.simulated && <SimulatedBadge />}
+                      </div>
                     </td>
                     <td className="reason">
                       {r.reason ?? "Waiting for the delivery window to close."}

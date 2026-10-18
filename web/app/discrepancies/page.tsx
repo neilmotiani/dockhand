@@ -5,8 +5,11 @@ import { DayNav } from "@/components/DayNav";
 import { carrierVisible, NOT_VISIBLE_HELP } from "@/components/Carrier";
 import { EvidenceImage, Frames } from "@/components/Media";
 import { evidence, mediaSrc } from "@/lib/media";
+import { SimToggle } from "@/components/SimToggle";
+import { SimulatedBadge } from "@/components/SimulatedBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { apiGet, withQuery } from "@/lib/api";
+import { showSimulated, simApiQuery, simPageQuery, toggleHref } from "@/lib/sim";
 import { disputeSummary } from "@/lib/dispute";
 import { formatTime } from "@/lib/time";
 import type { Day, Discrepancy } from "@/lib/types";
@@ -39,6 +42,7 @@ function Card({ x, tz, business }: { x: Discrepancy; tz: string; business?: stri
         <div className="disc-title">
           <StatusBadge status={x.status} large />
           <h2>{title(x)}</h2>
+          {x.simulated && <SimulatedBadge />}
         </div>
         <dl className="disc-facts">
           {e && (
@@ -91,8 +95,12 @@ function Card({ x, tz, business }: { x: Discrepancy; tz: string; business?: stri
           <EvidenceImage
             src={evidence(d.media).main!}
             gallery={d.media.frames}
-            alt={`Ring snapshot at ${formatTime(d.detected_at, tz)}`}
-            caption={`Ring camera, ${formatTime(d.detected_at, tz)}`}
+            alt={`${d.simulated ? "Synthetic composite for a simulated delivery" : "Ring snapshot"} at ${formatTime(d.detected_at, tz)}`}
+            caption={
+              d.simulated
+                ? `Simulated delivery, ${formatTime(d.detected_at, tz)} (synthetic composite)`
+                : `Ring camera, ${formatTime(d.detected_at, tz)}`
+            }
           />
         ) : (
           <div className="evidence-none">
@@ -109,7 +117,12 @@ function Card({ x, tz, business }: { x: Discrepancy; tz: string; business?: stri
             caption={`Ring camera, ${formatTime(d.detected_at, tz)}`}
           />
         )}
-        {d && (
+        {d && d.simulated && (
+          <div className="small muted">
+            Simulated demo history · illustrative synthetic composite, not camera footage
+          </div>
+        )}
+        {d && !d.simulated && (
           <div className="small muted">
             Ring camera ·{" "}
             {d.source === "ring_playground" ? "Ring Developer Playground" : "Ring device"}
@@ -124,11 +137,12 @@ function Card({ x, tz, business }: { x: Discrepancy; tz: string; business?: stri
 }
 
 export default async function DiscrepanciesPage({ searchParams }: PageProps<"/discrepancies">) {
-  const { date } = await searchParams;
+  const { date, sim } = await searchParams;
+  const show = showSimulated(sim);
   let data;
   try {
     data = await apiGet<Day & { discrepancies: Discrepancy[] }>(
-      withQuery("/v1/discrepancies", date),
+      withQuery("/v1/discrepancies", date, simApiQuery(show)),
     );
   } catch (err) {
     return <ApiProblem error={err} />;
@@ -142,7 +156,22 @@ export default async function DiscrepanciesPage({ searchParams }: PageProps<"/di
           <h1>Discrepancies</h1>
           <p>Short, missing and unexpected deliveries, with the camera evidence to back them up.</p>
         </div>
-        <DayNav path="/discrepancies" date={data.date} today={data.today} />
+        <div className="head-tools">
+          <DayNav
+            path="/discrepancies"
+            date={data.date}
+            today={data.today}
+            query={simPageQuery(show)}
+          />
+          <SimToggle
+            show={show}
+            href={toggleHref(
+              "/discrepancies",
+              { ...(data.date === data.today ? {} : { date: data.date }), ...simPageQuery(show) },
+              show,
+            )}
+          />
+        </div>
       </div>
       {data.discrepancies.length === 0 ? (
         <div className="card empty">

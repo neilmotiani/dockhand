@@ -32,6 +32,9 @@
   --pending-bg: #eef0f3;
   --pending-line: #c9ced8;
   --pending-ink: #4a5161;
+  --sim-bg: #f1f2f4;
+  --sim-line: #8c93a1;
+  --sim-ink: #3d4452;
 
   --radius: 10px;
   --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 8%);
@@ -66,6 +69,9 @@
     --pending-bg: #23272f;
     --pending-line: #3c424e;
     --pending-ink: #b7bdc9;
+    --sim-bg: #22262e;
+    --sim-line: #6b7282;
+    --sim-ink: #c9ced8;
     --shadow: none;
   }
 }
@@ -1002,5 +1008,102 @@ select:focus {
 
 .lightbox-actions {
   display: flex;
+  gap: 6px;
+}
+
+/* --- simulated demo history ------------------------------------------------------------- */
+
+.badge-sim {
+  background: var(--sim-bg);
+  border-color: var(--sim-line);
+  border-style: dashed;
+  color: var(--sim-ink);
+  font-size: 13px;
+  padding: 2px 9px 2px 7px;
+}
+
+.sim-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 550;
+  color: var(--ink-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.sim-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.sim-toggle[aria-busy="true"] {
+  opacity: 0.6;
+}
+
+.head-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.notice-sim {
+  border-style: dashed;
+  border-color: var(--sim-line);
+  background: var(--sim-bg);
+  color: var(--sim-ink);
+}
+
+/* --- suppliers ---------------------------------------------------------------------------- */
+
+th.sortable {
+  padding: 0;
+}
+
+th.sortable button {
+  all: unset;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  cursor: pointer;
+  text-align: inherit;
+}
+
+th.sortable button:hover,
+th.sortable button:focus-visible {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+tr.worst td {
+  background: var(--missing-bg);
+}
+
+tr.worst td:first-child {
+  box-shadow: inset 4px 0 0 var(--missing-ink);
+}
+
+.worst-callout {
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--missing-line);
+  background: var(--missing-bg);
+  color: var(--missing-ink);
+}
+
+.worst-callout strong {
+  color: var(--missing-ink);
+}
+
+.badge-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 6px;
 }
