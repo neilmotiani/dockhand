@@ -30,11 +30,12 @@ npm run dev                 # http://localhost:3010
 
 ## Dashboard
 
-`web/` is a Next.js + TypeScript app on port 3010 with four pages:
+`web/` is a Next.js + TypeScript app on port 3010 with five pages:
 
 - **Today:** the live delivery ledger (snapshot, time, carrier, box count, status, and the reason for it). It refreshes every 3 s. Events still being captured appear as `pending` rows, and the activity list says why an event produced no delivery (no packages, stale, Ring auth).
 - **Expected:** add an order (supplier, carrier, box count, time window, PO) and see today's orders with their status. Times are entered in `BUSINESS_TIMEZONE` (an IANA name such as `America/New_York`; it also sets the business day and every time shown, reasons included).
 - **Discrepancies:** each short, over, missing or unexpected item with its reason, the snapshot and the other frames the model read (or the clip, when one is stored), and a **Copy dispute summary** button that produces a short email to the supplier. Set `DOCKHAND_BUSINESS_NAME` to sign it.
+- **Suppliers:** each supplier's on-time %, short-delivery rate, late and missed deliveries and total boxes short over the last 30 days, with k/n next to every rate. Sortable; the supplier with the highest share of problem orders (missing, short or late) is highlighted. A banner says when the figures include simulated history.
 - **How it works:** the pipeline at a glance, and the accuracy and latency numbers read from `eval/results/` and `bench/results/` through `GET /v1/metrics`, each with its N, file and commit.
 
 **Simulate delivery** in the header calls `POST /v1/trigger`, so a demo can show an event flowing in live.
@@ -49,11 +50,25 @@ uv run python -m scripts.reset_demo_day --yes    # clear today's Playground deli
 uv run python -m scripts.seed_expected           # fresh demo orders
 ```
 
-The reset needs `ADMIN_TOKEN` and `ALLOW_DEMO_RESET=true` on the API (off by default; keep it off in deployments). It never deletes deliveries from a real Ring device, and it refuses while a capture is still running.
+The reset needs `ADMIN_TOKEN` and `ALLOW_DEMO_RESET=true` on the API (off by default; keep it off in deployments). It never deletes deliveries from a real Ring device or simulated history, and it refuses while a capture is still running.
+
+### Simulated demo history
+
+A dashboard with one day of Playground deliveries has nothing to compare against, so the past 21 days can be backfilled with simulated deliveries:
+
+```sh
+uv run python -m scripts.seed_demo_history     # safe to rerun: replaces the simulated rows only
+```
+
+It uses `eval/simulate.py` with five suppliers (Sysco, US Foods, Daybreak Bakery, Ridgeline Roasters, Amazon Business) on realistic schedules. Most orders match; a handful are short, late or missing, plus the odd unexpected parcel, and US Foods is set up to be the least reliable. Every row is stored as `source = simulated` (orders as `simulated = true`), never as Ring footage. The dashboard badges each one **Simulated**, and Today, Discrepancies and Suppliers have a **Show simulated data** toggle (on by default). Simulated rows are reconciled in their own batch, so they never pair with a real delivery or order, and their dispute summaries say they are not real.
+
+Snapshots for simulated deliveries reuse the synthetic composites from the extraction eval (attribution below), picked by carrier and nearest box count. They illustrate the row: the box count in the picture need not match the simulated count.
+
+Simulated history feeds no metric. The README numbers and the How it works page come only from the committed results files, `bench/latency.py` always skips `simulated` rows, and `tests/test_simulated_isolation.py` checks both.
 
 Ring Playground tokens last 30 minutes (from the token's own `iat`/`exp`). Paste a new one into `RING_ACCESS_TOKEN` in `.env`. The API re-reads it on every Ring call, so there's no restart.
 
-The admin token stays on the dashboard's server. Pages fetch from the API in server components, writes go through server actions, and images go through a proxy route that forwards only evidence paths. Read endpoints, all admin-only: `GET /v1/deliveries`, `/v1/expected`, `/v1/discrepancies`, `/v1/activity` (each takes `?date=YYYY-MM-DD`, default today in `BUSINESS_TIMEZONE`), `/v1/metrics`, and `/v1/deliveries/{id}/snapshot|frames/{rank}|clip`.
+The admin token stays on the dashboard's server. Pages fetch from the API in server components, writes go through server actions, and images go through a proxy route that forwards only evidence paths. Read endpoints, all admin-only: `GET /v1/deliveries`, `/v1/expected`, `/v1/discrepancies`, `/v1/activity` (each takes `?date=YYYY-MM-DD`, default today in `BUSINESS_TIMEZONE`; the first three also take `?include_simulated=false`), `/v1/suppliers?days=30`, `/v1/metrics`, and `/v1/deliveries/{id}/snapshot|frames/{rank}|clip`.
 
 Checks: `npm run lint`, `npm run typecheck`, `npm test`, `npm run format:check` (all run in CI).
 
@@ -120,8 +135,8 @@ How to read this:
 ### Data attribution
 
 - *Porch Piracy Dataset* by gluwxyws, Roboflow Universe, version 8, licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): https://universe.roboflow.com/gluwxyws/porch-piracy. 28 images are used unmodified as eval items.
-- *Package Detection Dataset* by MPJ, Roboflow Universe, version 1, licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): https://universe.roboflow.com/mpj/package-detection-f03pa. Box photos were cropped, resized and given made-up shipping labels to build the synthetic composites.
+- *Package Detection Dataset* by MPJ, Roboflow Universe, version 1, licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): https://universe.roboflow.com/mpj/package-detection-f03pa. Box photos were cropped, resized and given made-up shipping labels to build the synthetic composites. The same composites are reused as illustrative snapshots for simulated demo history on the dashboard.
 - *Packages Dataset* by Roboflow Community, Roboflow Universe, version 6, Public Domain: https://universe.roboflow.com/joseph-nelson/packages-g0ton.
-- Ring Developer Playground live-view footage (simulated device), captured with `scripts/ring_spike.py`. It is also the background of the synthetic composites.
+- Ring Developer Playground live-view footage (simulated device), captured with `scripts/ring_spike.py`. It is also the background of the synthetic composites (and so of the simulated-history snapshots).
 
 Dataset images are not committed. `eval/build_roboflow.py` downloads the pinned versions (it needs `ROBOFLOW_API_KEY`) and checks them against the content hashes in `eval/labels/sources.json`.

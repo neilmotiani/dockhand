@@ -14,7 +14,15 @@ function order(e: NonNullable<Discrepancy["expected"]>): string {
   return e.reference ? `order ${e.reference}` : "our order";
 }
 
+// Simulated history must never pass for a real dispute, even if someone copies it.
+export const SIMULATED_NOTE = "[Simulated demo data: not a real delivery. Do not send.]";
+
 export function disputeSummary(x: Discrepancy, timeZone: string, business?: string): string {
+  const text = summaryText(x, timeZone, business);
+  return x.simulated ? `${SIMULATED_NOTE}\n\n${text}` : text;
+}
+
+function summaryText(x: Discrepancy, timeZone: string, business?: string): string {
   const d = x.delivery;
   const e = x.expected;
   const at = (iso: string) =>

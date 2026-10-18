@@ -13,6 +13,7 @@ const expected: Expected = {
   window_start: "2026-10-16T16:00:00+00:00",
   window_end: "2026-10-16T18:00:00+00:00",
   reference: "PO-1042",
+  simulated: false,
 };
 
 const delivery: Delivery = {
@@ -25,6 +26,7 @@ const delivery: Delivery = {
   label_text: [],
   confidence: 0.8,
   source: "ring_playground",
+  simulated: false,
   model_id: "m",
   prompt_version: "v1",
   frames_sampled: 10,
@@ -36,6 +38,7 @@ const delivery: Delivery = {
 function disc(over: Partial<Discrepancy>): Discrepancy {
   return {
     id: "r1",
+    simulated: false,
     status: "short",
     reason: "Short by 2",
     decided_at: "2026-10-16T17:13:00+00:00",
@@ -46,6 +49,15 @@ function disc(over: Partial<Discrepancy>): Discrepancy {
 }
 
 describe("disputeSummary", () => {
+  it("simulated: says so first, so it cannot be sent as a real dispute", () => {
+    const text = disputeSummary(disc({ simulated: true }), LA);
+    expect(text.startsWith("[Simulated demo data: not a real delivery. Do not send.]\n\n")).toBe(
+      true,
+    );
+    expect(text).toContain("Subject: Short delivery");
+    expect(disputeSummary(disc({}), LA)).not.toContain("Simulated");
+  });
+
   it("short: states ordered, received and the gap", () => {
     const text = disputeSummary(disc({}), LA, "Maria's Café");
     expect(text).toContain("Subject: Short delivery – Sysco PO-1042");

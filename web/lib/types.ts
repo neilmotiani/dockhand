@@ -21,6 +21,8 @@ export interface Delivery {
   label_text: string[];
   confidence: number | null;
   source: string;
+  /** Simulated demo history (scripts/seed_demo_history.py), not a Ring capture. */
+  simulated: boolean;
   model_id: string | null;
   prompt_version: string | null;
   frames_sampled: number | null;
@@ -37,6 +39,8 @@ export interface Expected {
   window_start: string;
   window_end: string;
   reference: string | null;
+  /** A simulated order (scripts/seed_demo_history.py). */
+  simulated: boolean;
 }
 
 export interface LedgerDelivery extends Delivery {
@@ -53,6 +57,7 @@ export interface LedgerExpected extends Expected {
 
 export interface Discrepancy {
   id: string;
+  simulated: boolean;
   status: DiscrepancyStatus;
   reason: string;
   decided_at: string;
@@ -74,6 +79,41 @@ export interface PipelineEvent {
   outcome: string | null;
   last_error: string | null;
   delivery_id: string | null;
+}
+
+export interface RatioOrNull {
+  value: number | null;
+  k: number;
+  n: number;
+}
+
+export interface SupplierRow {
+  supplier: string;
+  orders: number;
+  pending: number;
+  due: number;
+  delivered: number;
+  on_time: RatioOrNull;
+  late: number;
+  short_rate: RatioOrNull;
+  over: number;
+  missed: number;
+  boxes_short: number;
+  problem_rate: RatioOrNull;
+  simulated_orders: number;
+  last_order: string | null;
+  worst: boolean;
+}
+
+export interface Suppliers {
+  from: string;
+  to: string;
+  days: number;
+  suppliers: SupplierRow[];
+  worst: string | null;
+  orders: number;
+  simulated_orders: number;
+  includes_simulated: boolean;
 }
 
 export interface Day {

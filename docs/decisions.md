@@ -185,3 +185,20 @@ Reconciliation reasons give times as "11:00 AM" in `BUSINESS_TIMEZONE`, without 
 `POST /v1/admin/reset-day` (called by `scripts/reset_demo_day.py`) deletes a day's Playground deliveries and evidence files, the orders whose window starts that day, their reconciliations, and the day's pipeline events. It needs the admin token and `ALLOW_DEMO_RESET=true`, which defaults to off, so a deployed API can't be wiped with the admin token alone. It goes through the API rather than straight to Postgres, so it works against a deployment without database credentials, and it reuses the reconciliation advisory lock.
 
 Safety rules: dry run unless asked; `ring_device` deliveries and their events are never deleted (the remaining day is reconciled again); refused while an event of the day is queued or processing, because the running capture would then write to a deleted event; media folders are removed only when they are a direct child of `MEDIA_DIR` named by a deleted delivery's ID.
+
+## Simulated demo history: tagged, reconciled apart, never measured
+
+`scripts/seed_demo_history.py` fills the past 21 days so the Suppliers page and day navigation have something to show. The rule is that simulated data can never be mistaken for, or mixed into, real data:
+
+- **Tagged at the row.** Deliveries get a third `source` value, `simulated`; orders get a `simulated` boolean. A flag on the row, not a separate table, so every existing query, page and the reset see it and can filter on it.
+- **Reconciled apart.** `reconcile_day` runs the matcher twice per day, once for real rows and once for simulated rows. Otherwise a simulated Sysco order on Oct 16 could have been paired with that day's real Playground delivery.
+- **Rerun = replace.** One transaction deletes every simulated row and inserts the new set. Each date gets its own seed (from `--seed` and the date), so running the script on a later day regenerates overlapping dates identically instead of shuffling history.
+- **Kept on reset.** The demo reset clears a day's live rows only.
+- **Never measured.** Metrics come from committed results files; the latency benchmark (the one script that reads the ledger) filters to `ring_playground`/`ring_device` whatever its arguments. `tests/test_simulated_isolation.py` enforces this.
+- **Schema change without migrations.** `create_all` doesn't alter existing tables, so `init_db` replays a short list of idempotent DDL statements (`UPGRADES` in `app/db/session.py`). That holds until the first deploy brings real migrations.
+
+The seed (2027) was chosen by looking at a few seeds for a mix that contains every kind of problem. That's acceptable for demo data; it would not be for an eval.
+
+## Supplier reliability: definitions
+
+On-time % = orders delivered by the window end / orders due, so a missed order counts against it. Short rate = short deliveries / delivered orders. Orders still inside window plus grace are left out of every rate. "Worst" = the highest share of due orders with any problem (missing, short or late), ties broken by boxes short, then by missed deliveries. If no supplier had a problem, none is highlighted. Every rate shows k/n, because "100%" from 2 orders and from 20 orders are not the same thing.

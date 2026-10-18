@@ -5,6 +5,9 @@ Plain functions over a connection, so the dashboard API and the MCP server share
 timestamp is returned as an aware datetime; callers serialize. A delivery or expected delivery
 with no reconciliation row yet is `pending` (an expected delivery before window_end + grace, or
 a delivery in the instant between its insert and its reconciliation run).
+
+Every row says whether it is simulated demo history (scripts/seed_demo_history.py), and the
+day queries take `include_simulated` so the dashboard can hide it.
 """
 
 import re
@@ -14,9 +17,10 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import and_, or_, select
+from sqlalchemy import and_, false, or_, select, true
 from sqlalchemy.ext.asyncio import AsyncConnection
 
+from app.config import SIMULATED_SOURCE
 from app.db.models import deliveries, expected_deliveries, reconciliations, ring_events
 from app.reconcile.models import DISCREPANCY_STATUSES
 from app.reconcile.store import day_bounds
@@ -61,6 +65,7 @@ def _delivery(row: dict) -> dict[str, Any]:
         "label_text": list(row["label_text"] or []),
         "confidence": row["confidence"],
         "source": row["source"],
+        "simulated": row["source"] == SIMULATED_SOURCE,
         "model_id": row["model_id"],
         "prompt_version": row["prompt_version"],
         "frames_sampled": row["frames_sampled"],
@@ -79,6 +84,7 @@ def _expected(row: dict) -> dict[str, Any]:
         "window_start": row["window_start"],
         "window_end": row["window_end"],
         "reference": row["reference"],
+        "simulated": row["simulated"],
     }
 
 
@@ -108,6 +114,7 @@ EXPECTED_COLS = (
     e.window_start,
     e.window_end,
     e.reference,
+    e.simulated,
 )
 REC_COLS = (r.status, r.reason, r.score, r.decided_at)
 
@@ -120,7 +127,22 @@ def _split(row: dict, prefix: str) -> dict:
     return {k[len(prefix) :]: v for k, v in row.items() if k.startswith(prefix)}
 
 
-async def day_deliveries(conn: AsyncConnection, day: date, tz: ZoneInfo) -> list[dict]:
+def live_delivery(include_simulated: bool):
+    """Filter on the deliveries side of a join. A missing side (outer join) passes."""
+    if include_simulated:
+        return true()
+    return or_(d.id.is_(None), d.source != SIMULATED_SOURCE)
+
+
+def live_expected(include_simulated: bool):
+    if include_simulated:
+        return true()
+    return or_(e.id.is_(None), e.simulated.is_(false()))
+
+
+async def day_deliveries(
+    conn: AsyncConnection, day: date, tz: ZoneInfo, include_simulated: bool = True
+) -> list[dict]:
     """The day's deliveries, newest first, each with its status and the order it matched."""
     start, end = day_bounds(day, tz)
     stmt = (
@@ -130,7 +152,7 @@ async def day_deliveries(conn: AsyncConnection, day: date, tz: ZoneInfo) -> list
                 expected_deliveries, e.id == r.expected_id
             )
         )
-        .where(d.detected_at >= start, d.detected_at < end)
+        .where(d.detected_at >= start, d.detected_at < end, live_delivery(include_simulated))
         .order_by(d.detected_at.desc(), d.id)
     )
     out = []
@@ -147,7 +169,9 @@ async def day_deliveries(conn: AsyncConnection, day: date, tz: ZoneInfo) -> list
     return out
 
 
-async def day_expected(conn: AsyncConnection, day: date, tz: ZoneInfo) -> list[dict]:
+async def day_expected(
+    conn: AsyncConnection, day: date, tz: ZoneInfo, include_simulated: bool = True
+) -> list[dict]:
     """The day's expected deliveries in window order, each with its status and the delivery
     that filled it (if any)."""
     start, end = day_bounds(day, tz)
@@ -158,7 +182,7 @@ async def day_expected(conn: AsyncConnection, day: date, tz: ZoneInfo) -> list[d
                 deliveries, d.id == r.delivery_id
             )
         )
-        .where(e.window_start >= start, e.window_start < end)
+        .where(e.window_start >= start, e.window_start < end, live_expected(include_simulated))
         .order_by(e.window_start, e.supplier, e.id)
     )
     out = []
@@ -175,7 +199,9 @@ async def day_expected(conn: AsyncConnection, day: date, tz: ZoneInfo) -> list[d
     return out
 
 
-async def day_discrepancies(conn: AsyncConnection, day: date, tz: ZoneInfo) -> list[dict]:
+async def day_discrepancies(
+    conn: AsyncConnection, day: date, tz: ZoneInfo, include_simulated: bool = True
+) -> list[dict]:
     """Short, over, missing and unexpected decisions touching the day, most urgent first.
 
     A row belongs to the day if either side does: same rule as reconcile_day, which batches a
@@ -195,6 +221,7 @@ async def day_discrepancies(conn: AsyncConnection, day: date, tz: ZoneInfo) -> l
             )
         )
         .where(r.status.in_(DISCREPANCY_ORDER))
+        .where(live_delivery(include_simulated), live_expected(include_simulated))
         .where(
             or_(
                 and_(d.detected_at >= start, d.detected_at < end),
@@ -209,6 +236,8 @@ async def day_discrepancies(conn: AsyncConnection, day: date, tz: ZoneInfo) -> l
         out.append(
             {
                 "id": row["id"],
+                # Both sides are simulated or neither: store.py reconciles them apart.
+                "simulated": bool(exp["simulated"]) or dl["source"] == SIMULATED_SOURCE,
                 "status": row["status"],
                 "reason": row["reason"],
                 "decided_at": row["decided_at"],

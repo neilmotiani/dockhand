@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 
 from app.auth import require_admin
 from app.ingest.queue import utcnow
-from app.ledger import metrics, queries, reset
+from app.ledger import metrics, queries, reset, suppliers
 from app.reconcile.cost import ReconcileConfig
 from app.reconcile.store import business_day, day_bounds
 
@@ -50,29 +50,36 @@ def _envelope(day: date, tz: ZoneInfo, **body) -> dict:
 
 
 DateQuery = Query(default=None, alias="date", description="YYYY-MM-DD; default today")
+SimQuery = Query(default=True, description="Include simulated demo history")
 
 
 @router.get("/v1/deliveries")
-async def list_deliveries(request: Request, day: date | None = DateQuery) -> dict:
+async def list_deliveries(
+    request: Request, day: date | None = DateQuery, include_simulated: bool = SimQuery
+) -> dict:
     day, tz = _day(request, day)
     async with request.app.state.engine.connect() as conn:
-        rows = await queries.day_deliveries(conn, day, tz)
+        rows = await queries.day_deliveries(conn, day, tz, include_simulated)
     return _envelope(day, tz, deliveries=rows)
 
 
 @router.get("/v1/expected")
-async def list_expected(request: Request, day: date | None = DateQuery) -> dict:
+async def list_expected(
+    request: Request, day: date | None = DateQuery, include_simulated: bool = SimQuery
+) -> dict:
     day, tz = _day(request, day)
     async with request.app.state.engine.connect() as conn:
-        rows = await queries.day_expected(conn, day, tz)
+        rows = await queries.day_expected(conn, day, tz, include_simulated)
     return _envelope(day, tz, expected=rows)
 
 
 @router.get("/v1/discrepancies")
-async def list_discrepancies(request: Request, day: date | None = DateQuery) -> dict:
+async def list_discrepancies(
+    request: Request, day: date | None = DateQuery, include_simulated: bool = SimQuery
+) -> dict:
     day, tz = _day(request, day)
     async with request.app.state.engine.connect() as conn:
-        rows = await queries.day_discrepancies(conn, day, tz)
+        rows = await queries.day_discrepancies(conn, day, tz, include_simulated)
     return _envelope(day, tz, discrepancies=rows)
 
 
@@ -88,6 +95,20 @@ async def list_activity(
     async with request.app.state.engine.connect() as conn:
         rows = await queries.recent_activity(conn, start, end, limit)
     return _envelope(day, tz, events=rows)
+
+
+@router.get("/v1/suppliers")
+async def list_suppliers(
+    request: Request,
+    days: int = Query(default=30, ge=1, le=365),
+    include_simulated: bool = SimQuery,
+) -> dict:
+    """Per-supplier on-time %, short-delivery rate, missed deliveries and boxes short over the
+    last `days` business days, today included (app/ledger/suppliers.py)."""
+    today, tz = _day(request, None)
+    async with request.app.state.engine.connect() as conn:
+        body = await suppliers.supplier_stats(conn, today, tz, days, include_simulated)
+    return _envelope(today, tz, **body)
 
 
 class ResetRequest(BaseModel):

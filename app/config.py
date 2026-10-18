@@ -11,7 +11,10 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-MediaSource = Literal["ring_playground", "ring_device"]
+# `simulated` marks backfilled demo history (scripts/seed_demo_history.py). It is never a
+# capture's provenance: those are always `ring_playground` or `ring_device`.
+MediaSource = Literal["ring_playground", "ring_device", "simulated"]
+SIMULATED_SOURCE = "simulated"
 
 
 class Settings(BaseSettings):

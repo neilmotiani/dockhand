@@ -2,9 +2,24 @@ import Link from "next/link";
 
 import { formatDay, shiftDay } from "@/lib/time";
 
-/** Previous / next business day. `today` is the API's notion of today (business timezone). */
-export function DayNav({ path, date, today }: { path: string; date: string; today: string }) {
-  const href = (d: string) => (d === today ? path : `${path}?date=${d}`);
+/** Previous / next business day. `today` is the API's notion of today (business timezone).
+ * `query` holds other parameters to keep while paging (e.g. the simulated-data toggle). */
+export function DayNav({
+  path,
+  date,
+  today,
+  query = {},
+}: {
+  path: string;
+  date: string;
+  today: string;
+  query?: Record<string, string>;
+}) {
+  const href = (d: string) => {
+    const params = new URLSearchParams(d === today ? query : { date: d, ...query });
+    const qs = params.toString();
+    return qs ? `${path}?${qs}` : path;
+  };
   return (
     <div className="daynav">
       <Link className="btn btn-sm" href={href(shiftDay(date, -1))} aria-label="Previous day">
@@ -15,7 +30,7 @@ export function DayNav({ path, date, today }: { path: string; date: string; toda
         →
       </Link>
       {date !== today && (
-        <Link className="btn btn-sm" href={path}>
+        <Link className="btn btn-sm" href={href(today)}>
           Today
         </Link>
       )}

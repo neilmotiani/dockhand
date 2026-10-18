@@ -1,8 +1,9 @@
 """Reset a demo day through POST /v1/admin/reset-day, to record a clean take.
 
-Clears the day's Ring Playground deliveries (and their evidence frames), every expected
+Clears the day's Ring Playground deliveries (and their evidence frames), every real expected
 delivery whose window starts that day, and the day's pipeline events. Deliveries from a real
-Ring device are never deleted. See app/ledger/reset.py.
+Ring device and simulated history (scripts/seed_demo_history.py) are never deleted. See
+app/ledger/reset.py.
 
 Admin-only twice over: it needs ADMIN_TOKEN, and the API refuses unless it runs with
 ALLOW_DEMO_RESET=true. Without --yes it only prints what would be deleted.
@@ -47,6 +48,8 @@ def describe(res: dict) -> str:
     ]
     if res["kept_device_deliveries"]:
         lines.append(f"Kept {res['kept_device_deliveries']} deliveries from a real Ring device.")
+    if res.get("kept_simulated"):
+        lines.append(f"Kept {res['kept_simulated']} simulated history rows.")
     if res["dry_run"]:
         lines.append("Dry run: nothing was deleted. Re-run with --yes to delete.")
     return "\n".join(lines)

@@ -1,9 +1,12 @@
 """Reset one business day of demo data, so a demo can be recorded again from a clean ledger.
 
-Deletes, for the day: Playground deliveries and their evidence files, every expected delivery
-(orders belong to the day their window starts), the reconciliations touching either, and the
-day's pipeline events. Deliveries from a real Ring device (`source = ring_device`) are never
-deleted; they, and the events they came from, are kept and reconciled again.
+Deletes, for the day: Playground deliveries and their evidence files, every real expected
+delivery (orders belong to the day their window starts), the reconciliations touching either,
+and the day's pipeline events. Deliveries from a real Ring device (`source = ring_device`) are
+never deleted; they, and the events they came from, are kept and reconciled again. Simulated
+history (scripts/seed_demo_history.py: `source = simulated` deliveries and `simulated` orders)
+is kept too. It is reconciled in its own batch, so deleting real rows leaves its decisions
+unchanged.
 
 Runs in one transaction under the reconciliation advisory lock, so it can't interleave with a
 reconciliation run. It refuses while an event of the day is still queued or being processed:
@@ -22,6 +25,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import and_, delete, func, not_, or_, select, text
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+from app.config import SIMULATED_SOURCE
 from app.db.models import deliveries, expected_deliveries, reconciliations, ring_events
 from app.reconcile.cost import ReconcileConfig
 from app.reconcile.store import ADVISORY_LOCK_KEY, day_bounds, reconcile_day
@@ -45,6 +49,7 @@ class ResetResult:
     events: int
     media_dirs: int
     kept_device_deliveries: int
+    kept_simulated: int  # simulated deliveries plus simulated orders of the day
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -99,16 +104,22 @@ async def reset_day(
         )
         kept = (
             await conn.execute(
-                select(func.count()).where(in_day, not_(d.source.in_(RESETTABLE_SOURCES)))
+                select(func.count()).where(
+                    in_day,
+                    not_(d.source.in_(RESETTABLE_SOURCES)),
+                    d.source != SIMULATED_SOURCE,
+                )
             )
         ).scalar_one()
+        e_day = and_(e.window_start >= start, e.window_start < end)
         e_ids: list[uuid.UUID] = list(
-            (
-                await conn.execute(
-                    select(e.id).where(e.window_start >= start, e.window_start < end)
-                )
-            ).scalars()
+            (await conn.execute(select(e.id).where(e_day, e.simulated.is_(False)))).scalars()
         )
+        kept_sim = (
+            await conn.execute(select(func.count()).where(in_day, d.source == SIMULATED_SOURCE))
+        ).scalar_one() + (
+            await conn.execute(select(func.count()).where(e_day, e.simulated.is_(True)))
+        ).scalar_one()
         touching = or_(r.delivery_id.in_(d_ids), r.expected_id.in_(e_ids))
         n_recs = (await conn.execute(select(func.count()).where(touching))).scalar_one()
         # Events of the day, except those a kept (device) delivery still points at.
@@ -138,6 +149,7 @@ async def reset_day(
         events=n_events,
         media_dirs=media_dirs,
         kept_device_deliveries=kept,
+        kept_simulated=kept_sim,
     )
     log.info("reset day %s: %s", day, result)
     return result
