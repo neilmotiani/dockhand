@@ -102,6 +102,31 @@ class Settings(BaseSettings):
     reconcile_max_offset_hours: float = 8.0
     reconcile_count_cost_weight: float = 0.5
 
+    # MCP server (mcp_server/, Streamable HTTP). It refuses to start without MCP_TOKEN: every
+    # request must carry `Authorization: Bearer $MCP_TOKEN`.
+    mcp_token: SecretStr | None = None
+    # Public base URL of the MCP server. Snapshot links in tool results point here, so a screen
+    # device (or the dashboard's browser) can load them without any token.
+    mcp_public_url: str = "http://localhost:8020"
+    # HMAC key for those signed, expiring snapshot links. Unset: derived from MCP_TOKEN.
+    mcp_media_key: SecretStr | None = None
+    mcp_media_ttl_s: int = 3600
+    # DNS-rebinding protection (MCP spec: servers MUST validate Origin). The host of
+    # MCP_PUBLIC_URL is always allowed. No browser talks to the MCP server directly (the
+    # assistant runs server-side), so by default any request with an Origin header is refused.
+    mcp_allowed_hosts: list[str] = ["localhost:*", "127.0.0.1:*"]
+    mcp_allowed_origins: list[str] = []
+    # Tools answer from the whole ledger, simulated demo history included, and say so.
+    mcp_include_simulated: bool = True
+    mcp_rate_limit_per_min: int = 120  # tool calls per minute, all clients together
+
+    # Assistant (app/assistant/): a Bedrock tool-use loop that calls the MCP server over HTTP.
+    mcp_url: str = "http://localhost:8020/mcp"
+    assistant_model_id: str | None = None  # unset: BEDROCK_MODEL_ID
+    assistant_max_steps: int = 6  # model calls per turn
+    assistant_max_tokens: int = 600
+    business_name: str = ""  # optional, for the assistant's system prompt
+
     @field_validator("business_timezone")
     @classmethod
     def _known_timezone(cls, v: str) -> str:
@@ -118,6 +143,9 @@ class Settings(BaseSettings):
         "ring_webhook_secret",
         "aws_bearer_token_bedrock",
         "admin_token",
+        "mcp_token",
+        "mcp_media_key",
+        "assistant_model_id",
         "capture_reference_dir",
         mode="before",
     )

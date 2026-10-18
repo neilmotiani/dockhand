@@ -24,13 +24,40 @@ services:
         required: false
     environment:
       DATABASE_URL: postgresql+asyncpg://dockhand:dockhand@db:5432/dockhand
+      # The assistant reaches the MCP server over the Compose network.
+      MCP_URL: http://mcp:8020/mcp
     ports:
       # Host port 8010: 8000 is commonly taken by other local projects. The dashboard (web/)
       # runs on 3010 for the same reason.
       - "8010:8000"
+    volumes:
+      - media:/srv/data/media
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # MCP server (Streamable HTTP, /mcp). Needs MCP_TOKEN in .env. It reads the same ledger and
+  # serves snapshots from the shared media volume through signed links.
+  mcp:
+    build: .
+    command:
+      ["uv", "run", "--no-dev", "uvicorn", "--factory", "mcp_server.server:create_app",
+       "--host", "0.0.0.0", "--port", "8020"]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+asyncpg://dockhand:dockhand@db:5432/dockhand
+      MCP_PUBLIC_URL: http://localhost:8020
+      MCP_ALLOWED_HOSTS: '["localhost:*","127.0.0.1:*","mcp:8020"]'
+    ports:
+      - "8020:8020"
+    volumes:
+      - media:/srv/data/media
     depends_on:
       db:
         condition: service_healthy
 
 volumes:
   pgdata:
+  media:

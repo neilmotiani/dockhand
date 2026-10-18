@@ -175,6 +175,13 @@ async def day_expected(
     """The day's expected deliveries in window order, each with its status and the delivery
     that filled it (if any)."""
     start, end = day_bounds(day, tz)
+    return await expected_with_status(
+        conn, e.window_start >= start, e.window_start < end, live_expected(include_simulated)
+    )
+
+
+async def expected_with_status(conn: AsyncConnection, *where) -> list[dict]:
+    """Expected deliveries matching `where`, in window order, joined with their status."""
     stmt = (
         select(*_labelled(EXPECTED_COLS, "e_"), *_labelled(DELIVERY_COLS, "d_"), *REC_COLS)
         .select_from(
@@ -182,7 +189,7 @@ async def day_expected(
                 deliveries, d.id == r.delivery_id
             )
         )
-        .where(e.window_start >= start, e.window_start < end, live_expected(include_simulated))
+        .where(*where)
         .order_by(e.window_start, e.supplier, e.id)
     )
     out = []
@@ -197,6 +204,12 @@ async def day_expected(
             }
         )
     return out
+
+
+async def supplier_names(conn: AsyncConnection, include_simulated: bool = True) -> list[str]:
+    """Distinct supplier names on any order, for resolving a spoken or misspelled name."""
+    stmt = select(e.supplier).where(live_expected(include_simulated)).distinct()
+    return sorted({row.strip() for row in (await conn.execute(stmt)).scalars()})
 
 
 async def day_discrepancies(

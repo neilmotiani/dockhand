@@ -9,6 +9,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
 COPY app ./app
+COPY mcp_server ./mcp_server
 # Committed eval and bench results, served by GET /v1/metrics.
 COPY eval/results ./eval/results
 COPY bench/results ./bench/results

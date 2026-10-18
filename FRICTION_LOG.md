@@ -141,3 +141,43 @@ Format per entry: task, steps, expected vs. actual, severity, workaround, sugges
 - **Severity:** Low for this project (we use Playground tokens). For a partner implementing the token exchange, the 60-second figure is the one to design for, but the docs don't say which is right.
 - **Workaround:** None needed yet. When the OAuth provider is built, exchange the code immediately on receipt.
 - **Suggestion:** Use one value in every token table.
+
+## 2026-10-18 · MCP Python SDK answers an unknown tool with a tool result, not a protocol error
+
+- **Task:** MCP server on the official Python SDK (`mcp` 2.3.0, `MCPServer`), checked against the 2025-11-25 spec.
+- **Steps:** `tools/call` with `"name": "nope"` over Streamable HTTP.
+- **Expected:** A JSON-RPC error. The spec's tools page lists "Unknown tools" under protocol errors, and its example is `{"code": -32602, "message": "Unknown tool: invalid_tool_name"}`.
+- **Actual:** `200` with `result: {"content": [{"type": "text", "text": "Unknown tool: nope"}], "isError": true}`.
+- **Severity:** Low. Clients still see a failure, but a conformance check against the spec text fails.
+- **Workaround:** A server middleware checks the tool name before dispatch and raises `MCPError(INVALID_PARAMS, "Unknown tool: …")` (`mcp_server/server.py`).
+- **Suggestion:** Return `-32602` for unknown tools by default, or say in the SDK docs why it differs from the spec.
+
+## 2026-10-18 · Stateless Streamable HTTP: GET opens a stream that can never carry a message
+
+- **Task:** Same server, `streamable_http_app(stateless_http=True, json_response=True)`.
+- **Steps:** `GET /mcp` with `Accept: text/event-stream` from an httpx ASGI client.
+- **Expected:** `405 Method Not Allowed`. The transport spec allows that for a server that offers no SSE stream, and a stateless server has no session for a stream to belong to.
+- **Actual:** The request didn't complete within 120 s; the probe script had to be killed.
+- **Severity:** Low. It ties up a connection per GET and hangs naive tests.
+- **Workaround:** An ASGI wrapper answers GET and DELETE on `/mcp` with 405 (after the bearer-token check).
+- **Suggestion:** Default to 405 for GET in stateless mode.
+
+## 2026-10-18 · Bad MCP-Protocol-Version: right status, misleading message
+
+- **Task:** Conformance test for "an invalid or unsupported MCP-Protocol-Version MUST get 400 Bad Request".
+- **Steps:** `tools/list` with `MCP-Protocol-Version: 1999-01-01`.
+- **Expected:** `400` naming the unsupported version.
+- **Actual:** `400` (correct), with `"params._meta must be an object carrying the required 'io.modelcontextprotocol/protocolVersion' and 'io.modelcontextprotocol/clientCapabilities' envelope keys"`. That message is about the 2026-07-28 per-request envelope, which a 2025-11-25 client has never heard of.
+- **Severity:** Low (debugging time).
+- **Workaround:** None needed.
+- **Suggestion:** Say "unsupported MCP-Protocol-Version '1999-01-01'; supported: …" when the header names no known version.
+
+## 2026-10-18 · MCP conformance suite can't test a server that requires a bearer token
+
+- **Task:** Run `@modelcontextprotocol/conformance` 0.1.16 (`conformance server --url …`) against the Dockhand MCP server, which requires `Authorization: Bearer`.
+- **Steps:** `npx @modelcontextprotocol/conformance server --help`.
+- **Expected:** An option to pass a header or token.
+- **Actual:** Options are `--url`, `--scenario`, `--suite`, `--expected-failures`, `--output-dir`, `--spec-version`, `--verbose`; every request goes out unauthenticated. Many scenarios also need the suite's own fixture tools (`test_simple_text`, `json_schema_2020_12_tool`, …), so an application server fails them by design.
+- **Severity:** Medium for anyone who follows the spec's "SHOULD implement proper authentication".
+- **Workaround:** `scripts/mcp_conformance.py` serves the real app on 127.0.0.1 behind a wrapper that adds the token, and runs only the scenarios that test a server's own surface.
+- **Suggestion:** A `--header` option, and a tag on scenarios that need the fixture server.

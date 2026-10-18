@@ -1,0 +1,59 @@
+{
+  "suite": "@modelcontextprotocol/conformance@0.1.16",
+  "spec_version": "2025-11-25",
+  "run_at": "2026-10-18T21:55:36+00:00",
+  "scenarios": [
+    {
+      "scenario": "server-initialize",
+      "exit_code": 0,
+      "checks": [
+        {
+          "id": "server-initialize",
+          "status": "SUCCESS"
+        }
+      ],
+      "stdout_tail": null
+    },
+    {
+      "scenario": "ping",
+      "exit_code": 0,
+      "checks": [
+        {
+          "id": "ping",
+          "status": "SUCCESS"
+        }
+      ],
+      "stdout_tail": null
+    },
+    {
+      "scenario": "tools-list",
+      "exit_code": 0,
+      "checks": [
+        {
+          "id": "tools-list",
+          "status": "SUCCESS"
+        }
+      ],
+      "stdout_tail": null
+    },
+    {
+      "scenario": "dns-rebinding-protection",
+      "exit_code": 0,
+      "checks": [
+        {
+          "id": "localhost-host-rebinding-rejected",
+          "status": "SUCCESS"
+        },
+        {
+          "id": "localhost-host-valid-accepted",
+          "status": "SUCCESS"
+        }
+      ],
+      "stdout_tail": null
+    }
+  ],
+  "checks_total": 5,
+  "checks_passed": 5,
+  "checks_failed": 0,
+  "checks_other": 0
+}
