@@ -6,6 +6,7 @@
     "dev": "next dev --port 3010",
     "build": "next build",
     "start": "next start --port 3010",
+    "start:demo": "NEXT_DIST_DIR=.next-demo next build && NEXT_DIST_DIR=.next-demo next start --port 3011",
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "next typegen && tsc --noEmit",

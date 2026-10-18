@@ -1,4 +1,4 @@
-"""Backfill the past 21 days with simulated deliveries, so the dashboard has history to show.
+"""Backfill the past 21 days, and today so far, with simulated deliveries for the dashboard.
 
 Everything written here is synthetic and tagged as such: deliveries get `source = 'simulated'`
 (never `ring_playground` or `ring_device`) and orders get `simulated = true`. The dashboard
@@ -11,6 +11,12 @@ uses: most orders match, a handful are short, late or missing, and the odd unexp
 turns up. US Foods is deliberately less reliable than the rest, so the Suppliers page has
 something to point at. Each day is generated from its own seed (derived from --seed and the
 date), so a given date always gets the same deliveries, whichever day the script runs on.
+
+Today is filled up to the moment the script runs, so the Today page looks like a business day
+in progress: deliveries detected before now, and orders whose window has started (or whose
+delivery has already arrived). Orders still inside their window come out `pending`, as real
+ones would. Rerunning later in the day adds what has "happened" since. Pass --no-today to
+seed past days only.
 
 Safe to rerun: one transaction deletes every simulated row (and its reconciliations and
 snapshot folder) and inserts the fresh set, then each day is reconciled. Real rows are never
@@ -25,6 +31,7 @@ the rows are written without snapshots.
 Usage:
     uv run python -m scripts.seed_demo_history
     uv run python -m scripts.seed_demo_history --days 21 --seed 2027
+    uv run python -m scripts.seed_demo_history --no-today
 """
 
 import argparse
@@ -80,13 +87,15 @@ DEMO_SUPPLIERS = [
 
 @dataclass
 class SeedResult:
-    days: int
+    days: int  # past days, today not included
     expected: int
     deliveries: int
     snapshots: int
     replaced_expected: int
     replaced_deliveries: int
     statuses: dict[str, int] = field(default_factory=dict)
+    today_expected: int = 0
+    today_deliveries: int = 0
 
 
 def day_seed(seed: int, day: date) -> int:
@@ -112,6 +121,29 @@ def _local(t: datetime, tz: ZoneInfo) -> datetime:
     # eval/simulate.py writes local clock times as UTC-aware datetimes; pin them to the business
     # timezone instead.
     return t.replace(tzinfo=None).replace(tzinfo=tz)
+
+
+def until(day: Day, cutoff: datetime, tz: ZoneInfo) -> Day:
+    """The part of a simulated day that has happened by `cutoff`: deliveries detected before
+    it, and orders whose window started before it or whose delivery is kept. Keeping the
+    order of an early delivery avoids a made-up `unexpected` for a delivery whose order would
+    otherwise be cut."""
+    kept_d = {x.id for x in day.deliveries if _local(x.detected_at, tz) < cutoff}
+    with_delivery = {t.expected_id for t in day.truth if t.delivery_id in kept_d}
+    kept_e = {
+        x.id for x in day.expected if _local(x.window_start, tz) < cutoff or x.id in with_delivery
+    }
+    return Day(
+        day.day,
+        expected=[x for x in day.expected if x.id in kept_e],
+        deliveries=[x for x in day.deliveries if x.id in kept_d],
+        truth=[
+            t
+            for t in day.truth
+            if (t.expected_id is None or t.expected_id in kept_e)
+            and (t.delivery_id is None or t.delivery_id in kept_d)
+        ],
+    )
 
 
 @dataclass(frozen=True)
@@ -179,9 +211,14 @@ async def seed_history(
     n_days: int = DEFAULT_DAYS,
     seed: int = DEFAULT_SEED,
     composites: list[Composite] | None = None,
+    include_today: bool = True,
 ) -> SeedResult:
-    """Replace all simulated rows with `n_days` simulated days ending yesterday."""
+    """Replace all simulated rows with `n_days` simulated days ending yesterday, plus today
+    up to `now` unless `include_today` is false."""
     days = simulate_days(today - timedelta(days=n_days), n_days, seed)
+    past = len(days)
+    if include_today:
+        days.append(until(simulate_days(today, 1, seed)[0], now, tz))
     composites = composites or []
 
     exp_rows, del_rows, snapshots = [], [], {}
@@ -254,8 +291,11 @@ async def seed_history(
             if rec.delivery_id in sim_ids or rec.expected_id in sim_ids
         )
 
+    today_day = days[past] if include_today else None
     return SeedResult(
-        days=len(days),
+        days=past,
+        today_expected=len(today_day.expected) if today_day else 0,
+        today_deliveries=len(today_day.deliveries) if today_day else 0,
         expected=len(exp_rows),
         deliveries=len(del_rows),
         snapshots=len(snapshots),
@@ -265,7 +305,7 @@ async def seed_history(
     )
 
 
-async def _main(n_days: int, seed: int) -> SeedResult:
+async def _main(n_days: int, seed: int, include_today: bool) -> SeedResult:
     settings = get_settings()
     tz = ZoneInfo(settings.business_timezone)
     now = utcnow()
@@ -288,6 +328,7 @@ async def _main(n_days: int, seed: int) -> SeedResult:
             n_days=n_days,
             seed=seed,
             composites=composites,
+            include_today=include_today,
         )
     finally:
         await engine.dispose()
@@ -297,19 +338,28 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--days", type=int, default=DEFAULT_DAYS, help="days before today to fill")
     p.add_argument("--seed", type=int, default=DEFAULT_SEED)
+    p.add_argument(
+        "--no-today", dest="today", action="store_false", help="past days only, nothing today"
+    )
     args = p.parse_args()
     if args.days < 1:
         p.error("--days must be at least 1")
-    res = asyncio.run(_main(args.days, args.seed))
+    res = asyncio.run(_main(args.days, args.seed, args.today))
     if res.replaced_deliveries or res.replaced_expected:
         print(
             f"Replaced {res.replaced_expected} simulated orders and "
             f"{res.replaced_deliveries} simulated deliveries."
         )
     print(
-        f"Seeded {res.days} days: {res.expected} orders, {res.deliveries} deliveries "
-        f"({res.snapshots} with a snapshot)."
+        f"Seeded {res.days} past days and {'today so far' if args.today else 'nothing today'}: "
+        f"{res.expected} orders, {res.deliveries} deliveries ({res.snapshots} with a snapshot)."
     )
+    if args.today:
+        e, d = res.today_expected, res.today_deliveries
+        print(
+            f"Today so far: {e} order{'' if e == 1 else 's'}, "
+            f"{d} deliver{'y' if d == 1 else 'ies'}."
+        )
     print("Statuses: " + ", ".join(f"{k} {v}" for k, v in res.statuses.items()))
 
 

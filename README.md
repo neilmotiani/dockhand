@@ -54,11 +54,14 @@ The reset needs `ADMIN_TOKEN` and `ALLOW_DEMO_RESET=true` on the API (off by def
 
 ### Simulated demo history
 
-A dashboard with one day of Playground deliveries has nothing to compare against, so the past 21 days can be backfilled with simulated deliveries:
+A dashboard with one day of Playground deliveries has nothing to compare against, so the past 21 days, and today up to the current time, can be filled with simulated deliveries:
 
 ```sh
-uv run python -m scripts.seed_demo_history     # safe to rerun: replaces the simulated rows only
+uv run python -m scripts.seed_demo_history             # safe to rerun: replaces the simulated rows only
+uv run python -m scripts.seed_demo_history --no-today  # past days only
 ```
+
+Today gets the deliveries "seen" before now and the orders whose window has started (or whose delivery already arrived), so the Today page looks like a business day in progress. Orders still inside their window show as pending. Rerun later in the day to add what has happened since. Weekends are quiet: on Saturday only the bakery delivers.
 
 It uses `eval/simulate.py` with five suppliers (Sysco, US Foods, Daybreak Bakery, Ridgeline Roasters, Amazon Business) on realistic schedules. Most orders match; a handful are short, late or missing, plus the odd unexpected parcel, and US Foods is set up to be the least reliable. Every row is stored as `source = simulated` (orders as `simulated = true`), never as Ring footage. The dashboard badges each one **Simulated**, and Today, Discrepancies and Suppliers have a **Show simulated data** toggle (on by default). Simulated rows are reconciled in their own batch, so they never pair with a real delivery or order, and their dispute summaries say they are not real.
 
@@ -69,6 +72,8 @@ Simulated history feeds no metric. The README numbers and the How it works page 
 Ring Playground tokens last 30 minutes (from the token's own `iat`/`exp`). Paste a new one into `RING_ACCESS_TOKEN` in `.env`. The API re-reads it on every Ring call, so there's no restart.
 
 The admin token stays on the dashboard's server. Pages fetch from the API in server components, writes go through server actions, and images go through a proxy route that forwards only evidence paths. Read endpoints, all admin-only: `GET /v1/deliveries`, `/v1/expected`, `/v1/discrepancies`, `/v1/activity` (each takes `?date=YYYY-MM-DD`, default today in `BUSINESS_TIMEZONE`; the first three also take `?include_simulated=false`), `/v1/suppliers?days=30`, `/v1/metrics`, and `/v1/deliveries/{id}/snapshot|frames/{rank}|clip`.
+
+For screen recordings, `npm run start:demo` (in `web/`) serves a production build on port 3011 without the Next.js dev indicator. It builds into `web/.next-demo/`, so it can run next to `npm run dev` without disturbing it.
 
 Checks: `npm run lint`, `npm run typecheck`, `npm test`, `npm run format:check` (all run in CI).
 
