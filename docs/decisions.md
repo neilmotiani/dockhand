@@ -202,3 +202,41 @@ The seed (2027) was chosen by looking at a few seeds for a mix that contains eve
 ## Supplier reliability: definitions
 
 On-time % = orders delivered by the window end / orders due, so a missed order counts against it. Short rate = short deliveries / delivered orders. Orders still inside window plus grace are left out of every rate. "Worst" = the highest share of due orders with any problem (missing, short or late), ties broken by boxes short, then by missed deliveries. If no supplier had a problem, none is highlighted. Every rate shows k/n, because "100%" from 2 orders and from 20 orders are not the same thing.
+
+## MCP server: a separate process over the same ledger
+
+`mcp_server/` is its own service (port 8020), not a router on the API. It shares the read queries (`app/ledger/queries.py`, `suppliers.py`) and the one write path for orders (`app/reconcile/expected.py`, also behind `POST /v1/expected`), so a tool and a dashboard page can't disagree. A separate process keeps the MCP surface, its token and its rate limit independent of the operator API, and it is what an Alexa+ integration would point at.
+
+The SDK is `mcp` 2.x (2.3.0), the official Python SDK. Its `MCPServer` negotiates 2025-11-25 through the initialize handshake (and the older handshake versions), and also speaks 2026-07-28. The assistant pins the handshake (`mode="legacy"`), so every session we test negotiates 2025-11-25, the revision this project targets.
+
+## MCP transport: stateless, JSON responses, GET/DELETE 405
+
+No tool streams progress, asks the client anything or sends notifications, so the server runs the SDK in stateless mode with `application/json` responses. No `MCP-Session-Id` is issued (the spec says a server MAY assign one). A restart or a second replica loses nothing, and every request can be checked on its own. GET (open an SSE stream) and DELETE (end a session) are answered 405, which the transport spec allows for both. Without that, the SDK's stateless GET held a connection open that could never carry a message.
+
+## MCP auth: a static bearer token, not OAuth
+
+MCP authorization is OPTIONAL in 2025-11-25. When it is used over HTTP, the spec's OAuth 2.1 flow needs an authorization server plus Protected Resource Metadata whose `authorization_servers` list must name one. Dockhand has a single client (its own assistant, and later an Alexa skill backend), so a pre-shared `MCP_TOKEN` is enough. It is sent as `Authorization: Bearer` on every request, compared in constant time, never accepted in a query string, and answered with `401` plus `WWW-Authenticate: Bearer` when missing or wrong. The server refuses to start without one. We don't serve a Protected Resource Metadata document, because there is no authorization server to put in it. If a third-party client ever needs access, that is when to add OAuth.
+
+## MCP results: a summary to say, cards to show, rows to reason over
+
+Each tool returns `structuredContent` with an `outputSchema`. `summary` is one to three sentences written to be spoken. `cards` hold title, status, facts and a snapshot URL for a screen device. Compact typed rows (no file paths, no pipeline internals) are what the model reasons over. `content` carries the summary, the same JSON serialized (the spec says a tool returning structured content SHOULD), and a `resource_link` per snapshot. Bad arguments are tool execution errors (`isError: true`) so the model can retry; unknown tool names are JSON-RPC `-32602`, as the tools page says. The SDK alone would answer an unknown tool with `isError`, so a small middleware checks the name first.
+
+Speech recognition writes "Cisco" for Sysco, so supplier names are resolved against known suppliers: letters-and-digits containment first, then `difflib` similarity (cutoff 0.6). The tool says which supplier it resolved to (`matched_supplier`).
+
+## MCP snapshots: signed, expiring URLs
+
+A screen device loads a card image by URL and can't add a header, and the MCP token must never sit in a URL. The MCP server therefore serves `/media/deliveries/{id}/snapshot?exp=…&sig=…`, where `sig` is an HMAC-SHA256 over (delivery ID, kind, expiry). The key is `MCP_MEDIA_KEY`, or one derived from `MCP_TOKEN`. A link names one file, stops working after `MCP_MEDIA_TTL_S` (default 1 h), and only serves files under `MEDIA_DIR`. In Compose, the API and MCP containers share a `media` volume for this.
+
+## add_expected_delivery: idempotent by construction
+
+The order ID is `uuid5` of (supplier, carrier, count, window start, window end, reference), so a model retrying a call, or a user repeating the request, adds the order once (`created: false` the second time). The cost is that two genuinely identical orders in the same window can't both be added by voice; the dashboard form can still do it. Times are taken as local times on a business day ("07:00", "7 AM") rather than ISO timestamps, so the model never has to work out UTC offsets.
+
+## Assistant: Bedrock tool loop as a real MCP client, confirmation before writes
+
+`POST /v1/assistant/turn` runs Converse with the tools from the MCP server's `tools/list`, and calls them with `tools/call` over Streamable HTTP. It doesn't import the tool functions, so the demo exercises the same protocol path an external client would. Tool schemas are lightly rewritten for Bedrock (`$ref` inlined, `anyOf [X, null]` reduced to X), because some models reject `$defs` and null unions. The model is `ASSISTANT_MODEL_ID`, or `BEDROCK_MODEL_ID` (Nova Pro) by default.
+
+The MCP spec says clients SHOULD keep a human in the loop. Any tool whose annotations don't mark it read-only pauses the turn: the API returns `pending` with a question built from the arguments (not from model prose), and the page asks for Confirm/Cancel or a spoken "yes"/"no". All tool uses in that model message run only after the answer, because Converse expects every result of one message together. The conversation is held by the page and sent back each turn (a stateless API, like the MCP server). A forged history would grant nothing the dashboard form doesn't already allow.
+
+## Assistant page: browser speech, server-side everything else
+
+Push-to-talk uses the Web Speech API (`webkitSpeechRecognition` in Chrome and Safari) and replies use `speechSynthesis`. Both are free, need no keys, and are good enough to simulate a voice device. Typing is always available, and it is the only input where recognition isn't supported. The browser talks only to the dashboard server (a server action), which calls the API with the admin token. Card images are the MCP server's signed URLs, the same links a screen device would get. The MCP activity panel shows each `tools/list` and `tools/call` with its arguments, timing and `structuredContent`.

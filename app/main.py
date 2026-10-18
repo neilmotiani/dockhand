@@ -4,12 +4,14 @@ import logging
 from collections.abc import AsyncIterator
 from datetime import timedelta
 from pathlib import Path
+from typing import Any
 from zoneinfo import ZoneInfo
 
 import httpx
 from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+from app.assistant.api import router as assistant_router
 from app.config import Settings, get_settings
 from app.db.session import init_db, make_engine
 from app.ingest.api import router as ingest_router
@@ -43,6 +45,7 @@ def create_app(
     processor: Processor | None = None,
     start_background: bool = True,
     token_env_file: Path | None = Path(".env"),
+    assistant: Any = None,
 ) -> FastAPI:
     """Build the API. Without a `processor`, events run through the real pipeline (WHEP
     capture + Bedrock). Tests pass their own engine and processor and turn off the background
@@ -102,9 +105,12 @@ def create_app(
 
     app = FastAPI(title="Dockhand", lifespan=lifespan)
     app.state.settings = settings
+    # Built on first use (app/assistant/api.py) unless a test passes one in.
+    app.state.assistant = assistant
     app.include_router(ingest_router)
     app.include_router(expected_router)
     app.include_router(ledger_router)
+    app.include_router(assistant_router)
 
     @app.get("/healthz")
     async def healthz() -> dict[str, str]:

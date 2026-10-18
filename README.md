@@ -13,7 +13,7 @@ cp .env.example .env        # fill in tokens; set ADMIN_TOKEN
 uv sync                     # install dependencies
 uv run pytest               # tests
 uv run ruff check .         # lint
-docker compose up --build   # Postgres (host port 55432) + API on http://localhost:8010
+docker compose up --build   # Postgres (host port 55432), API on :8010, MCP server on :8020
 ```
 
 Run the API and dashboard locally (two terminals):
@@ -30,7 +30,7 @@ npm run dev                 # http://localhost:3010
 
 ## Dashboard
 
-`web/` is a Next.js + TypeScript app on port 3010 with five pages:
+`web/` is a Next.js + TypeScript app on port 3010 with six pages (the Assistant is described under [MCP server and voice assistant](#mcp-server-and-voice-assistant-alexa-path)):
 
 - **Today:** the live delivery ledger (snapshot, time, carrier, box count, status, and the reason for it). It refreshes every 3 s. Events still being captured appear as `pending` rows, and the activity list says why an event produced no delivery (no packages, stale, Ring auth).
 - **Expected:** add an order (supplier, carrier, box count, time window, PO) and see today's orders with their status. Times are entered in `BUSINESS_TIMEZONE` (an IANA name such as `America/New_York`; it also sets the business day and every time shown, reasons included).
@@ -76,6 +76,29 @@ The admin token stays on the dashboard's server. Pages fetch from the API in ser
 For screen recordings, `npm run start:demo` (in `web/`) serves a production build on port 3011 without the Next.js dev indicator. It builds into `web/.next-demo/`, so it can run next to `npm run dev` without disturbing it.
 
 Checks: `npm run lint`, `npm run typecheck`, `npm test`, `npm run format:check` (all run in CI).
+
+## MCP server and voice assistant (Alexa+ path)
+
+`mcp_server/` exposes the ledger as MCP tools over Streamable HTTP (spec 2025-11-25, official Python SDK `mcp` 2.x) at `http://localhost:8020/mcp`:
+
+| Tool | What it answers |
+|---|---|
+| `get_todays_deliveries(date?)` | The day's deliveries with status, plus orders still pending or missing |
+| `check_delivery(supplier \| reference, date?)` | Did it come? Status, time, box count, snapshot. Misheard names ("Cisco") resolve to known suppliers |
+| `list_discrepancies(start_date?, end_date?)` | Short, over, missing and unexpected deliveries with reasons (up to 31 days) |
+| `add_expected_delivery(supplier, count, date, window_start, window_end, carrier?, reference?)` | Adds an order; repeating the call adds it once |
+| `get_supplier_scorecard(supplier?, days?)` | On time, short, boxes short and missed per supplier; who shorts you the most |
+
+Every result has a `summary` written to be spoken, `cards` for a screen (status, facts and a signed snapshot URL that expires after an hour), typed rows, and `includes_simulated` when demo history is in the answer. Requests need `Authorization: Bearer $MCP_TOKEN`; the server won't start without one.
+
+```sh
+# MCP_TOKEN=... in .env (any long random string), then:
+uv run uvicorn --factory mcp_server.server:create_app --port 8020
+```
+
+The **Assistant** page (`/assistant`) simulates an Alexa+ device. Hold the mic button (or type), and `POST /v1/assistant/turn` runs a Bedrock Converse tool-use loop (`BEDROCK_MODEL_ID` by default) that calls the MCP server as an ordinary MCP client. The reply is spoken with the browser's speech synthesis, with cards and snapshots below it. Adding an order always stops for **Confirm** or a spoken "yes". A collapsible panel lists every `tools/list` and `tools/call` with arguments, timing and the raw `structuredContent`. Voice input needs a browser with the Web Speech API (Chrome, Edge, Safari); typing works everywhere.
+
+Conformance: `tests/test_mcp_protocol.py` checks the wire behaviour against the spec text (handshake, 202 for notifications, `-32602` for unknown tools, `isError` for bad arguments, 401 with `WWW-Authenticate`, 403 on a bad Origin, 400 on a bad `MCP-Protocol-Version`, 405 for GET and DELETE). `uv run python -m scripts.mcp_conformance` runs the official suite (`@modelcontextprotocol/conformance` 0.1.16) against a live server. Last run (`bench/results/mcp_conformance.json`): 5 of 5 checks passed across the 4 scenarios that test a server's own surface (`server-initialize`, `ping`, `tools-list`, `dns-rebinding-protection`). The other scenarios call the suite's own fixture tools, which Dockhand doesn't define. Design notes are in `docs/decisions.md`.
 
 ## Ingest pipeline
 
