@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { pct, sortRows } from "../suppliers";
+import { pct, problemCounts, sortRows } from "../suppliers";
 import type { SupplierRow } from "../types";
 
 function row(supplier: string, over: Partial<SupplierRow> = {}): SupplierRow {
@@ -26,10 +26,31 @@ function row(supplier: string, over: Partial<SupplierRow> = {}): SupplierRow {
 }
 
 describe("pct", () => {
-  it("shows k/n and never rounds up", () => {
-    expect(pct({ value: 0.6667, k: 2, n: 3 })).toBe("66.6% (2/3)");
+  it("rounds to one decimal and shows k/n", () => {
+    expect(pct({ value: 0.6667, k: 2, n: 3 })).toBe("66.7% (2/3)");
+    expect(pct({ value: 0.3333, k: 1, n: 3 })).toBe("33.3% (1/3)");
+    expect(pct({ value: 0.7778, k: 14, n: 18 })).toBe("77.8% (14/18)");
+    expect(pct({ value: 0.625, k: 5, n: 8 })).toBe("62.5% (5/8)");
+    // Exact halves at the second decimal round up: 1/16 = 6.25%.
+    expect(pct({ value: 0.0625, k: 1, n: 16 })).toBe("6.3% (1/16)");
     expect(pct({ value: 1, k: 8, n: 8 })).toBe("100.0% (8/8)");
+    expect(pct({ value: 0, k: 0, n: 4 })).toBe("0.0% (0/4)");
     expect(pct({ value: null, k: 0, n: 0 })).toBe("–");
+  });
+});
+
+describe("problemCounts", () => {
+  it("lists every count, zeros included", () => {
+    const r = row("US Foods", {
+      short_rate: { value: 0.6667, k: 4, n: 6 },
+      missed: 2,
+      late: 1,
+      boxes_short: 11,
+    });
+    expect(problemCounts(r)).toBe("4 short, 2 missed, 1 late, 11 boxes short");
+    expect(problemCounts(row("Sysco", { boxes_short: 1 }))).toBe(
+      "0 short, 0 missed, 0 late, 1 box short",
+    );
   });
 });
 

@@ -3,7 +3,7 @@ import { SimToggle } from "@/components/SimToggle";
 import { SupplierTable } from "@/components/SupplierTable";
 import { apiGet, withQuery } from "@/lib/api";
 import { showSimulated, simApiQuery, simPageQuery, toggleHref } from "@/lib/sim";
-import { pct } from "@/lib/suppliers";
+import { pct, problemCounts } from "@/lib/suppliers";
 import { formatDay } from "@/lib/time";
 import type { Day, Suppliers } from "@/lib/types";
 
@@ -45,12 +45,9 @@ export default async function SuppliersPage({ searchParams }: PageProps<"/suppli
 
       {worst && (
         <div className="worst-callout">
-          <strong>{worst.supplier}</strong> had the most problems: {worst.problem_rate.k} of{" "}
-          {worst.due} orders due were missing, short or late
-          {worst.boxes_short > 0
-            ? `, ${worst.boxes_short} box${worst.boxes_short === 1 ? "" : "es"} short in total`
-            : ""}
-          . On time {pct(worst.on_time)}.
+          <strong>{worst.supplier}</strong> had the most problems: {problemCounts(worst)} (
+          {worst.problem_rate.k} of {worst.due} orders due had a problem). On time{" "}
+          {pct(worst.on_time)}.
         </div>
       )}
 

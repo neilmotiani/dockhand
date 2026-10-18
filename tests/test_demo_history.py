@@ -12,6 +12,8 @@ from sqlalchemy import func, select, text, update
 from app.db.models import deliveries, expected_deliveries, reconciliations
 from app.db.session import init_db
 from app.reconcile.cost import ReconcileConfig
+from app.reconcile.models import DetectedDelivery, ExpectedDelivery, Status
+from eval.simulate import Day, TruthRow
 from scripts.seed_demo_history import (
     DEMO_SUPPLIERS,
     SNAPSHOT_NAME,
@@ -20,6 +22,7 @@ from scripts.seed_demo_history import (
     pick_composite,
     seed_history,
     simulate_days,
+    until,
 )
 from tests.pipeline_fakes import T0, add_expected, tiny_jpeg
 from tests.test_ledger_api import DAY, LA, add_delivery, client_for, reconcile
@@ -132,14 +135,15 @@ def test_composite_choice_prefers_carrier_then_count(composites):
 
 
 async def test_seed_writes_only_simulated_rows_and_reconciles_every_day(engine, media, composites):
-    res = await seed(engine, media, composites)
+    res = await seed(engine, media, composites, include_today=False)
+    assert res.today_expected == res.today_deliveries == 0
     assert res.days == 21 and res.expected > 30 and res.deliveries > 30
     srcs = {s for (s,) in await rows(engine, deliveries, deliveries.c.source)}
     assert srcs == {"simulated"}
     assert all(
         sim for (sim,) in await rows(engine, expected_deliveries, expected_deliveries.c.simulated)
     )
-    # Days run from three weeks ago to yesterday; nothing today.
+    # Days run from three weeks ago to yesterday; nothing today with include_today=False.
     first, last = (
         await rows(
             engine,
@@ -159,6 +163,71 @@ async def test_seed_writes_only_simulated_rows_and_reconciles_every_day(engine, 
     paths = [p for (p,) in await rows(engine, deliveries, deliveries.c.snapshot_path)]
     assert res.snapshots == res.deliveries == len(paths)
     assert all(_is_snapshot(p) for p in paths)
+
+
+# A Friday, so several suppliers deliver; noon in Los Angeles.
+FRIDAY = date(2026, 10, 16)
+FRIDAY_NOON = datetime(2026, 10, 16, 19, 0, tzinfo=UTC)
+
+
+async def test_today_is_seeded_up_to_now(engine, media):
+    res = await seed_history(
+        engine, today=FRIDAY, tz=LA, media_dir=media, now=FRIDAY_NOON, cfg=ReconcileConfig()
+    )
+    assert res.days == 21 and res.today_expected > 0 and res.today_deliveries > 0
+    async with client_for(engine, media) as c:
+        day = FRIDAY.isoformat()
+        dels = (await c.get("/v1/deliveries", params={"date": day})).json()["deliveries"]
+        exp = (await c.get("/v1/expected", params={"date": day})).json()["expected"]
+    sim_d = [x for x in dels if x["simulated"]]
+    sim_e = [x for x in exp if x["simulated"]]
+    assert len(sim_d) == res.today_deliveries and len(sim_e) == res.today_expected
+    at = datetime.fromisoformat
+    assert all(at(x["detected_at"]) < FRIDAY_NOON for x in sim_d)
+    # An order is there once its window has started, or once its delivery has arrived.
+    assert all(at(x["window_start"]) < FRIDAY_NOON or x["delivery"] for x in sim_e)
+    # Nothing is decided `missing` before its window plus grace (1 h) is over.
+    grace = timedelta(hours=1)
+    assert all(
+        x["status"] != "missing" or at(x["window_end"]) + grace <= FRIDAY_NOON for x in sim_e
+    )
+
+
+def test_until_keeps_what_has_happened_and_never_orphans_a_delivery():
+    def t(h: int, m: int = 0) -> datetime:
+        # eval/simulate.py convention: local clock time written as UTC.
+        return datetime(2026, 10, 16, h, m, tzinfo=UTC)
+
+    early = ExpectedDelivery(
+        id=uuid.uuid4(), supplier="A", expected_count=1, window_start=t(6), window_end=t(9)
+    )
+    # B's driver comes early (11:00), before its window and before the cutoff.
+    later = ExpectedDelivery(
+        id=uuid.uuid4(), supplier="B", expected_count=1, window_start=t(14), window_end=t(16)
+    )
+    afternoon = ExpectedDelivery(
+        id=uuid.uuid4(), supplier="C", expected_count=1, window_start=t(13), window_end=t(15)
+    )
+    d_early = DetectedDelivery(id=uuid.uuid4(), detected_at=t(7), carrier="UPS", package_count=1)
+    d_b = DetectedDelivery(id=uuid.uuid4(), detected_at=t(11), carrier="UPS", package_count=1)
+    d_late = DetectedDelivery(id=uuid.uuid4(), detected_at=t(13), carrier="UPS", package_count=1)
+    day = Day(
+        FRIDAY,
+        expected=[early, later, afternoon],
+        deliveries=[d_early, d_b, d_late],
+        truth=[
+            TruthRow(early.id, d_early.id, Status.MATCHED),
+            TruthRow(later.id, d_b.id, Status.MATCHED, ("early",)),
+            TruthRow(afternoon.id, d_late.id, Status.MATCHED),
+        ],
+    )
+    cut = until(day, FRIDAY_NOON, LA)  # 12:00 in Los Angeles
+    assert [x.supplier for x in cut.expected] == ["A", "B"]
+    assert [x.id for x in cut.deliveries] == [d_early.id, d_b.id]
+    assert [(r.expected_id, r.delivery_id) for r in cut.truth] == [
+        (early.id, d_early.id),
+        (later.id, d_b.id),
+    ]
 
 
 async def test_seed_is_safe_to_rerun(engine, media, composites):
