@@ -168,3 +168,9 @@ How to read this:
 - Ring Developer Playground live-view footage (simulated device), captured with `scripts/ring_spike.py`. It is also the background of the synthetic composites (and so of the simulated-history snapshots).
 
 Dataset images are not committed. `eval/build_roboflow.py` downloads the pinned versions (it needs `ROBOFLOW_API_KEY`) and checks them against the content hashes in `eval/labels/sources.json`.
+
+## License
+
+Dockhand's code is released under the [MIT License](LICENSE). Copyright (c) 2026 Neil Motiani.
+
+The eval datasets keep their own licenses (CC BY 4.0 and Public Domain, listed above). Their images aren't committed to this repo, and the MIT License doesn't cover them.
