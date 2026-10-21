@@ -6,7 +6,7 @@ Format per entry: task, steps, expected vs. actual, severity, workaround, sugges
 
 ## 2026-10-15 · Bedrock API key accepted at creation but denied on every call
 
-- **Task:** First Bedrock vision call (Converse with an image) using a Bedrock API key (`AWS_BEARER_TOKEN_BEDROCK`), region us-east-1.
+- **Task:** First Bedrock vision call (Converse with an image) using a Bedrock API key (`AWS_BEARER_TOKEN_BEDROCK`), region us-east-1, on a new AWS Free-plan account.
 - **Steps:** Generated a Bedrock API key in the console. Set `AWS_BEARER_TOKEN_BEDROCK`. Called `ListInferenceProfiles` (bedrock) and `Converse` (bedrock-runtime) with boto3 1.43.113.
 - **Expected:** The key works, or the console says it can't be used before it is issued.
 - **Actual:** Both calls return `AccessDeniedException: User: arn:aws:iam::<account>:user/BedrockAPIKey-xxxx is not authorized to perform: bedrock:CallWithBearerToken on resource: * with an explicit deny in a service control policy`. The console created the key and its IAM user without warning that an organization SCP blocks bearer-token calls in this account.
