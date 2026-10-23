@@ -139,7 +139,7 @@ I checked each guarantee by breaking it and confirming its test fails.
 
 ## Event History filter is verified, not trusted
 
-The Playground returned the same `on_demand` items for every `event_types` value, including a nonsense one (FRICTION_LOG.md, 2026-10-16). The poller therefore only infers a subtype from the filter when every returned item has one of the requested types. Otherwise motion items get no subtype, and the default `motion_detected.human` rule won't capture them. The poller also no longer stores history items that fail the relevance rules. Unlike webhooks, nothing was pushed to us, and our own live views would otherwise add a row each.
+The Playground returned the same `on_demand` items for every `event_types` value, including a nonsense one (FRICTION_LOG.md, entry 3). The poller therefore only infers a subtype from the filter when every returned item has one of the requested types. Otherwise motion items get no subtype, and the default `motion_detected.human` rule won't capture them. The poller also no longer stores history items that fail the relevance rules. Unlike webhooks, nothing was pushed to us, and our own live views would otherwise add a row each.
 
 ## Capture time is dominated by the timeout on the Playground
 
